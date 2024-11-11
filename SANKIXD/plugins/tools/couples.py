@@ -14,8 +14,8 @@ from SANKIXD.mongo.couples_db import _get_image, get_couple
 POLICE = [
     [
         InlineKeyboardButton(
-            text="𓊈𒆜彡[𝐃𝚊𝚡𝚡 𝐂𝙲 𝐂𝙻𝚄𝙱 ]彡𒆜𓊉",
-            url=f"https://t.me/ALLTYPECC",
+            text="❛𝐒𝐓𝐑𝐀𝐍𝐆𝐄𝐑➻𝐒𝐄𝐂𝐓𝐈𝐎𝐍❜",
+            url=f"https://t.me/ABOUT_VIP_STRANGER",
         ),
     ],
 ]
