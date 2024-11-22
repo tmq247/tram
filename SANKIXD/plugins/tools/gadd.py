@@ -2,7 +2,7 @@ import asyncio
 
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-OWNERS = "7759282826"
+OWNERS = "7830314087"
 from SANKIXD import app
 from SANKIXD.utils.database import add_served_chat, get_assistant
 
