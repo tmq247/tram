@@ -2,7 +2,7 @@ import asyncio
 import os
 import re
 import json
-from typing import Unio
+from typing import Union
 
 import yt_dlp
 from pyrogram.enums import MessageEntityType
