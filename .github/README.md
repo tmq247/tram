@@ -28,14 +28,14 @@ And Replace Into Your Cookies if you not chnage then Music Will No play And Bot 
     ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʜᴇʀᴏᴋᴜ 」─
 </h3>
 
-<p align="center"><a href="https://dashboard.heroku.com/new?template=https://github.com/Teamsanki/SANKIXD"> <img src="https://img.shields.io/badge/Deploy%20On%20Heroku-green?style=for-the-badge&logo=heroku" width="520" height="138.45"/></a></p>
+<p align="center"><a href="https://dashboard.heroku.com/new?template=https://github.com/Teamsanki/TS-MUSIC"> <img src="https://img.shields.io/badge/Deploy%20On%20Heroku-green?style=for-the-badge&logo=heroku" width="520" height="138.45"/></a></p>
 
 <p><img width="500" align="center" src="https://github-readme-stats.vercel.app/api/top-langs?username=Teamsanki&show_icons=true&locale=en&layout=compact" alt="Teamsanki" /></p>
 
-[![Contributors](https://contrib.rocks/image?repo=Teamsanki/SANKIXD)](https://github.com/Teamsanki/SANKIXD/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=Teamsanki/SANKIXD)](https://github.com/Teamsanki/TS-MUSIC/graphs/contributors)
 
 ### Contact :
-<a href="https://t.me/ABOUT_VIP_STRANGER"><img title="Telegram" src="https://img.shields.io/badge/Telegram-%23000000.svg?&style=for-the-badge&logo=telegram&logoColor=61DAFB"></a>
+<a href="https://t.me/TSGCODER"><img title="Telegram" src="https://img.shields.io/badge/Telegram-%23000000.svg?&style=for-the-badge&logo=telegram&logoColor=61DAFB"></a>
 <a href="https://mail.google.com/mail/?view=cm&fs=1&to=schoudhary11256@gmail.com"><img title="GMAIL" src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"></a>
 
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
