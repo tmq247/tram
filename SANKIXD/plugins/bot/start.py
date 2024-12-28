@@ -29,13 +29,13 @@ from strings import get_string
 #--------------------------
 
 NEXI_VID = [
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
-"https://telegra.ph/file/5a9a513482f4236022cea.mp4",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
 
 ]
 
