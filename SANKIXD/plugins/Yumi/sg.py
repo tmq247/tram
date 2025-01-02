@@ -11,7 +11,7 @@ from SANKIXD.core.userbot import assistants
 @app.on_message(filters.command("check"))
 async def sg(client: Client, message: Message):
     if len(message.text.split()) < 1 and not message.reply_to_message:
-        return await message.reply("check username/id/reply")
+        return await message.reply("sg username/id/reply")
     if message.reply_to_message:
         args = message.reply_to_message.from_user.id
     else:
