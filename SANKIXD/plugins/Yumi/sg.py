@@ -8,10 +8,10 @@ from pyrogram.raw.functions.messages import DeleteHistory
 from SANKIXD import userbot as us, app
 from SANKIXD.core.userbot import assistants
 
-@app.on_message(filters.command("sg"))
+@app.on_message(filters.command("check"))
 async def sg(client: Client, message: Message):
     if len(message.text.split()) < 1 and not message.reply_to_message:
-        return await message.reply("sg username/id/reply")
+        return await message.reply("check username/id/reply")
     if message.reply_to_message:
         args = message.reply_to_message.from_user.id
     else:
@@ -21,7 +21,7 @@ async def sg(client: Client, message: Message):
         try:
             user = await client.get_users(f"{args}")
         except Exception:
-            return await lol.edit("<code>Please specify a valid user!</code>")
+            return await lol.edit("<code>Vui lòng chỉ định một người dùng hợp lệ!</code>")
     bo = ["sangmata_bot", "sangmata_beta_bot"]
     sg = random.choice(bo)
     if 1 in assistants:
