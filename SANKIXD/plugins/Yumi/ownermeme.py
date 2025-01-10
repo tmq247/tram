@@ -8,7 +8,7 @@ from threading import Thread
 OWNER_ID = 6337933296  # Replace with your Telegram user ID
 
 # Channel username
-CHANNEL_USERNAME = "@SANKI_MEMES"  # Replace with your channel username
+CHANNEL_USERNAME = "@coihaycoc"  # Replace with your channel username
 
 # Global variables for controlling auto-upload
 auto_upload = False
