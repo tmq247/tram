@@ -22,7 +22,7 @@ BOT_USERNAME = getenv("BOT_USERNAME" , "muoimuoiamnhac_Bot")
 # --------------------------------------------------------
 BOT_NAME = getenv("BOT_NAME" , "Muội Muội Bot")
 # ---------------------------------------------------------
-ASSUSERNAME = getenv("ASSUSERNAME" , "Muội Muội")
+ASSUSERNAME = getenv("ASSUSERNAME" , "muoimuoimusic")
 # ---------------------------------------------------------
 
 
@@ -55,7 +55,7 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 # ----------------------------------------------------------------
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/Teamsanki/TS-MUSIC",
+    "https://github.com",
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "Master")
 GIT_TOKEN = getenv(
