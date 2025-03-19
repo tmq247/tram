@@ -12,7 +12,7 @@ def spam_command(client, message):
         # Delete the user's command text
         message.delete()
     except pyrogram.errors.exceptions.FloodWait as e:
-        print(f"Error deleting message: {e}")
+        print(f"Lỗi xóa thông báo: {e}")
         pass  # Ignore the deletion error and continue
 
     # Check if the message is a reply and has text
@@ -41,4 +41,4 @@ def spam_command(client, message):
             message.reply_to_message.reply_text(f"{user_to_tag} **SPAM!**")
             time.sleep(0.2)  # Add a delay between spam messages
     else:
-        message.reply_text("Reply to a message and use the .raid command to spam.")
+        message.reply_text("Trả lời tin nhắn và sử dụng lệnh .raid để gửi thư rác.")
