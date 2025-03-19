@@ -22,4 +22,4 @@ async def unmute_all(_,msg):
             except Exception as e:
                 print(e)
     else:
-        await msg.reply_text("ᴇɪᴛʜᴇʀ ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴛʜᴇ ʀɪɢʜᴛ ᴛᴏ ʀᴇsᴛʀɪᴄᴛ ᴜsᴇʀs ᴏʀ ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ɪɴ sᴜᴅᴏ ᴜsᴇʀs")
+        await msg.reply_text("Có thể tôi không có quyền hạn để hạn chế người dùng hoặc bạn không phải là người dùng sudo")
