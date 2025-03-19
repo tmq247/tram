@@ -9,7 +9,7 @@ from SANKIXD import app
 
 
 # "/gn" command ka handler
-@app.on_message(filters.command("gủ", prefixes="n"))
+@app.on_message(filters.command("gủ ngon", prefixes="n"))
 def goodnight_command_handler(client: Client, message: Message):
     # Randomly decide whether to send a sticker or an emoji
     send_sticker = random.choice([True, False])
