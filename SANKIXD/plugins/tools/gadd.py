@@ -23,7 +23,7 @@ async def add_allbot(client, message):
         app_id = bot.id
         done = 0
         failed = 0
-        lol = await message.reply("🔄 **Thêm bot vào tất cả các cuộc trò chuyện!**")
+        lol = await message.reply("🔄 **Thêm bot vào tất cả các nhóm!**")
         await userbot.send_message(bot_username, f"/start")
         async for dialog in userbot.get_dialogs():
             if dialog.chat.id == -1001816641523:
@@ -33,17 +33,17 @@ async def add_allbot(client, message):
                 await userbot.add_chat_members(dialog.chat.id, app_id)
                 done += 1
                 await lol.edit(
-                    f"**🔂 ᴀᴅᴅɪɴɢ {bot_username}**\n\n**➥ Đã thêm vào nhóm {done} ✅**\n**➥ Đã thất bại trong nhóm {failed} ❌**\n\n**➲ Đã thêm bởi»** @{userbot.username}"
+                    f"**🔂 ᴀᴅᴅɪɴɢ {bot_username}**\n\n**➥ Đã thêm vào {done} nhóm ✅**\n**➥ Đã thất bại trong {failed} nhóm ❌**\n\n**➲ Đã thêm bởi»** @{userbot.username}"
                 )
             except Exception as e:
                 failed += 1
                 await lol.edit(
-                    f"**🔂 Thêm {bot_username}**\n\n**➥ Đã thêm vào nhóm {done} ✅**\n**➥ Đã thất bại trong nhóm {failed} ❌**\n\n**➲ Thêm bởi»** @{userbot.username}"
+                    f"**🔂 Thêm {bot_username}**\n\n**➥ Đã thêm vào{done} nhóm ✅**\n**➥ Đã thất bại trong {failed} nhóm ❌**\n\n**➲ Thêm bởi»** @{userbot.username}"
                 )
             await asyncio.sleep(3)  # Adjust sleep time based on rate limits
 
         await lol.edit(
-            f"**➻ {bot_username} bot đã được thêm thành công🎉**\n\n**➥ Đã thêm vào nhóm {done} ✅**\n**➥ Đã thất bại trong nhóm {failed} ❌**\n\n**➲ Thêm bởi»** @{userbot.username}"
+            f"**➻ {bot_username} bot đã được thêm thành công🎉**\n\n**➥ Đã thêm vào {done} nhóm ✅**\n**➥ Đã thất bại trong {failed} nhóm ❌**\n\n**➲ Thêm bởi»** @{userbot.username}"
         )
     except Exception as e:
         await message.reply(f"Lỗi: {str(e)}")
