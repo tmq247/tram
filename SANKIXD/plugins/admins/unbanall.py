@@ -4,7 +4,7 @@ from pyrogram import filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from SANKIXD.utils.SANKI_ban import admin_filter
 
-BOT_ID = "6974730627"
+BOT_ID = "6543379161"
 
 @app.on_message(filters.command("unbanall") & admin_filter)
 async def unban_all(_, msg):
@@ -18,12 +18,12 @@ async def unban_all(_, msg):
             banned_users.append(m.user.id)
             try:
                 await app.unban_chat_member(chat_id, banned_users[x])
-                print(f"ᴜɴʙᴀɴɪɴɢ ᴀʟʟ ᴍᴄ ɪɴ ᴛʜɪs ɢʀᴏᴜᴘ {m.user.mention}")
+                print(f"Bở chặn tất cả mọi thành viên trong nhóm này {m.user.mention}")
                 x += 1
             except Exception:
                 pass
     else:
-        await msg.reply_text("ᴇɪᴛʜᴇʀ ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴛʜᴇ ʀɪɢʜᴛ ᴛᴏ ʀᴇsᴛʀɪᴄᴛ ᴜsᴇʀs ᴏʀ ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ɪɴ sᴜᴅᴏ ᴜsᴇʀs")
+        await msg.reply_text("Hoặc tôi không có quyền hạn để hạn chế người dùng hoặc bạn không phải là người dùng sudo")
 
 @app.on_callback_query(filters.regex("^stop$"))
 async def stop_callback(_, query):
