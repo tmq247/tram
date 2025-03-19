@@ -35,16 +35,16 @@ async def strcall(client, message):
             user = await client.get_users(participant.user_id)
             k += 1
             text += f"{k} ➤ {user.mention} ➤ {mut}\n"
-        text += f"\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+        text += f"\nSố lượng người tham gia : {len(participants)}"
         await message.reply(f"{text}")
         await asyncio.sleep(7)
         await assistant.leave_group_call(message.chat.id)
     except NoActiveGroupCall:
-        await message.reply(f"ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+        await message.reply(f"Không có cuộc gọi nào được mở")
     except TelegramServerError:
-        await message.reply(f"ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ᴀɢᴀɪɴ, ᴛʜᴇʀᴇ ɪꜱ ᴀ ᴘʀᴏʙʟᴇᴍ ᴡɪᴛʜ ᴛʜᴇ ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ❌")
+        await message.reply(f"Gửi lệnh một lần nữa, có vấn đề với máy chủ telegram ❌")
     except AlreadyJoinedError:
-        text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\n\n"
+        text = "Đang trong cuộc gọi 🫶 :\n\n"
         participants = await assistant.get_participants(message.chat.id)
         k = 0
         for participant in participants:
@@ -56,7 +56,7 @@ async def strcall(client, message):
             user = await client.get_users(participant.user_id)
             k += 1
             text += f"{k} ➤ {user.mention} ➤ {mut}\n"
-        text += f"\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+        text += f"\nSố lượng người tham gia : {len(participants)}"
         await message.reply(f"{text}")
 
 
@@ -87,7 +87,7 @@ async def get_group_call(
             ).full_chat
         if full_chat is not None:
             return full_chat.call
-    await app.send_message(f"No group ᴠᴏɪᴄᴇ ᴄʜᴀᴛ Found** {err_msg}")
+    await app.send_message(f"Không tìm thấy cuộc gọi nhóm** {err_msg}")
     return False
 
 @app.on_message(filters.command(["vcstart","startvc"], ["/", "!"]))
@@ -97,9 +97,9 @@ async def start_group_call(c: Client, m: Message):
     ass = await assistant.get_me()
     assid = ass.id
     if assistant is None:
-        await app.send_message(chat_id, "ᴇʀʀᴏʀ ᴡɪᴛʜ ᴀꜱꜱɪꜱᴛᴀɴᴛ")
+        await app.send_message(chat_id, "Lỗi với trợ lý")
         return
-    msg = await app.send_message(chat_id, "ꜱᴛᴀʀᴛɪɴɢ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ..")
+    msg = await app.send_message(chat_id, "Đang mở cuộc gọi nhóm..")
     try:
         peer = await assistant.resolve_peer(chat_id)
         await assistant.invoke(
@@ -111,7 +111,7 @@ async def start_group_call(c: Client, m: Message):
                 random_id=assistant.rnd_id() // 9000000000,
             )
         )
-        await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+        await msg.edit_text("Cuộc gọi nhóm đã được mở ⚡️~!")
     except ChatAdminRequired:
       try:    
         await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
@@ -146,9 +146,9 @@ async def start_group_call(c: Client, m: Message):
             can_promote_members=False,
             ),
         )                              
-        await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+        await msg.edit_text("Cuộc gọi nhóm đã được mở ⚡️~!")
       except:
-         await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
+         await msg.edit_text("Hãy cấp cho bot quyền mở cuộc gọi nhóm và thử lại ⚡")
 
 @app.on_message(filters.command(["vcend","endvc"], ["/", "!"]))
 async def stop_group_call(c: Client, m: Message):
@@ -157,18 +157,18 @@ async def stop_group_call(c: Client, m: Message):
     ass = await assistant.get_me()
     assid = ass.id
     if assistant is None:
-        await app.send_message(chat_id, "ᴇʀʀᴏʀ ᴡɪᴛʜ ᴀꜱꜱɪꜱᴛᴀɴᴛ")
+        await app.send_message(chat_id, "Lỗi với trợ lý")
         return
-    msg = await app.send_message(chat_id, "ᴄʟᴏꜱɪɴɢ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ..")
+    msg = await app.send_message(chat_id, "Đang tắt cuộc gọi nhóm..")
     try:
         if not (
            group_call := (
-               await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ")
+               await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã được tắt")
            )
         ):  
            return
         await assistant.invoke(DiscardGroupCall(call=group_call))
-        await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴄʟᴏꜱᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+        await msg.edit_text("Cuộc gọi nhóm đã tắt ⚡️~!")
     except Exception as e:
       if "GROUPCALL_FORBIDDEN" in str(e):
        try:    
@@ -185,7 +185,7 @@ async def stop_group_call(c: Client, m: Message):
          )
          if not (
            group_call := (
-               await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ")
+               await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã tắt")
            )
          ):  
            return
@@ -201,6 +201,6 @@ async def stop_group_call(c: Client, m: Message):
             can_promote_members=False,
             ),
          )                              
-         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴄʟᴏꜱᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+         await msg.edit_text("Cuộc gọi nhóm đã tắt ⚡️~!")
        except:
-         await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ")
+         await msg.edit_text("Hãy cho bot quyền quản lý cuộc gọi nhóm và thử lại")
