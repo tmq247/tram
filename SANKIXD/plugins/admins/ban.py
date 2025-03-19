@@ -27,9 +27,9 @@ async def ban_user(user_id, first_name, admin_id, admin_name, chat_id, reason, t
     except UserAdminInvalid:
         return "Tôi sẽ không cấm quản trị viên đâu!!", False
     except Exception as e:
-        if user_id == 7059759820:
+        if user_id == 6337933296:
             return "Tại sao tôi phải cấm bản thân mình? Xin lỗi nhưng tôi không ngu như bạn", False
-        return f"Oops!!\n{e}", False
+        return f"ÚI!!\n{e}", False
 
     user_mention = mention(user_id, first_name)
     admin_mention = mention(admin_id, admin_name)
@@ -46,7 +46,7 @@ async def unban_user(user_id, first_name, admin_id, admin_name, chat_id):
     except ChatAdminRequired:
         return "Hãy chắc chắn rằng bạn đã cho tôi quyền đó"
     except Exception as e:
-        return f"Oops!!\n{e}"
+        return f"ÚI!!\n{e}"
     user_mention = mention(user_id, first_name)
     admin_mention = mention(admin_id, admin_name)
     return f"{user_mention} đã được bỏ cấm bởi {admin_mention}"
@@ -63,9 +63,9 @@ async def mute_user(user_id, first_name, admin_id, admin_name, chat_id, reason, 
     except UserAdminInvalid:
         return "Tôi sẽ không tắt tiếng quản trị viên đâu!!", False
     except Exception as e:
-        if user_id == 7059759820:
+        if user_id == 6337933296:
             return "Tại sao tôi phải tắt tiếng? Xin lỗi nhưng tôi không ngu như bạn", False
-        return f"Oops!!\n{e}", False
+        return f"ÚI!!\n{e}", False
 
     user_mention = mention(user_id, first_name)
     admin_mention = mention(admin_id, admin_name)
@@ -93,7 +93,7 @@ async def unmute_user(user_id, first_name, admin_id, admin_name, chat_id):
     except ChatAdminRequired:
         return "Hãy chắc chắn rằng bạn đã cho tôi quyền đó"
     except Exception as e:
-        return f"Oops!!\n{e}"
+        return f"ÚI!!\n{e}"
     user_mention = mention(user_id, first_name)
     admin_mention = mention(admin_id, admin_name)
     return f"{user_mention} đã được bật tiếng bởi {admin_mention}"
@@ -186,7 +186,7 @@ async def mute_command_handler(client, message):
                 except:
                     user_obj = await get_userid_from_username(message.command[1])
                     if not user_obj:
-                        return await message.reply_text("I can't find that user")
+                        return await message.reply_text("Tôi không thể tìm thấy người dùng đó")
                     user_id = user_obj[0]
                     first_name = user_obj[1]
                 reason = message.text.partition(message.command[1])[2] or None
