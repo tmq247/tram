@@ -36,10 +36,10 @@ async def RemoveBG(input_file_name):
 
 @app.on_message(filters.command("rmbg"))
 async def rmbg(bot, message):
-  rmbg = await message.reply("Processing...") 
+  rmbg = await message.reply("Đang xử lý...") 
   replied = message.reply_to_message
   if not replied:
-      return await rmbg.edit("Reply to a photo to Remove it's Backgroud")
+      return await rmbg.edit("Trả lời ảnh để Xóa nền của nó")
 
   if replied.photo:
       photo = await bot.download_media(replied)
@@ -48,9 +48,9 @@ async def rmbg(bot, message):
       if not x:
           bruh = y["errors"][0]
           details = bruh.get("detail", "")
-          return await rmbg.edit(f"ERROR ~ {bruh['title']},\n{details}")
-      await message.reply_photo(photo=y,caption="Here is your Image without Background")
+          return await rmbg.edit(f"Lỗi ~ {bruh['title']},\n{details}")
+      await message.reply_photo(photo=y,caption="Đây là hình ảnh của bạn không có nền")
       await message.reply_document(document=y)
       await rmbg.delete()
       return os.remove(y)
-  await rmbg.edit("Reply only to a photo to Remove it's Background")
+  await rmbg.edit("Chỉ trả lời ảnh để xóa nền của ảnh")
