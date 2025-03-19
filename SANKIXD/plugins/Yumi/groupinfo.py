@@ -5,7 +5,7 @@ from SANKIXD import app
 @app.on_message(filters.command("groupinfo", prefixes="/"))
 async def get_group_status(_, message: Message):
     if len(message.command) != 2:
-        await message.reply("Please provide a group username. Example: `/groupinfo YourGroupUsername`")
+        await message.reply("Vui lòng cung cấp tên người dùng nhóm. Ví dụ: `/groupinfo username nhóm của bạn`")
         return
     
     group_username = message.command[1]
@@ -22,10 +22,10 @@ async def get_group_status(_, message: Message):
 
     response_text = (
         f"➖➖➖➖➖➖➖\n"
-        f"➲ GROUP NAME : {group.title} ✅\n"
-        f"➲ GROUP ID : {group.id}\n"
-        f"➲ TOTAL MEMBERS : {total_members}\n"
-        f"➲ DESCRIPTION : {group_description or 'N/A'}\n"
+        f"➲ TÊN NHÓM : {group.title} ✅\n"
+        f"➲ ID NHÓM : {group.id}\n"
+        f"➲ SỐ THÀNH VIÊN : {total_members}\n"
+        f"➲ MIÊU TẢ : {group_description or 'N/A'}\n"
         f"➲ USERNAME : @{group_username}\n"
        
         f"➖➖➖➖➖➖➖"
