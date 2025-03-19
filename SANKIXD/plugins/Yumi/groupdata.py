@@ -15,7 +15,7 @@ async def instatus(app, message):
         enums.ChatMemberStatus.ADMINISTRATOR,
         enums.ChatMemberStatus.OWNER,
     ):
-        sent_message = await message.reply_text("GETTING INFORMATION...")
+        sent_message = await message.reply_text("NHẬN THÔNG TIN...")
         deleted_acc = 0
         premium_acc = 0
         banned = 0
@@ -37,16 +37,16 @@ async def instatus(app, message):
         timelog = "{:.2f}".format(end_time - start_time)
         await sent_message.edit(f"""
 **➖➖➖➖➖➖➖
-➲ NAME : {message.chat.title} ✅
-➲ MEMBERS : [ {count} ]🫂
+➲ TÊN : {message.chat.title} ✅
+➲ THÀNH VIÊN : [ {count} ]🫂
 ➖➖➖➖➖➖➖
 ➲ BOTS : {bot}💡
 ➲ ZOMBIES : {deleted_acc}🧟
 ➲ BANNED : {banned}🚫
-➲ PREMIUM USERS : {premium_acc}🎁
+➲ NGƯỜI DÙNG CÓ PREMIUM : {premium_acc}🎁
 ➖➖➖➖➖➖➖
 TIME TAKEN : {timelog} S**""")
     else:
-        sent_message = await message.reply_text("ONLY ADMINS CAN USE THIS !")
+        sent_message = await message.reply_text("CHỈ QUẢN TRỊ VIÊN MỚI CÓ THỂ SỬ DỤNG TÍNH NĂNG NÀY !")
         await sleep(5)
         await sent_message.delete()
