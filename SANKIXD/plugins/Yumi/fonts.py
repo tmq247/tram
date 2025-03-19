@@ -196,7 +196,7 @@ async def style(c, m):
 
 __help__ = """
 
- ❍ /fonts <text> *:* ᴄᴏɴᴠᴇʀᴛs sɪᴍᴩʟᴇ ᴛᴇxᴛ ᴛᴏ ʙᴇᴀᴜᴛɪғᴜʟ ᴛᴇxᴛ ʙʏ ᴄʜᴀɴɢɪɴɢ ɪᴛ's ғᴏɴᴛ.
+ ❍ /fonts <text> *:* Chuyển đổi văn bản đơn giản thành văn bản đẹp bằng cách thay đổi phông chữ của nó.
  """
 
 __mod_name__ = "Fᴏɴᴛ"
