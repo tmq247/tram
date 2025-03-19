@@ -8,8 +8,7 @@ from threading import Thread
 OWNER_ID = 6337933296  # Replace with your Telegram user ID
 
 # Channel username
-CHANNEL_USERNAME = "@coihaycoc"  # Replace with your channel username
-
+CHANNEL_USERNAME = "@muoimuoimusicbot
 # Global variables for controlling auto-upload
 auto_upload = False
 uploaded_memes = set()  # To track already uploaded memes
@@ -44,7 +43,7 @@ def auto_upload_memes():
                     caption=f"{title}\n\nĐược chia sẻ qua @{app.get_me().username}"
                 )
                 uploaded_memes.add(meme_url)  # Mark meme as uploaded
-                print(f"Meme uploaded: {meme_url}")
+                print(f"Meme đã tải: {meme_url}")
             except Exception as e:
                 print(f"Error uploading meme: {e}")
         else:
@@ -74,7 +73,7 @@ def meme_control(client, message):
         else:
             message.reply_text("Việc tải lên meme tự động đã bị dừng.")
     else:
-        message.reply_text("Usage: /memes on|off")
+        message.reply_text("Cách dùng: /memes on|off")
 
 # Command: /meme (manual meme fetch)
 @app.on_message(filters.command("meme") & ~filters.user(OWNER_ID))
@@ -91,7 +90,7 @@ def meme_command(client, message):
                 caption=caption
             )
         except Exception as e:
-            print(f"Error sending meme: {e}")
+            print(f"Lỗi gửi meme: {e}")
             message.reply_text("Xin lỗi, hiện tại tôi không thể tìm thấy meme.")
     else:
         message.reply_text("Xin lỗi, hiện tại tôi không thể tìm thấy meme.")
