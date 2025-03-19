@@ -57,17 +57,17 @@ class Userbot(Client):
                 pass
             assistants.append(1)
             try:
-                await self.one.send_message(config.LOGGER_ID, "Assistant Started")
+                await self.one.send_message(config.LOGGER_ID, "Trợ lý khởi động")
             except:
                 LOGGER(__name__).error(
-                    "Assistant Account 1 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin!"
+                    "Tài khoản Trợ lý 1 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên!"
                 )
                 exit()
             self.one.id = self.one.me.id
             self.one.name = self.one.me.mention
             self.one.username = self.one.me.username
             assistantids.append(self.one.id)
-            LOGGER(__name__).info(f"Assistant Started as {self.one.name}")
+            LOGGER(__name__).info(f"Trợ lý khởi động là {self.one.name}")
 
         if config.STRING2:
             await self.two.start()
@@ -78,17 +78,17 @@ class Userbot(Client):
                 pass
             assistants.append(2)
             try:
-                await self.two.send_message(config.LOGGER_ID, "Assistant Started")
+                await self.two.send_message(config.LOGGER_ID, "Trợ lý khởi động")
             except:
                 LOGGER(__name__).error(
-                    "Assistant Account 2 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin!"
+                    "Tài khoản Trợ lý 2 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên!"
                 )
                 exit()
             self.two.id = self.two.me.id
             self.two.name = self.two.me.mention
             self.two.username = self.two.me.username
             assistantids.append(self.two.id)
-            LOGGER(__name__).info(f"Assistant Two Started as {self.two.name}")
+            LOGGER(__name__).info(f"Trợ lý khởi động 2 là {self.two.name}")
 
         if config.STRING3:
             await self.three.start()
@@ -99,17 +99,17 @@ class Userbot(Client):
                 pass
             assistants.append(3)
             try:
-                await self.three.send_message(config.LOGGER_ID, "Assistant Started")
+                await self.three.send_message(config.LOGGER_ID, "Trợ lý khởi động")
             except:
                 LOGGER(__name__).error(
-                    "Assistant Account 3 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
+                    "Tài khoản Trợ lý 3 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
                 )
                 exit()
             self.three.id = self.three.me.id
             self.three.name = self.three.me.mention
             self.three.username = self.three.me.username
             assistantids.append(self.three.id)
-            LOGGER(__name__).info(f"Assistant Three Started as {self.three.name}")
+            LOGGER(__name__).info(f"Trợ lý khởi động 3 là {self.three.name}")
 
         if config.STRING4:
             await self.four.start()
@@ -120,17 +120,17 @@ class Userbot(Client):
                 pass
             assistants.append(4)
             try:
-                await self.four.send_message(config.LOGGER_ID, "Assistant Started")
+                await self.four.send_message(config.LOGGER_ID, "Trợ lý khởi động")
             except:
                 LOGGER(__name__).error(
-                    "Assistant Account 4 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
+                    "Tài khoản Trợ lý 4 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
                 )
                 exit()
             self.four.id = self.four.me.id
             self.four.name = self.four.me.mention
             self.four.username = self.four.me.username
             assistantids.append(self.four.id)
-            LOGGER(__name__).info(f"Assistant Four Started as {self.four.name}")
+            LOGGER(__name__).info(f"Trợ lý khởi động 4 là {self.four.name}")
 
         if config.STRING5:
             await self.five.start()
@@ -141,20 +141,20 @@ class Userbot(Client):
                 pass
             assistants.append(5)
             try:
-                await self.five.send_message(config.LOGGER_ID, "Assistant Started")
+                await self.five.send_message(config.LOGGER_ID, "Trợ lý khởi động")
             except:
                 LOGGER(__name__).error(
-                    "Assistant Account 5 has failed to access the log Group. Make sure that you have added your assistant to your log group and promoted as admin! "
+                    "Tài khoản Trợ lý 5 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
                 )
                 exit()
             self.five.id = self.five.me.id
             self.five.name = self.five.me.mention
             self.five.username = self.five.me.username
             assistantids.append(self.five.id)
-            LOGGER(__name__).info(f"Assistant Five Started as {self.five.name}")
+            LOGGER(__name__).info(f"Trợ lý khởi động 5 là {self.five.name}")
 
     async def stop(self):
-        LOGGER(__name__).info(f"Stopping Assistants...")
+        LOGGER(__name__).info(f"Dừng trợ lý...")
         try:
             if config.STRING1:
                 await self.one.stop()
