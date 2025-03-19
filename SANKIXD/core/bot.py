@@ -28,7 +28,7 @@ class SANKI(Client):
         try:
             await self.send_message(
                 chat_id=config.LOGGER_ID,
-                text=f"<u><b>» {self.mention} Bot khởi động :</b><u>\n\nɪᴅ : <code>{self.id}</code>\nTên : {self.name}\nᴜsᴇʀɴᴀᴍᴇ : @{self.username}",
+                text=f"<u><b>» {self.mention} Bot khởi động :</b><u>\n\nID : <code>{self.id}</code>\nTên : {self.name}\nᴜsᴇʀɴᴀᴍᴇ : @{self.username}",
             )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
             LOGGER(__name__).error(
