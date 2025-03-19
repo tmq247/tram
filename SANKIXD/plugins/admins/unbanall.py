@@ -23,7 +23,7 @@ async def unban_all(_, msg):
             except Exception:
                 pass
     else:
-        await msg.reply_text("Hoặc tôi không có quyền hạn để hạn chế người dùng hoặc bạn không phải là người dùng sudo")
+        await msg.reply_text("Có thể tôi không có quyền hạn để hạn chế người dùng hoặc bạn không phải là người dùng sudo")
 
 @app.on_callback_query(filters.regex("^stop$"))
 async def stop_callback(_, query):
