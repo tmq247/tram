@@ -11,7 +11,7 @@ from SANKIXD import app
 async def purge(app: app, msg: Message):
     
     if msg.chat.type != ChatType.SUPERGROUP:
-        await msg.reply_text(text="**ɪ ᴄᴀɴ'ᴛ ᴘᴜʀɢᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ʙᴀsɪᴄ ɢʀᴏᴜᴘ ᴍᴀᴋᴇ sᴜᴘᴇʀ ɢʀᴏᴜᴘ.**")
+        await msg.reply_text(text="**Tôi không thể xóa tin nhắn trong một nhóm cơ bản để tạo ra siêu nhóm .**")
         return
 
     if msg.reply_to_message:
@@ -30,17 +30,17 @@ async def purge(app: app, msg: Message):
                 
             await msg.delete()
         except MessageDeleteForbidden:
-            await msg.reply_text(text="**ɪ ᴄᴀɴ'ᴛ ᴅᴇʟᴇᴛᴇ ᴀʟʟ ᴍᴇssᴀɢᴇs. ᴛʜᴇ ᴍᴇssᴀɢᴇs ᴍᴀʏ ʙᴇ ᴛᴏᴏ ᴏʟᴅ, ɪ ᴍɪɢʜᴛ ɴᴏᴛ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇ ʀɪɢʜᴛs, ᴏʀ ᴛʜɪs ᴍɪɢʜᴛ ɴᴏᴛ ʙᴇ ᴀ sᴜᴘᴇʀɢʀᴏᴜᴘ.**")
+            await msg.reply_text(text="**Tôi không thể xóa tất cả tin nhắn. Các tin nhắn có thể đã quá cũ, tôi có thể không có quyền xóa, hoặc đây có thể không phải là một siêu nhóm..**")
             return
             
         except RPCError as ef:
-            await msg.reply_text(text=f"**sᴏᴍᴇ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀᴇᴅ, ʀᴇᴘᴏʀᴛ ɪᴛ ᴜsɪɴɢ** `/bug`<b>ᴇʀʀᴏʀ:</b> <code>{ef}</code>")
+            await msg.reply_text(text=f"**Đã xảy ra một số lỗi, báo cáo nó bằng một cách sử dụng** `/bug`<b>Lỗi:</b> <code>{ef}</code>")
         count_del_msg = len(message_ids)
-        sumit = await msg.reply_text(text=f"ᴅᴇʟᴇᴛᴇᴅ <i>{count_del_msg}</i> ᴍᴇssᴀɢᴇs")
+        sumit = await msg.reply_text(text=f"Đã xóa <i>{count_del_msg}</i> tin nhắn")
         await sleep(3)
         await sumit.delete()
         return
-    await msg.reply_text("**ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛᴀʀᴛ ᴘᴜʀɢᴇ !**")
+    await msg.reply_text("**Trả lời một tin nhắn để bắt đầu xoá đi !**")
     return
 
 
@@ -51,7 +51,7 @@ async def purge(app: app, msg: Message):
 async def spurge(app: app, msg: Message):
 
     if msg.chat.type != ChatType.SUPERGROUP:
-        await msg.reply_text(text="**ɪ ᴄᴀɴ'ᴛ ᴘᴜʀɢᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ʙᴀsɪᴄ ɢʀᴏᴜᴘ ᴍᴀᴋᴇ sᴜᴘᴇʀ ɢʀᴏᴜᴘ.**")
+        await msg.reply_text(text="**Tôi không thể xóa tin nhắn trong một nhóm cơ bản để tạo ra siêu nhóm**")
         return
 
     if msg.reply_to_message:
@@ -68,26 +68,26 @@ async def spurge(app: app, msg: Message):
                 await app.delete_messages(chat_id=msg.chat.id, message_ids=plist, revoke=True)
             await msg.delete()
         except MessageDeleteForbidden:
-            await msg.reply_text(text="**ɪ ᴄᴀɴ'ᴛ ᴅᴇʟᴇᴛᴇ ᴀʟʟ ᴍᴇssᴀɢᴇs. ᴛʜᴇ ᴍᴇssᴀɢᴇs ᴍᴀʏ ʙᴇ ᴛᴏᴏ ᴏʟᴅ, ɪ ᴍɪɢʜᴛ ɴᴏᴛ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇ ʀɪɢʜᴛs, ᴏʀ ᴛʜɪs ᴍɪɢʜᴛ ɴᴏᴛ ʙᴇ ᴀ sᴜᴘᴇʀɢʀᴏᴜᴘ.**")
+            await msg.reply_text(text="**ɪKhông thể xóa tất cả tin nhắn. Các tin nhắn có thể quá cũ, tôi có thể không có quyền xóa, hoặc đây có thể không phải là một siêu nhóm.**")
             return
             
         except RPCError as ef:
-            await msg.reply_text(text=f"**sᴏᴍᴇ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀᴇᴅ, ʀᴇᴘᴏʀᴛ ɪᴛ ᴜsɪɴɢ** `/bug`<b>ᴇʀʀᴏʀ:</b> <code>{ef}</code>")           
+            await msg.reply_text(text=f"**Đã xảy ra một số lỗi, báo cáo nó bằng một cách sử dụng** `/bug`<b>Lỗi:</b> <code>{ef}</code>")           
             return        
-    await msg.reply_text("**ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ sᴛᴀʀᴛ ᴘᴜʀɢᴇ !**")
+    await msg.reply_text("**Trả lời một tin nhắn để bắt đầu xoá đi !**")
     return
 
 
 @app.on_message(filters.command("del") & admin_filter)
 async def del_msg(app: app, msg: Message):
     if msg.chat.type != ChatType.SUPERGROUP:
-        await msg.reply_text(text="**ɪ ᴄᴀɴ'ᴛ ᴘᴜʀɢᴇ ᴍᴇssᴀɢᴇs ɪɴ ᴀ ʙᴀsɪᴄ ɢʀᴏᴜᴘ ᴍᴀᴋᴇ sᴜᴘᴇʀ ɢʀᴏᴜᴘ.**")
+        await msg.reply_text(text="**Tôi không thể xóa tin nhắn trong một nhóm cơ bản để tạo ra siêu nhóm.**")
         return        
     if msg.reply_to_message:
         await msg.delete()
         await app.delete_messages(chat_id=msg.chat.id, message_ids=msg.reply_to_message.id)
     else:
-        await msg.reply_text(text="**ᴡʜᴀᴛ ᴅᴏ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴇʟᴇᴛᴇ.**")
+        await msg.reply_text(text="**Bạn muốn xóa cái gì?.**")
         return
 
 
