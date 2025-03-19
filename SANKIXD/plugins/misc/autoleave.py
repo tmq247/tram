@@ -30,8 +30,8 @@ async def auto_leave():
                             chat_id = i.chat.id
                             if (
                                 chat_id != config.LOGGER_ID
-                                and i.chat.id != -1001919135283
-                                and i.chat.id != -1001841879487
+                                and i.chat.id != -1001816641523
+                                and i.chat.id != -1002448910041
                             ):
                                 if left == 20:
                                     continue
@@ -70,7 +70,7 @@ async def auto_end():
                 try:
                     await app.send_message(
                         chat_id,
-                        "» ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.",
+                        "» Bot tự động tắt video chat vì không ai đang nghe trong video chat.",
                     )
                 except:
                     continue
