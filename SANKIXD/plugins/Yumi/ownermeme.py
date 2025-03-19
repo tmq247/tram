@@ -8,7 +8,7 @@ from threading import Thread
 OWNER_ID = 6337933296  # Replace with your Telegram user ID
 
 # Channel username
-CHANNEL_USERNAME = "@muoimuoimusicbot
+CHANNEL_USERNAME = "@muoimuoimusicbot"
 # Global variables for controlling auto-upload
 auto_upload = False
 uploaded_memes = set()  # To track already uploaded memes
