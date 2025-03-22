@@ -20,6 +20,17 @@ def goodnight_command_handler(client: Client, message: Message):
     else:
         client.send_message(message.chat.id, get_random_emoji())
 
+@app.on_message(filters.command("ơn", prefixes="s"))
+def goodnight_command_handler(client: Client, message: Message):
+    # Randomly decide whether to send a sticker or an emoji
+    #send_sticker = random.choice([True, False])
+    
+    # Send a sticker or an emoji based on the random choice
+    #if send_sticker:
+        #client.send_sticker(message.chat.id, get_random_sticker())
+    #else:
+    client.send_message(message.chat.id, "nhớp")
+        
 # Function to get a random sticker
 def get_random_sticker():
     stickers = [
