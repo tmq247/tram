@@ -31,7 +31,7 @@ def goodnight_command_handler1(client: Client, message: Message):
     #else:
     message.reply_text("nhớp")
 
-@app.on_message(filters.command("ũ", prefixes=["V", "v"]))
+@app.on_message(filters.command("ũ", prefixes=[" V", " v", "v", "V"]))
 def goodnight_command_handler2(client: Client, message: Message):
     message.reply_text("gay")
 
