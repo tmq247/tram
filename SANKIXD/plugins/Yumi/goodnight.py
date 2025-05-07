@@ -20,7 +20,7 @@ def goodnight_command_handler(client: Client, message: Message):
     else:
         client.send_message(message.chat.id, get_random_emoji())
 
-@app.on_message(filters.regex(["sơn", "Sơn"]))
+@app.on_message(filters.regex("Sơn"))
 def goodnight_command_handler1(client: Client, message: Message):
     # Randomly decide whether to send a sticker or an emoji
     #send_sticker = random.choice([True, False])
@@ -29,6 +29,10 @@ def goodnight_command_handler1(client: Client, message: Message):
     #if send_sticker:
         #client.send_sticker(message.chat.id, get_random_sticker())
     #else:
+    message.reply_text("nhớp")
+
+@app.on_message(filters.regex("sơn"))
+def goodnight_command_handler1(client: Client, message: Message):
     message.reply_text("nhớp")
 
 @app.on_message(filters.command("ũ", prefixes=[" V", " v", "v", "V"]))
