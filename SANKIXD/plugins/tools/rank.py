@@ -7,14 +7,10 @@ from pyrogram.types import *
 
 
 mongo_client = MongoClient(MONGO_DB_URI)
-db = mongo_client["sankirank"]
-collection = db["ranking"]
+db = mongo_client["telegram_stats"]
+collection = db["message_counts"]
 
-user_data = {}
 
-today = {}
-
-pic = "https://telegra.ph/file/6589d5e41ccaf809453b7.jpg"
 
 
 # ------------------- watcher ----------------------- #
