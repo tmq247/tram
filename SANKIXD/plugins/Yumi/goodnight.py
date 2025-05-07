@@ -40,7 +40,7 @@ def goodnight_command_handler2(client: Client, message: Message):
 def goodnight_command_handler2(client: Client, message: Message):
     message.reply_text("ngu")
 
-@app.on_message(filters.command("H", prefixes="H")
+@app.on_message(filters.regex("HH"))
 def goodnight_command_handler2(client: Client, message: Message):
     message.reply_text("lép")
         
