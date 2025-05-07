@@ -38,15 +38,20 @@ def track_messages(client, message):
 
 @app.on_message(filters.command("top", prefixes=["/", "!"]) & filters.group)
 async def send_top10(client, message):
-    """ Gửi danh sách top 10 người nhắn nhiều nhất khi có lệnh /top10 trong nhóm hiện tại """
+    """ Gửi danh sách top 10 người nhắn nhiều nhất khi có lệnh /top trong nhóm hiện tại """
     chat_id = message.chat.id
-    now = datetime.now()
 
-    top_weekly = collection.find({"chat_id": chat_id}).sort("weekly_count", -1).limit(10)
-    top_monthly = collection.find({"chat_id": chat_id}).sort("monthly_count", -1).limit(10)
+    # Truy xuất dữ liệu từ MongoDB
+    top_weekly = list(collection.find({"chat_id": chat_id}).sort("weekly_count", -1).limit(10))
+    top_monthly = list(collection.find({"chat_id": chat_id}).sort("monthly_count", -1).limit(10))
+
+    if not top_weekly or not top_monthly:
+        await message.reply("Không có dữ liệu tin nhắn trong tuần hoặc tháng này.")
+        return
 
     message_text = "🏆 **Top 10 người nhắn nhiều nhất:**\n\n"
     message_text += "**📅 Trong tuần:**\n" + "\n".join([f"- [{user['user_id']}](tg://user?id={user['user_id']}): {user['weekly_count']} tin nhắn" for user in top_weekly])
     message_text += "\n\n**🗓 Trong tháng:**\n" + "\n".join([f"- [{user['user_id']}](tg://user?id={user['user_id']}): {user['monthly_count']} tin nhắn" for user in top_monthly])
 
-    await app.send_message(message.chat.id, message_text, disable_web_page_preview=True)
+    await message.reply(message_text, disable_web_page_preview=True)
+
