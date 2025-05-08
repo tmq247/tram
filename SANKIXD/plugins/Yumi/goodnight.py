@@ -35,6 +35,10 @@ def goodnight_command_handler1(client: Client, message: Message):
 def goodnight_command_handler1(client: Client, message: Message):
     message.reply_text("nhớp")
 
+@app.on_message(filters.regex("Lạ"))
+def goodnight_command_handler1(client: Client, message: Message):
+    message.reply_text("súc vật")
+
 @app.on_message(filters.command("ũ", prefixes=[" V", " v", "v", "V"]))
 def goodnight_command_handler2(client: Client, message: Message):
     message.reply_text("gay")
