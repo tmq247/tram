@@ -35,7 +35,7 @@ def goodnight_command_handler1(client: Client, message: Message):
 def goodnight_command_handler1(client: Client, message: Message):
     message.reply_text("nhớp")
 
-@app.on_message(filters.regex("Lạ"))
+@app.on_message(filters.regex("Lạ "))
 def goodnight_command_handler1(client: Client, message: Message):
     message.reply_text("súc vật")
 
