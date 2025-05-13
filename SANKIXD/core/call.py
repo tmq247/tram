@@ -8,7 +8,7 @@ from pyrogram.types import InlineKeyboardMarkup
 
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, ChatUpdate, GroupCallConfig
-from pytgcalls.types.stream import StreamAudioEnded, MediaStream, StreamEnded
+from pytgcalls.types.stream import MediaStream, StreamEnded
 from pytgcalls.types.stream.input import AudioPiped, AudioVideoPiped
 from pytgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
 
