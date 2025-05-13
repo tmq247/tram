@@ -14,17 +14,17 @@ from pytgcalls.exceptions import (
 )
 from pytgcalls.types import Update, MediaStream
 #from pytgcalls.types.raw import AudioParameters
-from pytgcalls.types.raw import AudioStream
-from pytgcalls.types.raw import Stream
+#from pytgcalls.types.raw import AudioStream
+#from pytgcalls.types.raw import Stream
 #from pytgcalls.types.raw import VideoParameters
 #from pytgcalls.types.raw import VideoStream
 from pytgcalls.types import AudioQuality
-from pytgcalls.types import MediaStream
+#from pytgcalls.types import MediaStream
 from pytgcalls.types import VideoQuality
-from pytgcalls.types import ChatUpdate
+#from pytgcalls.types import ChatUpdate
 #from pytgcalls.types import GroupCallParticipant
 from pytgcalls.types import StreamEnded
-from pytgcalls.types import Update
+#from pytgcalls.types import Update
 #from pytgcalls.types import UpdatedGroupCallParticipant
 #from pytgcalls.types.stream import screen, speaker, microphone, camera
 #from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
