@@ -583,7 +583,7 @@ class Call(PyTgCalls):
             await self.five.start()
 
     async def decorators(self):
-        @self.one.KICKED()
+        @self.one.LEFT_CALL()
         @self.two.KICKED()
         @self.three.KICKED()
         @self.four.KICKED()
