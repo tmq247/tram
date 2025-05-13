@@ -13,7 +13,7 @@ from pytgcalls.exceptions import (
     #TelegramServerError,
 )
 from pytgcalls.types import Update
-from pytgcalls.types.stream 
+from pytgcalls.types.stream import screen, speaker, microphone, camera
 #from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 #from pytgcalls.types.stream import StreamAudioEnded
 
