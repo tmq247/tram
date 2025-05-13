@@ -14,9 +14,23 @@ from typing import List, Union
 from pyrogram import filters
 from SANKIXD.core.call import SANKI
 from pyrogram.types import VideoChatEnded, Message
-from pytgcalls import PyTgCalls, StreamType
-from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-from pytgcalls.exceptions import (NoActiveGroupCall, TelegramServerError, AlreadyJoinedError)
+from ntgcalls import StreamType
+from pytgcalls import PyTgCalls
+from pytgcalls.exceptions import NoActiveGroupCall
+from pytgcalls.types import Update, MediaStream
+from pytgcalls.types.raw import AudioParameters
+from pytgcalls.types.raw import AudioStream
+from pytgcalls.types.raw import Stream
+from pytgcalls.types.raw import VideoParameters
+from pytgcalls.types.raw import VideoStream
+from pytgcalls.types import AudioQuality
+from pytgcalls.types import MediaStream
+from pytgcalls.types import VideoQuality
+from pytgcalls.types import ChatUpdate
+from pytgcalls.types import GroupCallParticipant
+from pytgcalls.types import StreamEnded
+from pytgcalls.types import Update
+from pytgcalls.types import UpdatedGroupCallParticipant
 
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
