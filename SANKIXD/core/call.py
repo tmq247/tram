@@ -9,8 +9,9 @@ from pytgcalls import PyTgCalls
 from pytgcalls.types import Update
 from pytgcalls.types.stream import StreamEnded
 #from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
+#from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 from pytgcalls.types.stream import AudioPiped, AudioVideoPiped
+from pytgcalls.types.stream import HighQualityAudio, MediumQualityVideo
 
 import config
 from SANKIXD import LOGGER, YouTube, app
