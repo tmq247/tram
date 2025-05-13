@@ -8,7 +8,7 @@ from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls#, StreamType
 from ntgcalls import StreamType
 from pytgcalls.exceptions import (
-    AlreadyJoinedError,
+    #AlreadyJoinedError,
     NoActiveGroupCall,
     TelegramServerError,
 )
