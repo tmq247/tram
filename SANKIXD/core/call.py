@@ -8,14 +8,14 @@ from pyrogram.types import InlineKeyboardMarkup
 from ntgcalls import StreamType
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
-    AlreadyJoinedError,
+    #AlreadyJoinedError,
     NoActiveGroupCall,
-    TelegramServerError,
+    #TelegramServerError,
 )
 from pytgcalls.types import Update
-from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-from pytgcalls.types.stream import StreamAudioEnded
+from pytgcalls.types.stream 
+#from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
+#from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from SANKIXD import LOGGER, YouTube, app
