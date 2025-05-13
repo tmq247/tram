@@ -6,11 +6,11 @@ from typing import Union
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 
-from py_tgcalls import PyTgCalls, filters
-from py_tgcalls.types import Update, ChatUpdate, GroupCallConfig
-from py_tgcalls.types.stream import StreamAudioEnded, MediaStream, StreamEnded
-from py_tgcalls.types.stream.input import AudioPiped, AudioVideoPiped
-from py_tgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
+from pytgcalls import PyTgCalls, filters
+from pytgcalls.types import Update, ChatUpdate, GroupCallConfig
+from pytgcalls.types.stream import StreamAudioEnded, MediaStream, StreamEnded
+from pytgcalls.types.stream.input import AudioPiped, AudioVideoPiped
+from pytgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
 
 import config
 from SANKIXD import LOGGER, YouTube, app
