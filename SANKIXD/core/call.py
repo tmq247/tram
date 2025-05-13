@@ -8,9 +8,28 @@ from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls#, StreamType
 from ntgcalls import StreamType
 from pytgcalls.exceptions import (
+    UnsupportedMethod, 
+    MTProtoClientNotConnected,
+    YtDlpError,
+    LiveStreamFound,
+    ImageSourceFound,
+    NoAudioSourceFound,
+    InvalidVideoProportion,
+    NoVideoSourceFound,
+    InvalidMTProtoClient,
+    TooManyCustomApiDecorators,
+    PyTgCallsAlreadyRunning,
+    ClientNotStarted,
+    NotInCallError,
+    CallDiscarded,
+    CallBusy,
+    CallDeclined,
+    TimedOutAnswer,
+    NoMTProtoClientSet,
+    TooOldPyrogramVersion,
     #AlreadyJoinedError,
     NoActiveGroupCall,
-    TelegramServerError,
+    #TelegramServerError,
 )
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
