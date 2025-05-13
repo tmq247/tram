@@ -5,34 +5,16 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-#from pytgcalls import PyTgCalls, StreamType
-from pytgcalls import PyTgCalls
-from ntgcalls import StreamType, TelegramServerError
+from pytgcalls import PyTgCalls, StreamType
 from pytgcalls.exceptions import (
-    #AlreadyJoinedError,
+    AlreadyJoinedError,
     NoActiveGroupCall,
-    #TelegramServerError,
+    TelegramServerError,
 )
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 from pytgcalls.types.stream import StreamAudioEnded
-
-from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import (
-    ChannelsTooMuch,
-    ChatAdminRequired,
-    FloodWait,
-    InviteRequestSent,
-    UserAlreadyParticipant,
-    UserNotParticipant,
-)
-from pytgcalls.types import (
-    ChatUpdate,
-    GroupCallConfig,
-    MediaStream,
-    StreamEnded,
-)
 
 import config
 from SANKIXD import LOGGER, YouTube, app
