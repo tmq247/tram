@@ -6,16 +6,16 @@ from typing import Union
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 
-from py_tgcalls import PyTgCalls, StreamType
-from py_tgcalls.exceptions import (
+from pytgcalls import PyTgCalls, StreamType
+from pytgcalls.exceptions import (
     AlreadyJoinedError,
     NoActiveGroupCall,
     TelegramServerError,
 )
-from py_tgcalls.types import Update
-from py_tgcalls.types.stream.input import AudioPiped, AudioVideoPiped
-from py_tgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
-from py_tgcalls.types.stream import StreamAudioEnded
+from pytgcalls.types import Update
+from pytgcalls.types.stream.input import AudioPiped, AudioVideoPiped
+from pytgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
+from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from SANKIXD import LOGGER, YouTube, app
