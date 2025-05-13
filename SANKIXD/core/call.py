@@ -5,9 +5,10 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-from py_tgcalls import PyTgCalls
-from py_tgcalls.types import Update
-from py_tgcalls.types.stream import StreamAudioEnded
+
+from py_tgcalls import PyTgCalls, filters
+from py_tgcalls.types import Update, ChatUpdate, GroupCallConfig
+from py_tgcalls.types.stream import StreamAudioEnded, MediaStream, StreamEnded
 from py_tgcalls.types.stream.input import AudioPiped, AudioVideoPiped
 from py_tgcalls.types.stream.quality import HighQualityAudio, MediumQualityVideo
 
