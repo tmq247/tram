@@ -589,7 +589,7 @@ class Call(PyTgCalls):
     ),
 )
 
-    async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
+        async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
         print(f'Kicked from {update.chat_id} or left')
 
     @self.one.on_update(fl.stream_end())
