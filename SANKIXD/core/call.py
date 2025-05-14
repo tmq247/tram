@@ -583,7 +583,7 @@ class Call(PyTgCalls):
         if config.STRING5:
             await self.five.start()
 
-    call_py = self.one
+call_py = self.one
     @call_py.on_update(fl.chat_update(ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,),)
     async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
         print(f'Kicked from {update.chat_id} or left')
