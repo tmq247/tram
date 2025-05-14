@@ -19,13 +19,13 @@ from pytgcalls.types import Update, MediaStream
 #from pytgcalls.types.raw import VideoParameters
 #from pytgcalls.types.raw import VideoStream
 from pytgcalls.types import AudioQuality
-#from pytgcalls.types import MediaStream
+from pytgcalls.types import MediaStream
 from pytgcalls.types import VideoQuality
-#from pytgcalls.types import ChatUpdate
-#from pytgcalls.types import GroupCallParticipant
+from pytgcalls.types import ChatUpdate
+from pytgcalls.types import GroupCallParticipant
 from pytgcalls.types import StreamEnded
 #from pytgcalls.types import Update
-#from pytgcalls.types import UpdatedGroupCallParticipant
+from pytgcalls.types import UpdatedGroupCallParticipant
 #from pytgcalls.types.stream import screen, speaker, microphone, camera
 #from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 #from pytgcalls.types.stream import StreamAudioEnded
@@ -582,6 +582,31 @@ class Call(PyTgCalls):
         if config.STRING5:
             await self.five.start()
 
+    
+    @self.one.on_update(
+    fl.chat_update(
+        ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,
+    ),
+)
+
+    async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
+        print(f'Kicked from {update.chat_id} or left')
+
+    @self.one.on_update(fl.stream_end())
+        async def stream_end_handler(_: PyTgCalls, update: StreamEnded):
+        print(f'Stream ended in {update.chat_id}', update)
+
+
+    @self.one.on_update(
+    fl.call_participant(GroupCallParticipant.Action.JOINED),
+)
+        async def participant_handler(_: PyTgCalls,update: UpdatedGroupCallParticipant,):
+        print(f'Participant joined in {update.chat_id}', update)
+
+
+    @self.one.on_update()
+        async def all_updates(_: PyTgCalls, update: Update):
+        print(update)
     async def decorators(self):
         #@self.one.LEFT_CALL()
         #@self.two.KICKED()
@@ -610,6 +635,5 @@ class Call(PyTgCalls):
             if not isinstance(update, StreamAudioEnded):
                 return
             await self.change_stream(client, update.chat_id)
-
 
 SANKI = Call()
