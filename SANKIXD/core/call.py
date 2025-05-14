@@ -584,24 +584,23 @@ class Call(PyTgCalls):
             await self.five.start()
 
 call_py = self.one
-    @call_py.on_update(fl.chat_update(ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,),)
-    async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
-        print(f'Kicked from {update.chat_id} or left')
+@call_py.on_update(fl.chat_update(ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,),)
+async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
+    print(f'Kicked from {update.chat_id} or left')
 
-    @call_py.on_update(fl.stream_end())
-    async def stream_end_handler(_: PyTgCalls, update: StreamEnded):
-        print(f'Stream ended in {update.chat_id}', update)
-
-
-    @call_py.on_update(
-    fl.call_participant(GroupCallParticipant.Action.JOINED),)
-    async def participant_handler(_: PyTgCalls,update: UpdatedGroupCallParticipant,):
-        print(f'Participant joined in {update.chat_id}', update)
+@call_py.on_update(fl.stream_end())
+async def stream_end_handler(_: PyTgCalls, update: StreamEnded):
+    print(f'Stream ended in {update.chat_id}', update)
 
 
-    @call_py.on_update()
-    async def all_updates(_: PyTgCalls, update: Update):
-        print(update)
+@call_py.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED),)
+async def participant_handler(_: PyTgCalls,update: UpdatedGroupCallParticipant,):
+    print(f'Participant joined in {update.chat_id}', update)
+
+
+@call_py.on_update()
+async def all_updates(_: PyTgCalls, update: Update):
+    print(update)
     async def decorators(self):
         #@self.one.LEFT_CALL()
         #@self.two.KICKED()
