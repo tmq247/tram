@@ -5,31 +5,16 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-#from ntgcalls import StreamType, TelegramServerError
-from pytgcalls import filters as fl
-from pytgcalls import PyTgCalls
+from pytgcalls import PyTgCalls, StreamType
 from pytgcalls.exceptions import (
-    #AlreadyJoinedError,
+    AlreadyJoinedError,
     NoActiveGroupCall,
-    #TelegramServerError,
+    TelegramServerError,
 )
-from pytgcalls.types import Update, MediaStream
-#from pytgcalls.types.raw import AudioParameters
-#from pytgcalls.types.raw import AudioStream
-#from pytgcalls.types.raw import Stream
-#from pytgcalls.types.raw import VideoParameters
-#from pytgcalls.types.raw import VideoStream
-from pytgcalls.types import AudioQuality
-from pytgcalls.types import MediaStream
-from pytgcalls.types import VideoQuality
-from pytgcalls.types import ChatUpdate
-from pytgcalls.types import GroupCallParticipant
-from pytgcalls.types import StreamEnded
-#from pytgcalls.types import Update
-from pytgcalls.types import UpdatedGroupCallParticipant
-#from pytgcalls.types.stream import screen, speaker, microphone, camera
-#from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-#from pytgcalls.types.stream import StreamAudioEnded
+from pytgcalls.types import Update
+from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
+from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from SANKIXD import LOGGER, YouTube, app
@@ -583,51 +568,34 @@ class Call(PyTgCalls):
         if config.STRING5:
             await self.five.start()
 
-call_py = self.one
-@call_py.on_update(fl.chat_update(ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,),)
-async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
-    print(f'Kicked from {update.chat_id} or left')
-
-@call_py.on_update(fl.stream_end())
-async def stream_end_handler(_: PyTgCalls, update: StreamEnded):
-    print(f'Stream ended in {update.chat_id}', update)
-
-
-@call_py.on_update(fl.call_participant(GroupCallParticipant.Action.JOINED),)
-async def participant_handler(_: PyTgCalls,update: UpdatedGroupCallParticipant,):
-    print(f'Participant joined in {update.chat_id}', update)
-
-
-@call_py.on_update()
-async def all_updates(_: PyTgCalls, update: Update):
-    print(update)
     async def decorators(self):
-        #@self.one.LEFT_CALL()
-        #@self.two.KICKED()
-        #@self.three.KICKED()
-        #@self.four.KICKED()
-        #@self.five.on_kicked()
-        #@self.one.on_closed_voice_chat()
-        #@self.two.on_closed_voice_chat()
-        #@self.three.on_closed_voice_chat()
-        #@self.four.on_closed_voice_chat()
-        #@self.five.on_closed_voice_chat()
-        #@self.one.on_left()
-       # @self.two.on_left()
-       # @self.three.on_left()
-       # @self.four.on_left()
-       # @self.five.on_left()
+        @self.one.on_kicked()
+        @self.two.on_kicked()
+        @self.three.on_kicked()
+        @self.four.on_kicked()
+        @self.five.on_kicked()
+        @self.one.on_closed_voice_chat()
+        @self.two.on_closed_voice_chat()
+        @self.three.on_closed_voice_chat()
+        @self.four.on_closed_voice_chat()
+        @self.five.on_closed_voice_chat()
+        @self.one.on_left()
+        @self.two.on_left()
+        @self.three.on_left()
+        @self.four.on_left()
+        @self.five.on_left()
         async def stream_services_handler(_, chat_id: int):
             await self.stop_stream(chat_id)
 
-       # @self.one.on_stream_end()
-       # @self.two.on_stream_end()
-       # @self.three.on_stream_end()
-      #  @self.four.on_stream_end()
-       # @self.five.on_stream_end()
+        @self.one.on_stream_end()
+        @self.two.on_stream_end()
+        @self.three.on_stream_end()
+        @self.four.on_stream_end()
+        @self.five.on_stream_end()
         async def stream_end_handler1(client, update: Update):
             if not isinstance(update, StreamAudioEnded):
                 return
             await self.change_stream(client, update.chat_id)
+
 
 SANKI = Call()
