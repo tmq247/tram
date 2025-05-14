@@ -6,6 +6,7 @@ from typing import Union
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 #from ntgcalls import StreamType, TelegramServerError
+from pytgcalls import filters as fl
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
     #AlreadyJoinedError,
@@ -583,12 +584,7 @@ class Call(PyTgCalls):
             await self.five.start()
 
     
-    @self.one.on_update(
-    fl.chat_update(
-        ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,
-    ),
-)
-
+    @self.one.on_update(fl.chat_update(ChatUpdate.Status.KICKED | ChatUpdate.Status.LEFT_GROUP,),)
         async def kicked_handler(_: PyTgCalls, update: ChatUpdate):
         print(f'Kicked from {update.chat_id} or left')
 
