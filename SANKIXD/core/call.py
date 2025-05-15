@@ -15,7 +15,7 @@ from SANKIXD.utils.database import add_active_chat, remove_active_chat
 
 class Call(PyTgCalls):
     def __init__(self):
-        super().__init__()  # Gọi phương thức khởi tạo của PyTgCalls
+        #super().__init__()  # Gọi phương thức khởi tạo của PyTgCalls
         self._is_running = False  # Tránh lỗi AttributeError khi gọi start()
         self.autoend = {}  # Khai báo biến autoend trong lớp
 
