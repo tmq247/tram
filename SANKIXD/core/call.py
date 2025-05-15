@@ -7,7 +7,7 @@ from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.types import Update
-from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from pytgcalls import AudioPiped, AudioVideoPiped
 from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 from pytgcalls.types.stream import StreamAudioEnded
 
@@ -40,10 +40,9 @@ class Call:
     async def join_call(self, chat_id: int, link: str, video: bool = False):
         assistant = self.one
         stream = (
-            AudioVideoPiped(link, audio_parameters=HighQualityAudio(), video_parameters=MediumQualityVideo())
-            if video else AudioPiped(link, audio_parameters=HighQualityAudio())
+            AudioVideoPiped(link) if video else AudioPiped(link)
         )
-        await assistant.join_group_call(chat_id, stream, stream_type="pulse")
+        await assistant.join_group_call(chat_id, stream, stream_type=StreamType().pulse_stream)
         await add_active_chat(chat_id)
 
     async def change_stream(self, chat_id: int, file_path: str, video: bool = False):
