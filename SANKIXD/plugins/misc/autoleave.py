@@ -5,10 +5,11 @@ from pyrogram.enums import ChatType
 
 import config
 from SANKIXD import app
-from SANKIXD.core.call import SANKI, autoend
+from SANKIXD.core.call import SANKI
+
 from SANKIXD.utils.database import get_client, is_active_chat, is_autoend
 
-
+autoend = SANKI.autoend
 async def auto_leave():
     if config.AUTO_LEAVING_ASSISTANT == str(True):
         while not await asyncio.sleep(
