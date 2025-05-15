@@ -13,15 +13,19 @@ import config
 from SANKIXD import LOGGER, YouTube, app
 from SANKIXD.utils.database import add_active_chat, remove_active_chat
 
-class Call(PyTgCalls):
+class Call:
     def __init__(self):
-        #super().__init__()  # Gọi phương thức khởi tạo của PyTgCalls
-        self._is_running = False  # Tránh lỗi AttributeError khi gọi start()
-        self.autoend = {}  # Khai báo biến autoend trong lớp
+        self.autoend = {}  # Định nghĩa autoend để tránh lỗi ImportError
 
         # Khởi tạo các session assistant
-        self.userbot1 = Client(name="SANKIAss1", api_id=config.API_ID, api_hash=config.API_HASH, session_string=str(config.STRING1))
-        self.one = PyTgCalls(self.userbot1, cache_duration=100)
+        self.userbot1 = Client(
+            name="SANKIAss1",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING1),
+        )
+
+        self.one = PyTgCalls(self.userbot1)  # Cung cấp 'app'
 
     async def stop_stream(self, chat_id: int):
         assistant = self.one
@@ -50,7 +54,20 @@ class Call(PyTgCalls):
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\n")
-        self._is_running = True  # Đánh dấu trạng thái đã chạy
         await self.one.start()
 
+    def decorators(self):
+        async def stream_services_handler(_, chat_id: int):
+            await self.stop_stream(chat_id)
+
+        async def stream_end_handler1(client, update):
+            if isinstance(update, StreamAudioEnded):
+                await self.change_stream(client, update.chat_id)
+
+        self.one.on_kicked()(stream_services_handler)
+        self.one.on_closed_voice_chat()(stream_services_handler)
+        self.one.on_left()(stream_services_handler)
+        self.one.on_stream_end()(stream_end_handler1)
+
 SANKI = Call()
+SANKI.decorators()  # Kích hoạt sự kiện xử lý
