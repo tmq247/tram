@@ -7,7 +7,7 @@ from ..logging import LOGGER
 assistants = []
 assistantids = []
 proxy = {
-    "scheme": "socks5",  # Hỗ trợ "socks4", "socks5" và "http"
+    "scheme": "MTProto proxy",  # Hỗ trợ "socks4", "socks5" và "http"
     "hostname": "51.159.157.218",
     "port": 7743,
     "secret": "ee1603010200010001fc030386e24c3add726161682e6972"
