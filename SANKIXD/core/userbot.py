@@ -6,7 +6,16 @@ from ..logging import LOGGER
 
 assistants = []
 assistantids = []
+proxy = {
+    "scheme": "socks5",  # Hỗ trợ "socks4", "socks5" và "http"
+    "hostname": "8.212.129.246",
+    "port": 443,
+    "username": "username",
+    "password": "password"
+}
 
+#app = Client("my_account", proxy=proxy)
+#app.run()
 
 class Userbot(Client):
     def __init__(self):
@@ -16,6 +25,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
             no_updates=True,
+            proxy=proxy
         )
         self.two = Client(
             name="SANKIAss2",
