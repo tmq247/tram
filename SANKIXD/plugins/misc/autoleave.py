@@ -5,11 +5,10 @@ from pyrogram.enums import ChatType
 
 import config
 from SANKIXD import app
-from SANKIXD.core.call import SANKI
-
+from SANKIXD.core.call import SANKI, autoend
 from SANKIXD.utils.database import get_client, is_active_chat, is_autoend
 
-autoend = SANKI.autoend
+
 async def auto_leave():
     if config.AUTO_LEAVING_ASSISTANT == str(True):
         while not await asyncio.sleep(
@@ -31,8 +30,8 @@ async def auto_leave():
                             chat_id = i.chat.id
                             if (
                                 chat_id != config.LOGGER_ID
-                                and i.chat.id != -1001816641523
-                                and i.chat.id != -1002448910041
+                                and i.chat.id != -1001919135283
+                                and i.chat.id != -1001841879487
                             ):
                                 if left == 20:
                                     continue
@@ -71,7 +70,7 @@ async def auto_end():
                 try:
                     await app.send_message(
                         chat_id,
-                        "» Bot tự động tắt video chat vì không ai đang nghe trong video chat.",
+                        "» ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.",
                     )
                 except:
                     continue
