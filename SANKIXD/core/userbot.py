@@ -10,7 +10,7 @@ proxy = {
     "scheme": "socks5",  # Hỗ trợ "socks4", "socks5" và "http"
     "hostname": "8.212.129.246",
     "port": 443,
-    """"username": "username",
+    """ "username": "username",
     "password": "password" """
 }
 
