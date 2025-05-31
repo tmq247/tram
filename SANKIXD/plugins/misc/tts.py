@@ -36,7 +36,7 @@ def text_to_speech(client, message):
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
 
     # Tạo file âm thanh với giọng tự nhiên hơn
-    tts.tts_to_file(text=text, file_path="natural_speech.wav")
+    tts.tts_to_file(text=text, file_path="natural_speech.mp3")
 
     # Gửi file âm thanh
-    client.send_audio(message.chat.id, "natural_speech.wav")
+    client.send_audio(message.chat.id, "natural_speech.mp3")
