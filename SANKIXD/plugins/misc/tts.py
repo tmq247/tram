@@ -32,11 +32,11 @@ from SANKIXD import app
 def text_to_speech(client, message):
     text = message.text.split(' ', 1)[1]
     
-    # Khởi tạo mô hình TTS
-    tts = TTS("tts_models/vietnamese/vietTTS")
-    
-    # Tạo file âm thanh với giọng tự nhiên
-    tts.tts_to_file(text=text, file_path="speech.mp3")
+    # Khởi tạo mô hình XTTS
+    tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
+
+    # Tạo file âm thanh với giọng tự nhiên hơn
+    tts.tts_to_file(text=text, file_path="natural_speech.wav")
 
     # Gửi file âm thanh
-    client.send_audio(message.chat.id, "speech.mp3")
+    client.send_audio(message.chat.id, "natural_speech.wav")
