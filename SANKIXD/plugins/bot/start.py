@@ -29,13 +29,13 @@ from strings import get_string
 #--------------------------
 
 NEXI_VID = [
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
-"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/Sanki%2FBlack%20and%20White%20Modern%20Welcome%20to%20my%20Channel%20Video.mp4?alt=media&token=2942f4b8-4144-45ab-83f3-c2fc6e8ec9c5",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
+"https://firebasestorage.googleapis.com/v0/b/social-bite-skofficial.appspot.com/o/SANKI%2FVID_20250528_234654_874.mp4?alt=media&token=cc65962f-c43f-4add-b324-6a7a01c4fff0",
 
 ]
 
@@ -59,7 +59,7 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=f"{message.from_user.mention} Chỉ mới khởi động bot để kiểm tra <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                 )
             return
         if name[0:3] == "inf":
@@ -97,7 +97,7 @@ async def start_pm(client, message: Message, _):
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOGGER_ID,
-                    text=f"{message.from_user.mention} Chỉ mới khởi động bot để kiểm tra <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
                 )
     else:
         out = private_panel(_)
@@ -109,7 +109,7 @@ async def start_pm(client, message: Message, _):
         if await is_on_off(2):
             return await app.send_message(
                 chat_id=config.LOGGER_ID,
-                text=f"{message.from_user.mention} Vừa mới bắt đầu bot.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
             )
 
 
