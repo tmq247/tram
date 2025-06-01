@@ -14,16 +14,53 @@ from typing import List, Union
 from pyrogram import filters
 from SANKIXD.core.call import SANKI
 from pyrogram.types import VideoChatEnded, Message
-from pytgcalls import PyTgCalls, StreamType
-from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-from pytgcalls.exceptions import (NoActiveGroupCall, TelegramServerError, AlreadyJoinedError)
+from pytgcalls import PyTgCalls
+
+# Import với compatibility checking
+try:
+    from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+    print("✅ New stream types imported in vctools")
+except ImportError:
+    try:
+        from pytgcalls.types import AudioPiped, AudioVideoPiped
+        print("✅ Alternative stream types imported in vctools")
+    except ImportError:
+        try:
+            from pytgcalls import AudioPiped, AudioVideoPiped
+            print("✅ Direct stream types imported in vctools")
+        except ImportError:
+            # Fallback classes
+            class AudioPiped:
+                def __init__(self, path, *args, **kwargs):
+                    self.path = path
+            
+            class AudioVideoPiped:
+                def __init__(self, path, *args, **kwargs):
+                    self.path = path
+            print("⚠️ Using fallback stream types in vctools")
+
+# Import exceptions với fallback
+try:
+    from pytgcalls.exceptions import NoActiveGroupCall, TelegramServerError, AlreadyJoinedError
+    print("✅ New exceptions imported in vctools")
+except ImportError:
+    try:
+        from pytgcalls.exceptions import NoActiveGroupCall, TelegramServerError, AlreadyJoinedError
+        print("✅ Alternative exceptions imported in vctools")
+    except ImportError:
+        # Fallback exceptions
+        NoActiveGroupCall = Exception
+        TelegramServerError = Exception
+        AlreadyJoinedError = Exception
+        print("⚠️ Using fallback exceptions in vctools")
 
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
     try:
-        await assistant.join_group_call(message.chat.id, AudioPiped("./SANKIXD/assets/call.mp3"), stream_type=StreamType().pulse_stream)
-        text = "- Beloveds in the call 🫶 :\n\n"
+        # Không sử dụng stream_type parameter nữa
+        await assistant.join_group_call(message.chat.id, AudioPiped("./SANKIXD/assets/call.mp3"))
+        text = "- Beloveds in the call 🫶 :\\n\\n"
         participants = await assistant.get_participants(message.chat.id)
         k = 0
         for participant in participants:
@@ -34,8 +71,8 @@ async def strcall(client, message):
                 mut = "ᴍᴜᴛᴇᴅ 🔕 "
             user = await client.get_users(participant.user_id)
             k += 1
-            text += f"{k} ➤ {user.mention} ➤ {mut}\n"
-        text += f"\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+            text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
+        text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
         await message.reply(f"{text}")
         await asyncio.sleep(7)
         await assistant.leave_group_call(message.chat.id)
@@ -44,7 +81,7 @@ async def strcall(client, message):
     except TelegramServerError:
         await message.reply(f"ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ᴀɢᴀɪɴ, ᴛʜᴇʀᴇ ɪꜱ ᴀ ᴘʀᴏʙʟᴇᴍ ᴡɪᴛʜ ᴛʜᴇ ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ❌")
     except AlreadyJoinedError:
-        text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\n\n"
+        text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
         participants = await assistant.get_participants(message.chat.id)
         k = 0
         for participant in participants:
@@ -55,9 +92,34 @@ async def strcall(client, message):
                 mut = "ᴍᴜᴛᴇᴅ 🔕 "
             user = await client.get_users(participant.user_id)
             k += 1
-            text += f"{k} ➤ {user.mention} ➤ {mut}\n"
-        text += f"\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+            text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
+        text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
         await message.reply(f"{text}")
+    except Exception as e:
+        # Generic exception handling
+        error_msg = str(e).lower()
+        if "no active" in error_msg or "notincall" in error_msg:
+            await message.reply(f"ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+        elif "already joined" in error_msg:
+            text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
+            try:
+                participants = await assistant.get_participants(message.chat.id)
+                k = 0
+                for participant in participants:
+                    info = participant
+                    if info.muted == False:
+                        mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣"
+                    else:
+                        mut = "ᴍᴜᴛᴇᴅ 🔕 "
+                    user = await client.get_users(participant.user_id)
+                    k += 1
+                    text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
+                text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+                await message.reply(f"{text}")
+            except:
+                await message.reply("Error getting participants")
+        else:
+            await message.reply(f"Error: {str(e)}")
 
 
 other_filters = filters.group  & ~filters.via_bot & ~filters.forwarded
