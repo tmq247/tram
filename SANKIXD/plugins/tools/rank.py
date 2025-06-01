@@ -75,7 +75,7 @@ def get_vietnam_week_key():
     return f"{year}-W{week:02d}"
 
 def get_vietnam_month_key():
-    \"\"\"Get current Vietnam month as string key\"\"\"
+  #  \"\"\"Get current Vietnam month as string key\"\"\"
     return get_vietnam_time().strftime("%Y-%m")
 
 def get_vietnam_7days_keys():
@@ -199,7 +199,7 @@ async def vietnam_timezone_watcher(_, message):
 
 # ------------------- Ranking Commands với Vietnam Time ----------------------- #
 
-@app.on_message(filters.command(["today", "daily"]))
+@app.on_message(filters.command(["today", "topngay"]))
 async def vietnam_today_ranking(_, message):
    # \"\"\"Show today's ranking with Vietnam timezone\"\"\"
     try:
@@ -262,7 +262,7 @@ async def vietnam_today_ranking(_, message):
         await message.reply_text(f"❌ **Lỗi:** {str(e)}")
 
 
-@app.on_message(filters.command(["week", "weekly"]))
+@app.on_message(filters.command(["week", "toptuan"]))
 async def vietnam_week_ranking(_, message):
     \"\"\"Show this week's ranking with Vietnam timezone\"\"\"
     try:
@@ -321,7 +321,7 @@ async def vietnam_week_ranking(_, message):
         await message.reply_text(f"❌ **Lỗi:** {str(e)}")
 
 
-@app.on_message(filters.command(["month", "monthly"]))  
+@app.on_message(filters.command(["month", "topthang"]))  
 async def vietnam_month_ranking(_, message):
   #  \"\"\"Show this month's ranking with Vietnam timezone\"\"\"
     try:
@@ -388,7 +388,7 @@ async def vietnam_month_ranking(_, message):
         await message.reply_text(f"❌ **Lỗi:** {str(e)}")
 
 
-@app.on_message(filters.command("7days"))
+@app.on_message(filters.command("7ngay"))
 async def vietnam_seven_days_ranking(_, message):
   #  \"\"\"Show 7 days detailed history with Vietnam timezone\"\"\"
     try:
