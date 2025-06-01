@@ -6,11 +6,23 @@ from typing import Union
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
-from pytgcalls.exceptions import (
-    AlreadyJoined,
-    NotInCall,
-    TelegramServerError,
-)
+
+# Import exceptions với try-catch để tránh lỗi
+try:
+    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
+except ImportError:
+    try:
+        # Fallback cho các tên exception khác
+        from pytgcalls.exceptions import AlreadyJoinedError as AlreadyJoined
+        from pytgcalls.exceptions import NoActiveGroupCall as NotInCall
+        from pytgcalls.exceptions import TelegramServerError
+    except ImportError:
+        # Nếu không import được, dùng Exception generic
+        AlreadyJoined = Exception
+        NotInCall = Exception
+        TelegramServerError = Exception
+        print("⚠️ Warning: Could not import specific pytgcalls exceptions, using generic Exception")
+
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
@@ -318,7 +330,13 @@ class Call(PyTgCalls):
         except TelegramServerError:
             raise AssistantErr(_["call_10"])
         except Exception as e:
-            raise AssistantErr(f"Error joining call: {str(e)}")
+            # Generic exception handling
+            if "NoActiveGroupCall" in str(e) or "no active group call" in str(e).lower():
+                raise AssistantErr(_["call_8"])
+            elif "AlreadyJoined" in str(e) or "already joined" in str(e).lower():
+                raise AssistantErr(_["call_9"])
+            else:
+                raise AssistantErr(f"Error joining call: {str(e)}")
             
         await add_active_chat(chat_id)
         await music_on(chat_id)
