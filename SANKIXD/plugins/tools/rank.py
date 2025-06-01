@@ -219,7 +219,7 @@ async def vietnam_today_ranking(_, message):
         
         vn_date_str = get_vietnam_date_str()
         vn_time_str = get_vietnam_time_str()
-        response = f"**📅 BXH HÔM NAY**\\n**{vn_date_str}** • 🕐 {vn_time_str}\\n\\n"
+        response = f"**📅 BXH HÔM NAY**\n**{vn_date_str}** • 🕐 {vn_time_str}\n\n"
         
         rank_emojis = ["🥇", "🥈", "🥉"] + ["🏅"] * 7
         
@@ -243,8 +243,8 @@ async def vietnam_today_ranking(_, message):
             else:
                 last_active = "N/A"
                 
-            response += f"{emoji} **{idx+1}.** {user_name}\\n"
-            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\\n\\n"
+            response += f"{emoji} **{idx+1}.** {user_name}\n"
+            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\n\n"
         
         buttons = [
             [InlineKeyboardButton("📊 Tuần này", callback_data="week_ranking")],
@@ -281,7 +281,7 @@ async def vietnam_week_ranking(_, message):
         
         week_key = get_vietnam_week_key()
         vn_time_str = get_vietnam_time_str()
-        response = f"**📊 BXH TUẦN NÀY**\\n**{week_key}** • 🕐 {vn_time_str}\\n\\n"
+        response = f"**📊 BXH TUẦN NÀY**\n**{week_key}** • 🕐 {vn_time_str}\n\n"
         
         rank_emojis = ["🥇", "🥈", "🥉"] + ["🏅"] * 7
         
@@ -303,8 +303,8 @@ async def vietnam_week_ranking(_, message):
             else:
                 last_active = "N/A"
                 
-            response += f"{emoji} **{idx+1}.** {user_name}\\n"
-            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\\n\\n"
+            response += f"{emoji} **{idx+1}.** {user_name}\n"
+            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\n\n"
         
         buttons = [
             [InlineKeyboardButton("📅 Hôm nay", callback_data="today_ranking")],
@@ -348,7 +348,7 @@ async def vietnam_month_ranking(_, message):
         month_name = f"{month_names[vn_time.month]} {vn_time.year}"
         vn_time_str = get_vietnam_time_str()
         
-        response = f"**📈 BXH THÁNG NÀY**\\n**{month_name}** • 🕐 {vn_time_str}\\n\\n"
+        response = f"**📈 BXH THÁNG NÀY**\n**{month_name}** • 🕐 {vn_time_str}\n\n"
         
         rank_emojis = ["🥇", "🥈", "🥉"] + ["🏅"] * 7
         
@@ -370,8 +370,8 @@ async def vietnam_month_ranking(_, message):
             else:
                 last_active = "N/A"
                 
-            response += f"{emoji} **{idx+1}.** {user_name}\\n"
-            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\\n\\n"
+            response += f"{emoji} **{idx+1}.** {user_name}\n"
+            response += f"   💬 `{user_data['messages']}` tin nhắn • 🕐 {last_active}\n\n"
         
         buttons = [
             [InlineKeyboardButton("📅 Hôm nay", callback_data="today_ranking")],
@@ -400,7 +400,7 @@ async def vietnam_seven_days_ranking(_, message):
             return
         
         vn_time_str = get_vietnam_time_str()
-        response = f"**📋 CHI TIẾT 7 NGÀY QUA**\\n🕐 {vn_time_str}\\n\\n"
+        response = f"**📋 CHI TIẾT 7 NGÀY QUA**\n🕐 {vn_time_str}\n\n"
         
         # Vietnamese day names
         day_names_vn = {
@@ -426,7 +426,7 @@ async def vietnam_seven_days_ranking(_, message):
             day_str = vn_date_obj.strftime(f"{day_name} %d/%m")
             total_msgs = sum(day_data.values())
             
-            response += f"**{day_str}** • `{total_msgs}` tin nhắn\\n"
+            response += f"**{day_str}** • `{total_msgs}` tin nhắn\n"
             
             for idx, (user_id, msg_count) in enumerate(sorted_day_users):
                 try:
@@ -436,8 +436,8 @@ async def vietnam_seven_days_ranking(_, message):
                     user_name = "Unknown"
                 
                 medal = ["🥇", "🥈", "🥉"][idx] if idx < 3 else "🏅"
-                response += f"  {medal} {user_name} (`{msg_count}`)\\n"
-            response += "\\n"
+                response += f"  {medal} {user_name} (`{msg_count}`)\n"
+            response += "\n"
         
         buttons = [
             [InlineKeyboardButton("📅 Hôm nay", callback_data="today_ranking")],
