@@ -7,8 +7,8 @@ from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
-    AlreadyJoinedError,
-    NoActiveGroupCall,
+    AlreadyJoined,
+    NotInCall,
     TelegramServerError,
 )
 from pytgcalls.types import Update
@@ -311,21 +311,27 @@ class Call(PyTgCalls):
                 chat_id,
                 stream,
             )
-        except NoActiveGroupCall:
+        except NotInCall:
             raise AssistantErr(_["call_8"])
-        except AlreadyJoinedError:
+        except AlreadyJoined:
             raise AssistantErr(_["call_9"])
         except TelegramServerError:
             raise AssistantErr(_["call_10"])
+        except Exception as e:
+            raise AssistantErr(f"Error joining call: {str(e)}")
+            
         await add_active_chat(chat_id)
         await music_on(chat_id)
         if video:
             await add_active_video_chat(chat_id)
         if await is_autoend():
             counter[chat_id] = {}
-            users = len(await assistant.get_participants(chat_id))
-            if users == 1:
-                autoend[chat_id] = datetime.now() + timedelta(minutes=1)
+            try:
+                users = len(await assistant.get_participants(chat_id))
+                if users == 1:
+                    autoend[chat_id] = datetime.now() + timedelta(minutes=1)
+            except:
+                pass
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
