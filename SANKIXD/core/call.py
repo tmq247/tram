@@ -198,7 +198,7 @@ class Call(PyTgCalls):
             pass
 
     def prepare_stream(self, path, is_video=False, additional_params=""):
-        \"\"\"Prepare stream based on available types\"\"\"
+      #  \"\"\"Prepare stream based on available types\"\"\"
         try:
             if is_video:
                 if AudioVideoPiped != str:
