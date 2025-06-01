@@ -136,7 +136,7 @@ class Call(PyTgCalls):
         )
 
     async def call_py_method(self, assistant, method_name, *args, **kwargs):
-        \"\"\"Universal method caller with fallbacks\"\"\"
+       # \"\"\"Universal method caller with fallbacks\"\"\"
         methods_to_try = [
             method_name,
             method_name.replace('_', ''),
