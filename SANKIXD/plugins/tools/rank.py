@@ -467,7 +467,7 @@ async def vietnam_time_info(_, message):
             9: "Tháng 9", 10: "Tháng 10", 11: "Tháng 11", 12: "Tháng 12"
         }
         
-        response = f"**🇻🇳 THỜI GIAN VIỆT NAM**
+        response = f"""**🇻🇳 THỜI GIAN VIỆT NAM**
 
 **📅 Ngày:** {day_name}, {vn_time.day} {month_names[vn_time.month]} {vn_time.year}
 **🕐 Giờ:** {vn_time.strftime("%H:%M:%S")}
@@ -481,8 +481,7 @@ async def vietnam_time_info(_, message):
 **⏰ Bot hoạt động theo giờ Việt Nam**
 • Reset hàng ngày: 00:00 VN
 • Reset hàng tuần: Thứ 2, 00:00 VN  
-• Reset hàng tháng: Ngày 1, 00:00 VN
-"
+• Reset hàng tháng: Ngày 1, 00:00 VN """
         
         await message.reply_text(response)
         
