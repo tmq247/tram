@@ -264,7 +264,7 @@ async def vietnam_today_ranking(_, message):
 
 @app.on_message(filters.command(["week", "toptuan"]))
 async def vietnam_week_ranking(_, message):
-    \"\"\"Show this week's ranking with Vietnam timezone\"\"\"
+    #\"\"\"Show this week's ranking with Vietnam timezone\"\"\"
     try:
         chat_id = message.chat.id
         week_data = current_data["week"].get(chat_id, {})
