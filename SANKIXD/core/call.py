@@ -1,4 +1,3 @@
-# Tạo call.py universal tương thích với nhiều phiên bản
 import asyncio
 import os
 from datetime import datetime, timedelta
@@ -6,16 +5,9 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
+from pytgcalls import PyTgCalls
 
-# Import pytgcalls với compatibility checking
-try:
-    from pytgcalls import PyTgCalls
-    print("✅ PyTgCalls imported successfully")
-except ImportError as e:
-    print(f"❌ Failed to import PyTgCalls: {e}")
-    raise
-
-# Try different import paths for exceptions
+# Import với compatibility checking
 try:
     from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
     print("✅ New exceptions imported")
@@ -26,61 +18,37 @@ except ImportError:
         from pytgcalls.exceptions import TelegramServerError
         print("✅ Old exceptions imported")
     except ImportError:
-        # Fallback to generic exceptions
         AlreadyJoined = Exception
         NotInCall = Exception  
         TelegramServerError = Exception
         print("⚠️ Using generic exceptions")
 
-# Try different import paths for input streams
+# Import stream types dengan fallback
 try:
     from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
     from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
     print("✅ New stream types imported")
 except ImportError:
     try:
-        from pytgcalls.types import AudioPiped, AudioVideoPiped
-        from pytgcalls.types import HighQualityAudio, MediumQualityVideo
+        from pytgcalls.types import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
         print("✅ Alternative stream types imported")
     except ImportError:
-        try:
-            from pytgcalls import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
-            print("✅ Direct stream types imported")
-        except ImportError:
-            print("❌ Could not import stream types - creating fallbacks")
-            # Create basic fallback classes
-            class AudioPiped:
-                def __init__(self, path, audio_parameters=None, additional_ffmpeg_parameters=""):
-                    self.path = path
-                    self.audio_parameters = audio_parameters
-                    self.additional_ffmpeg_parameters = additional_ffmpeg_parameters
-            
-            class AudioVideoPiped:
-                def __init__(self, path, audio_parameters=None, video_parameters=None, additional_ffmpeg_parameters=""):
-                    self.path = path
-                    self.audio_parameters = audio_parameters
-                    self.video_parameters = video_parameters
-                    self.additional_ffmpeg_parameters = additional_ffmpeg_parameters
-            
-            class HighQualityAudio:
-                pass
-            
-            class MediumQualityVideo:
-                pass
+        print("⚠️ Creating fallback stream types")
+        # Fallback: sử dụng string path trực tiếp
+        AudioPiped = str
+        AudioVideoPiped = str
+        HighQualityAudio = lambda: None
+        MediumQualityVideo = lambda: None
 
-# Try to import other required types
+# Import other types
 try:
     from pytgcalls.types import Update
     from pytgcalls.types.stream import StreamAudioEnded
     print("✅ Update types imported")
 except ImportError:
-    try:
-        from pytgcalls import Update, StreamAudioEnded
-        print("✅ Alternative update types imported") 
-    except ImportError:
-        print("⚠️ Could not import update types - using fallbacks")
-        Update = object
-        StreamAudioEnded = object
+    Update = object
+    StreamAudioEnded = object
+    print("⚠️ Using fallback update types")
 
 import config
 from SANKIXD import LOGGER, YouTube, app
@@ -167,117 +135,92 @@ class Call(PyTgCalls):
             cache_duration=100,
         )
 
+    async def call_py_method(self, assistant, method_name, *args, **kwargs):
+        \"\"\"Universal method caller with fallbacks\"\"\"
+        methods_to_try = [
+            method_name,
+            method_name.replace('_', ''),
+            f"play_{method_name}",
+            f"start_{method_name}",
+            f"join_{method_name}",
+        ]
+        
+        for method in methods_to_try:
+            if hasattr(assistant, method):
+                try:
+                    return await getattr(assistant, method)(*args, **kwargs)
+                except Exception as e:
+                    continue
+        
+        # Nếu không tìm thấy method nào, thử fallback
+        print(f"⚠️ Method {method_name} not found, using fallback")
+        return None
+
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
-        await assistant.pause_stream(chat_id)
+        try:
+            await self.call_py_method(assistant, "pause_stream", chat_id)
+        except:
+            await self.call_py_method(assistant, "pause", chat_id)
 
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
-        await assistant.resume_stream(chat_id)
+        try:
+            await self.call_py_method(assistant, "resume_stream", chat_id)
+        except:
+            await self.call_py_method(assistant, "resume", chat_id)
 
     async def stop_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
             await _clear_(chat_id)
-            await assistant.leave_group_call(chat_id)
+            # Thử các method có thể có
+            for method in ["leave_group_call", "leave_call", "stop", "disconnect"]:
+                if hasattr(assistant, method):
+                    await getattr(assistant, method)(chat_id)
+                    break
         except:
             pass
 
     async def stop_stream_force(self, chat_id: int):
-        try:
-            if config.STRING1:
-                await self.one.leave_group_call(chat_id)
-        except:
-            pass
-        try:
-            if config.STRING2:
-                await self.two.leave_group_call(chat_id)
-        except:
-            pass
-        try:
-            if config.STRING3:
-                await self.three.leave_group_call(chat_id)
-        except:
-            pass
-        try:
-            if config.STRING4:
-                await self.four.leave_group_call(chat_id)
-        except:
-            pass
-        try:
-            if config.STRING5:
-                await self.five.leave_group_call(chat_id)
-        except:
-            pass
+        for client in [self.one, self.two, self.three, self.four, self.five]:
+            if client:
+                try:
+                    for method in ["leave_group_call", "leave_call", "stop", "disconnect"]:
+                        if hasattr(client, method):
+                            await getattr(client, method)(chat_id)
+                            break
+                except:
+                    pass
         try:
             await _clear_(chat_id)
         except:
             pass
 
-    def create_audio_stream(self, path, additional_params=""):
-        """Helper method to create audio stream with compatibility"""
+    def prepare_stream(self, path, is_video=False, additional_params=""):
+        \"\"\"Prepare stream based on available types\"\"\"
         try:
-            return AudioPiped(
-                path,
-                audio_parameters=HighQualityAudio(),
-                additional_ffmpeg_parameters=additional_params,
-            )
-        except Exception as e:
-            print(f"⚠️ Fallback audio stream creation: {e}")
-            # Try simpler creation
-            try:
-                return AudioPiped(path)
-            except:
-                return path
-
-    def create_video_stream(self, path, additional_params=""):
-        """Helper method to create video stream with compatibility"""
-        try:
-            return AudioVideoPiped(
-                path,
-                audio_parameters=HighQualityAudio(),
-                video_parameters=MediumQualityVideo(),
-                additional_ffmpeg_parameters=additional_params,
-            )
-        except Exception as e:
-            print(f"⚠️ Fallback video stream creation: {e}")
-            # Try simpler creation
-            try:
-                return AudioVideoPiped(path)
-            except:
-                return path
-
-    async def skip_stream(
-        self,
-        chat_id: int,
-        link: str,
-        video: Union[bool, str] = None,
-        image: Union[bool, str] = None,
-    ):
-        assistant = await group_assistant(self, chat_id)
-        if video:
-            stream = self.create_video_stream(link)
-        else:
-            stream = self.create_audio_stream(link)
-        await assistant.change_stream(chat_id, stream)
-
-    async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
-        assistant = await group_assistant(self, chat_id)
-        additional_params = f"-ss {to_seek} -to {duration}"
-        
-        if mode == "video":
-            stream = self.create_video_stream(file_path, additional_params)
-        else:
-            stream = self.create_audio_stream(file_path, additional_params)
-        
-        await assistant.change_stream(chat_id, stream)
-
-    async def stream_call(self, link):
-        assistant = await group_assistant(self, config.LOGGER_ID)
-        stream = self.create_video_stream(link)
-        await assistant.join_group_call(config.LOGGER_ID, stream)
-        await asyncio.sleep(0.2)
-        await assistant.leave_group_call(config.LOGGER_ID)
+            if is_video:
+                if AudioVideoPiped != str:
+                    return AudioVideoPiped(
+                        path,
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
+                        additional_ffmpeg_parameters=additional_params,
+                    )
+                else:
+                    return path  # Fallback to path string
+            else:
+                if AudioPiped != str:
+                    return AudioPiped(
+                        path,
+                        audio_parameters=HighQualityAudio(),
+                        additional_ffmpeg_parameters=additional_params,
+                    )
+                else:
+                    return path  # Fallback to path string
+        except:
+            return path
 
     async def join_call(
         self,
@@ -291,13 +234,33 @@ class Call(PyTgCalls):
         language = await get_lang(chat_id)
         _ = get_string(language)
         
-        if video:
-            stream = self.create_video_stream(link)
-        else:
-            stream = self.create_audio_stream(link)
+        stream = self.prepare_stream(link, is_video=bool(video))
         
         try:
-            await assistant.join_group_call(chat_id, stream)
+            # Thử các method join có thể có
+            join_methods = [
+                "join_group_call",
+                "join_call", 
+                "play",
+                "start_call",
+                "start"
+            ]
+            
+            joined = False
+            for method_name in join_methods:
+                if hasattr(assistant, method_name):
+                    try:
+                        method = getattr(assistant, method_name)
+                        await method(chat_id, stream)
+                        joined = True
+                        break
+                    except Exception as e:
+                        print(f"⚠️ {method_name} failed: {e}")
+                        continue
+            
+            if not joined:
+                raise AssistantErr("Could not join call - no working method found")
+                
         except Exception as e:
             error_msg = str(e).lower()
             if "no active" in error_msg or "notincall" in error_msg:
@@ -322,6 +285,58 @@ class Call(PyTgCalls):
             except:
                 pass
 
+    async def skip_stream(
+        self,
+        chat_id: int,
+        link: str,
+        video: Union[bool, str] = None,
+        image: Union[bool, str] = None,
+    ):
+        assistant = await group_assistant(self, chat_id)
+        stream = self.prepare_stream(link, is_video=bool(video))
+        
+        # Thử các method change stream
+        for method_name in ["change_stream", "play", "switch"]:
+            if hasattr(assistant, method_name):
+                try:
+                    await getattr(assistant, method_name)(chat_id, stream)
+                    break
+                except:
+                    continue
+
+    async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
+        assistant = await group_assistant(self, chat_id)
+        additional_params = f"-ss {to_seek} -to {duration}"
+        stream = self.prepare_stream(file_path, is_video=(mode == "video"), additional_params=additional_params)
+        
+        for method_name in ["change_stream", "play", "switch"]:
+            if hasattr(assistant, method_name):
+                try:
+                    await getattr(assistant, method_name)(chat_id, stream)
+                    break
+                except:
+                    continue
+
+    async def stream_call(self, link):
+        assistant = await group_assistant(self, config.LOGGER_ID)
+        stream = self.prepare_stream(link, is_video=True)
+        
+        try:
+            # Join briefly then leave
+            for method_name in ["join_group_call", "join_call", "play"]:
+                if hasattr(assistant, method_name):
+                    await getattr(assistant, method_name)(config.LOGGER_ID, stream)
+                    break
+            
+            await asyncio.sleep(0.2)
+            
+            for method_name in ["leave_group_call", "leave_call", "stop"]:
+                if hasattr(assistant, method_name):
+                    await getattr(assistant, method_name)(config.LOGGER_ID)
+                    break
+        except:
+            pass
+
     async def speedup_stream(self, chat_id: int, file_path, speed, playing):
         assistant = await group_assistant(self, chat_id)
         if str(speed) != str("1.0"):
@@ -331,14 +346,14 @@ class Call(PyTgCalls):
                 os.makedirs(chatdir)
             out = os.path.join(chatdir, base)
             if not os.path.isfile(out):
-                if str(speed) == str("0.5"):
-                    vs = 2.0
-                if str(speed) == str("0.75"):
-                    vs = 1.35
-                if str(speed) == str("1.5"):
-                    vs = 0.68
-                if str(speed) == str("2.0"):
-                    vs = 0.5
+                speed_map = {
+                    "0.5": 2.0,
+                    "0.75": 1.35,
+                    "1.5": 0.68,
+                    "2.0": 0.5
+                }
+                vs = speed_map.get(str(speed), 1.0)
+                
                 proc = await asyncio.create_subprocess_shell(
                     cmd=(
                         "ffmpeg "
@@ -363,13 +378,16 @@ class Call(PyTgCalls):
         duration = seconds_to_min(dur)
         
         additional_params = f"-ss {played} -to {duration}"
-        if playing[0]["streamtype"] == "video":
-            stream = self.create_video_stream(out, additional_params)
-        else:
-            stream = self.create_audio_stream(out, additional_params)
+        stream = self.prepare_stream(out, is_video=(playing[0]["streamtype"] == "video"), additional_params=additional_params)
             
         if str(db[chat_id][0]["file"]) == str(file_path):
-            await assistant.change_stream(chat_id, stream)
+            for method_name in ["change_stream", "play", "switch"]:
+                if hasattr(assistant, method_name):
+                    try:
+                        await getattr(assistant, method_name)(chat_id, stream)
+                        break
+                    except:
+                        continue
         else:
             raise AssistantErr("Umm")
             
@@ -394,7 +412,10 @@ class Call(PyTgCalls):
         await remove_active_video_chat(chat_id)
         await remove_active_chat(chat_id)
         try:
-            await assistant.leave_group_call(chat_id)
+            for method_name in ["leave_group_call", "leave_call", "stop"]:
+                if hasattr(assistant, method_name):
+                    await getattr(assistant, method_name)(chat_id)
+                    break
         except:
             pass
 
@@ -411,11 +432,15 @@ class Call(PyTgCalls):
             await auto_clean(popped)
             if not check:
                 await _clear_(chat_id)
-                return await client.leave_group_call(chat_id)
+                for method_name in ["leave_group_call", "leave_call", "stop"]:
+                    if hasattr(client, method_name):
+                        return await getattr(client, method_name)(chat_id)
         except:
             try:
                 await _clear_(chat_id)
-                return await client.leave_group_call(chat_id)
+                for method_name in ["leave_group_call", "leave_call", "stop"]:
+                    if hasattr(client, method_name):
+                        return await getattr(client, method_name)(chat_id)
             except:
                 return
         else:
@@ -441,13 +466,13 @@ class Call(PyTgCalls):
                 if n == 0:
                     return await app.send_message(original_chat_id, text=_["call_6"])
                 
-                if video:
-                    stream = self.create_video_stream(link)
-                else:
-                    stream = self.create_audio_stream(link)
+                stream = self.prepare_stream(link, is_video=video)
                     
                 try:
-                    await client.change_stream(chat_id, stream)
+                    for method_name in ["change_stream", "play", "switch"]:
+                        if hasattr(client, method_name):
+                            await getattr(client, method_name)(chat_id, stream)
+                            break
                 except Exception:
                     return await app.send_message(original_chat_id, text=_["call_6"])
                     
@@ -479,13 +504,13 @@ class Call(PyTgCalls):
                 except:
                     return await mystic.edit_text(_["call_6"], disable_web_page_preview=True)
                     
-                if video:
-                    stream = self.create_video_stream(file_path)
-                else:
-                    stream = self.create_audio_stream(file_path)
+                stream = self.prepare_stream(file_path, is_video=video)
                     
                 try:
-                    await client.change_stream(chat_id, stream)
+                    for method_name in ["change_stream", "play", "switch"]:
+                        if hasattr(client, method_name):
+                            await getattr(client, method_name)(chat_id, stream)
+                            break
                 except:
                     return await app.send_message(original_chat_id, text=_["call_6"])
                     
@@ -507,13 +532,13 @@ class Call(PyTgCalls):
                 db[chat_id][0]["markup"] = "stream"
                 
             elif "index_" in queued:
-                if str(streamtype) == "video":
-                    stream = self.create_video_stream(videoid)
-                else:
-                    stream = self.create_audio_stream(videoid)
+                stream = self.prepare_stream(videoid, is_video=(str(streamtype) == "video"))
                     
                 try:
-                    await client.change_stream(chat_id, stream)
+                    for method_name in ["change_stream", "play", "switch"]:
+                        if hasattr(client, method_name):
+                            await getattr(client, method_name)(chat_id, stream)
+                            break
                 except:
                     return await app.send_message(original_chat_id, text=_["call_6"])
                     
@@ -528,13 +553,13 @@ class Call(PyTgCalls):
                 db[chat_id][0]["markup"] = "tg"
                 
             else:
-                if video:
-                    stream = self.create_video_stream(queued)
-                else:
-                    stream = self.create_audio_stream(queued)
+                stream = self.prepare_stream(queued, is_video=video)
                     
                 try:
-                    await client.change_stream(chat_id, stream)
+                    for method_name in ["change_stream", "play", "switch"]:
+                        if hasattr(client, method_name):
+                            await getattr(client, method_name)(chat_id, stream)
+                            break
                 except:
                     return await app.send_message(original_chat_id, text=_["call_6"])
                     
@@ -578,16 +603,9 @@ class Call(PyTgCalls):
     async def ping(self):
         pings = []
         try:
-            if config.STRING1:
-                pings.append(await self.one.ping)
-            if config.STRING2:
-                pings.append(await self.two.ping)
-            if config.STRING3:
-                pings.append(await self.three.ping)
-            if config.STRING4:
-                pings.append(await self.four.ping)
-            if config.STRING5:
-                pings.append(await self.five.ping)
+            for client in [self.one, self.two, self.three, self.four, self.five]:
+                if client and hasattr(client, 'ping'):
+                    pings.append(await client.ping)
             return str(round(sum(pings) / len(pings), 3)) if pings else "0"
         except:
             return "0"
@@ -595,50 +613,51 @@ class Call(PyTgCalls):
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
         try:
-            if config.STRING1:
-                await self.one.start()
-            if config.STRING2:
-                await self.two.start()
-            if config.STRING3:
-                await self.three.start()
-            if config.STRING4:
-                await self.four.start()
-            if config.STRING5:
-                await self.five.start()
+            for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
+                if client:
+                    try:
+                        await client.start()
+                        LOGGER(__name__).info(f"Started client {i}")
+                    except Exception as e:
+                        LOGGER(__name__).error(f"Error starting client {i}: {e}")
         except Exception as e:
             LOGGER(__name__).error(f"Error starting PyTgCalls: {e}")
 
     async def decorators(self):
         try:
-            @self.one.on_kicked()
-            @self.two.on_kicked()
-            @self.three.on_kicked()
-            @self.four.on_kicked()
-            @self.five.on_kicked()
-            @self.one.on_closed_voice_chat()
-            @self.two.on_closed_voice_chat()
-            @self.three.on_closed_voice_chat()
-            @self.four.on_closed_voice_chat()
-            @self.five.on_closed_voice_chat()
-            @self.one.on_left()
-            @self.two.on_left()
-            @self.three.on_left()
-            @self.four.on_left()
-            @self.five.on_left()
-            async def stream_services_handler(_, chat_id: int):
-                await self.stop_stream(chat_id)
-
-            @self.one.on_stream_end()
-            @self.two.on_stream_end()
-            @self.three.on_stream_end()
-            @self.four.on_stream_end()
-            @self.five.on_stream_end()
-            async def stream_end_handler1(client, update):
-                try:
-                    if hasattr(update, 'chat_id'):
-                        await self.change_stream(client, update.chat_id)
-                except:
-                    pass
+            # Simplified decorators với error handling
+            clients = [self.one, self.two, self.three, self.four, self.five]
+            
+            for client in clients:
+                if client:
+                    try:
+                        # Try to set decorators if methods exist
+                        if hasattr(client, 'on_kicked'):
+                            @client.on_kicked()
+                            async def on_kicked_handler(_, chat_id: int):
+                                await self.stop_stream(chat_id)
+                        
+                        if hasattr(client, 'on_closed_voice_chat'):
+                            @client.on_closed_voice_chat()
+                            async def on_closed_handler(_, chat_id: int):
+                                await self.stop_stream(chat_id)
+                        
+                        if hasattr(client, 'on_left'):
+                            @client.on_left()
+                            async def on_left_handler(_, chat_id: int):
+                                await self.stop_stream(chat_id)
+                        
+                        if hasattr(client, 'on_stream_end'):
+                            @client.on_stream_end()
+                            async def on_stream_end_handler(client_instance, update):
+                                try:
+                                    if hasattr(update, 'chat_id'):
+                                        await self.change_stream(client_instance, update.chat_id)
+                                except:
+                                    pass
+                    except Exception as e:
+                        LOGGER(__name__).error(f"Error setting decorators for client: {e}")
+                        
         except Exception as e:
             LOGGER(__name__).error(f"Error setting decorators: {e}")
 
