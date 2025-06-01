@@ -48,7 +48,7 @@ async def init():
         exit()
     except:
         pass
-    SANKI.decorators()
+    await SANKI.decorators()
     LOGGER("SANKIXD").info(
         "╔═════ஜ۩۞۩ஜ════╗\n  ❥𓆩🥀❱MUỘI💸✘𝗗❱\n╚═════ஜ۩۞۩ஜ════╝"
     )
