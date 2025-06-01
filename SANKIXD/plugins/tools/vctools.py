@@ -25,84 +25,107 @@ except ImportError:
         from pytgcalls.types import AudioPiped, AudioVideoPiped
         print("✅ Alternative stream types imported in vctools")
     except ImportError:
-        try:
-            from pytgcalls import AudioPiped, AudioVideoPiped
-            print("✅ Direct stream types imported in vctools")
-        except ImportError:
-            # Fallback classes
-            class AudioPiped:
-                def __init__(self, path, *args, **kwargs):
-                    self.path = path
-            
-            class AudioVideoPiped:
-                def __init__(self, path, *args, **kwargs):
-                    self.path = path
-            print("⚠️ Using fallback stream types in vctools")
+        AudioPiped = str
+        AudioVideoPiped = str
+        print("⚠️ Using string fallback in vctools")
 
-# Import exceptions với fallback
 try:
-    from pytgcalls.exceptions import NoActiveGroupCall, TelegramServerError, AlreadyJoinedError
+    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
+    NoActiveGroupCall = NotInCall
+    AlreadyJoinedError = AlreadyJoined
     print("✅ New exceptions imported in vctools")
 except ImportError:
     try:
         from pytgcalls.exceptions import NoActiveGroupCall, TelegramServerError, AlreadyJoinedError
-        print("✅ Alternative exceptions imported in vctools")
+        print("✅ Old exceptions imported in vctools")
     except ImportError:
-        # Fallback exceptions
         NoActiveGroupCall = Exception
         TelegramServerError = Exception
         AlreadyJoinedError = Exception
         print("⚠️ Using fallback exceptions in vctools")
 
+async def safe_join_call(assistant, chat_id, audio_path):
+   # \"\"\"Safe method to join call with multiple API attempts\"\"\"
+    # Prepare audio stream
+    if AudioPiped != str:
+        try:
+            stream = AudioPiped(audio_path)
+        except:
+            stream = audio_path
+    else:
+        stream = audio_path
+    
+    # Try different join methods
+    join_methods = ["join_group_call", "join_call", "play", "start_call"]
+    
+    for method_name in join_methods:
+        if hasattr(assistant, method_name):
+            try:
+                method = getattr(assistant, method_name)
+                await method(chat_id, stream)
+                return True
+            except Exception as e:
+                print(f"⚠️ {method_name} failed: {e}")
+                continue
+    
+    return False
+
+async def safe_leave_call(assistant, chat_id):
+   # \"\"\"Safe method to leave call with multiple API attempts\"\"\"
+    leave_methods = ["leave_group_call", "leave_call", "stop", "disconnect"]
+    
+    for method_name in leave_methods:
+        if hasattr(assistant, method_name):
+            try:
+                await getattr(assistant, method_name)(chat_id)
+                return True
+            except:
+                continue
+    
+    return False
+
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
     try:
-        # Không sử dụng stream_type parameter nữa
-        await assistant.join_group_call(message.chat.id, AudioPiped("./SANKIXD/assets/call.mp3"))
+        # Try to join call
+        joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
+        
+        if not joined:
+            await message.reply("ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+            return
+            
         text = "- Beloveds in the call 🫶 :\\n\\n"
-        participants = await assistant.get_participants(message.chat.id)
-        k = 0
-        for participant in participants:
-            info = participant
-            if info.muted == False:
-                mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣 "
-            else:
-                mut = "ᴍᴜᴛᴇᴅ 🔕 "
-            user = await client.get_users(participant.user_id)
-            k += 1
-            text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
-        text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+        
+        try:
+            participants = await assistant.get_participants(message.chat.id)
+            k = 0
+            for participant in participants:
+                info = participant
+                if info.muted == False:
+                    mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣 "
+                else:
+                    mut = "ᴍᴜᴛᴇᴅ 🔕 "
+                user = await client.get_users(participant.user_id)
+                k += 1
+                text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
+            text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+        except Exception as e:
+            text = f"Error getting participants: {e}"
+            
         await message.reply(f"{text}")
         await asyncio.sleep(7)
-        await assistant.leave_group_call(message.chat.id)
-    except NoActiveGroupCall:
-        await message.reply(f"ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
-    except TelegramServerError:
-        await message.reply(f"ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ᴀɢᴀɪɴ, ᴛʜᴇʀᴇ ɪꜱ ᴀ ᴘʀᴏʙʟᴇᴍ ᴡɪᴛʜ ᴛʜᴇ ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ❌")
-    except AlreadyJoinedError:
-        text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
-        participants = await assistant.get_participants(message.chat.id)
-        k = 0
-        for participant in participants:
-            info = participant
-            if info.muted == False:
-                mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣"
-            else:
-                mut = "ᴍᴜᴛᴇᴅ 🔕 "
-            user = await client.get_users(participant.user_id)
-            k += 1
-            text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
-        text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
-        await message.reply(f"{text}")
+        await safe_leave_call(assistant, message.chat.id)
+        
     except Exception as e:
-        # Generic exception handling
         error_msg = str(e).lower()
         if "no active" in error_msg or "notincall" in error_msg:
             await message.reply(f"ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+        elif "telegram server" in error_msg:
+            await message.reply(f"ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ᴀɢᴀɪɴ, ᴛʜᴇʀᴇ ɪꜱ ᴀ ᴘʀᴏʙʟᴇᴍ ᴡɪᴛʜ ᴛʜᴇ ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ❌")
         elif "already joined" in error_msg:
-            text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
             try:
+                text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
                 participants = await assistant.get_participants(message.chat.id)
                 k = 0
                 for participant in participants:
@@ -117,7 +140,7 @@ async def strcall(client, message):
                 text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
                 await message.reply(f"{text}")
             except:
-                await message.reply("Error getting participants")
+                await message.reply("Already in call but couldn't get participants")
         else:
             await message.reply(f"Error: {str(e)}")
 
