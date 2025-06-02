@@ -631,6 +631,30 @@ async def cb_vietnam_week_history(_, query):
     await vietnam_seven_days_ranking(_, query)
 
 
+# Initialize file-based storage as backup
+async def init_file_backup_system():
+    """Initialize file backup system for ranking data"""
+    try:
+        from SANKIXD.utils.file_ranking_storage import load_ranking_from_file, start_file_auto_save
+        
+        # Load existing data from file
+        saved_data = await load_ranking_from_file()
+        if saved_data:
+            # Merge saved data with current data
+            for period in ["today", "week", "month", "daily_7days"]:
+                if period in saved_data:
+                    current_data[period].update(saved_data[period])
+            print(f"✅ Restored ranking data from file backup")
+        
+        # Start auto-save to file
+        start_file_auto_save(current_data)
+        
+    except Exception as e:
+        print(f"⚠️ File backup system error: {e}")
+
+# Initialize file backup system
+asyncio.create_task(init_file_backup_system())
+
 # Start Vietnam timezone scheduler
 asyncio.create_task(vietnam_scheduler())
 
