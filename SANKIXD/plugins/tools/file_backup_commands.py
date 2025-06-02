@@ -9,7 +9,18 @@ from SANKIXD.utils.file_ranking_storage import (
     save_ranking_to_file, create_ranking_backup, 
     get_file_storage_info, load_ranking_from_file
 )
-from SANKIXD.plugins.vietnam_timezone_ranking import current_data, get_vietnam_datetime_str
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+try:
+    from vietnam_timezone_ranking import current_data, get_vietnam_datetime_str
+except ImportError:
+    # Fallback if import fails
+    current_data = {"today": {}, "week": {}, "month": {}, "daily_7days": {}}
+    def get_vietnam_datetime_str():
+        from datetime import datetime
+        import pytz
+        return datetime.now(pytz.timezone('Asia/Ho_Chi_Minh')).strftime("%d/%m/%Y %H:%M")
 
 @app.on_message(filters.command("backup"))
 async def manual_backup_command(_, message: Message):
