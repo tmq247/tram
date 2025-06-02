@@ -112,7 +112,7 @@ def is_vietnam_first_day_midnight():
 async def save_ranking_snapshot(period_type: str, period_key: str, chat_id: int, data: Dict):
     """Save ranking snapshot to history with Vietnam timezone"""
     try:
-        if not history_collection:
+        if history_collection is None:
             return
             
         snapshot = {
@@ -187,8 +187,8 @@ async def vietnam_timezone_watcher(_, message):
         current_data["daily_7days"][chat_id][date_key][user_id] += 1
         
         # Update global stats in MongoDB với Vietnam time
-        if collection is not None:
-            try:
+        try:
+            if collection is not None:
                 collection.update_one(
                     {"_id": user_id}, 
                     {
@@ -201,8 +201,8 @@ async def vietnam_timezone_watcher(_, message):
                     }, 
                     upsert=True
                 )
-            except Exception as e:
-                print(f"Error updating MongoDB stats: {e}")
+        except Exception as e:
+            print(f"Error updating MongoDB stats: {e}")
             
     except Exception as e:
         print(f"Error in vietnam_timezone_watcher: {e}")
