@@ -2,7 +2,7 @@
 from pyrogram import filters
 from pymongo import MongoClient
 from SANKIXD import app
-from config import MONGO_DB_URI
+import config
 from pyrogram.types import *
 import asyncio
 from datetime import datetime, timedelta
@@ -15,34 +15,42 @@ from typing import Dict, List
 VIETNAM_TZ = pytz.timezone('Asia/Ho_Chi_Minh')
 
 def get_vietnam_time():
-  #  \"\"\"Get current time in Vietnam timezone\"\"\"
+    """Get current time in Vietnam timezone"""
     return datetime.now(VIETNAM_TZ)
 
 def get_vietnam_date():
- #   \"\"\"Get current date in Vietnam timezone\"\"\"
+    """Get current date in Vietnam timezone"""
     return get_vietnam_time().date()
 
 def get_vietnam_time_str():
-  #  \"\"\"Get Vietnam time as formatted string\"\"\"
+    """Get Vietnam time as formatted string"""
     return get_vietnam_time().strftime("%H:%M")
 
 def get_vietnam_date_str():
-  #  \"\"\"Get Vietnam date as formatted string\"\"\"
+    """Get Vietnam date as formatted string"""
     return get_vietnam_time().strftime("%d/%m/%Y")
 
 def get_vietnam_datetime_str():
-   # \"\"\"Get Vietnam datetime as formatted string\"\"\"
+    """Get Vietnam datetime as formatted string"""
     return get_vietnam_time().strftime("%d/%m/%Y %H:%M")
 
 
 # MongoDB connection với error handling
 try:
-    mongo_client = MongoClient(MONGO_DB_URI)
-    db = mongo_client["sankirank"]
-    collection = db["ranking"]
-    history_collection = db["ranking_history"]
-    stats_collection = db["chat_stats"]
-    print("✅ MongoDB connected for Vietnam timezone ranking system")
+    if hasattr(config, 'MONGO_DB_URI') and config.MONGO_DB_URI:
+        mongo_client = MongoClient(config.MONGO_DB_URI)
+        db = mongo_client["sankirank"]
+        collection = db["ranking"]
+        history_collection = db["ranking_history"]
+        stats_collection = db["chat_stats"]
+        print("✅ MongoDB connected for Vietnam timezone ranking system")
+    else:
+        print("⚠️ MONGO_DB_URI not configured, ranking will use memory only")
+        mongo_client = None
+        db = None
+        collection = None
+        history_collection = None
+        stats_collection = None
 except Exception as e:
     print(f"❌ MongoDB connection failed: {e}")
     mongo_client = None
@@ -65,21 +73,21 @@ pic = "https://telegra.ph/file/6589d5e41ccaf809453b7.jpg"
 # ------------------- Helper Functions với Vietnam Time ----------------------- #
 
 def get_vietnam_date_key():
- #   \"\"\"Get current Vietnam date as string key\"\"\"
+    """Get current Vietnam date as string key"""
     return get_vietnam_time().strftime("%Y-%m-%d")
 
 def get_vietnam_week_key():
- #   \"\"\"Get current Vietnam week as string key\"\"\"
+    """Get current Vietnam week as string key"""
     vn_time = get_vietnam_time()
     year, week, _ = vn_time.isocalendar()
     return f"{year}-W{week:02d}"
 
 def get_vietnam_month_key():
-  #  \"\"\"Get current Vietnam month as string key\"\"\"
+    """Get current Vietnam month as string key"""
     return get_vietnam_time().strftime("%Y-%m")
 
 def get_vietnam_7days_keys():
-#    \"\"\"Get list of last 7 days keys in Vietnam timezone\"\"\"
+    """Get list of last 7 days keys in Vietnam timezone"""
     keys = []
     for i in range(7):
         date = get_vietnam_time() - timedelta(days=i)
@@ -87,22 +95,22 @@ def get_vietnam_7days_keys():
     return keys
 
 def is_vietnam_midnight():
-  #  \"\"\"Check if it's midnight in Vietnam\"\"\"
+    """Check if it's midnight in Vietnam"""
     vn_time = get_vietnam_time()
     return vn_time.hour == 0 and vn_time.minute == 0
 
 def is_vietnam_monday_midnight():
-  #  \"\"\"Check if it's Monday midnight in Vietnam\"\"\"
+    """Check if it's Monday midnight in Vietnam"""
     vn_time = get_vietnam_time()
     return vn_time.weekday() == 0 and vn_time.hour == 0 and vn_time.minute == 0
 
 def is_vietnam_first_day_midnight():
- #   \"\"\"Check if it's first day of month midnight in Vietnam\"\"\"
+    """Check if it's first day of month midnight in Vietnam"""
     vn_time = get_vietnam_time()
     return vn_time.day == 1 and vn_time.hour == 0 and vn_time.minute == 0
 
 async def save_ranking_snapshot(period_type: str, period_key: str, chat_id: int, data: Dict):
- #   \"\"\"Save ranking snapshot to history with Vietnam timezone\"\"\"
+    """Save ranking snapshot to history with Vietnam timezone"""
     try:
         if not history_collection:
             return
@@ -135,7 +143,7 @@ async def save_ranking_snapshot(period_type: str, period_key: str, chat_id: int,
 
 @app.on_message(filters.group, group=7)
 async def vietnam_timezone_watcher(_, message):
-  #  \"\"\"Advanced message tracking for all periods with Vietnam timezone\"\"\"
+    """Advanced message tracking for all periods with Vietnam timezone"""
     try:
         if not message.from_user:
             return
@@ -179,19 +187,22 @@ async def vietnam_timezone_watcher(_, message):
         current_data["daily_7days"][chat_id][date_key][user_id] += 1
         
         # Update global stats in MongoDB với Vietnam time
-        if collection:
-            collection.update_one(
-                {"_id": user_id}, 
-                {
-                    "$inc": {"total_messages": 1},
-                    "$set": {
-                        "last_active": vn_now,
-                        "last_active_vietnam": get_vietnam_datetime_str(),
-                        "username": message.from_user.username or ""
-                    }
-                }, 
-                upsert=True
-            )
+        if collection is not None:
+            try:
+                collection.update_one(
+                    {"_id": user_id}, 
+                    {
+                        "$inc": {"total_messages": 1},
+                        "$set": {
+                            "last_active": vn_now,
+                            "last_active_vietnam": get_vietnam_datetime_str(),
+                            "username": message.from_user.username or ""
+                        }
+                    }, 
+                    upsert=True
+                )
+            except Exception as e:
+                print(f"Error updating MongoDB stats: {e}")
             
     except Exception as e:
         print(f"Error in vietnam_timezone_watcher: {e}")
@@ -201,7 +212,7 @@ async def vietnam_timezone_watcher(_, message):
 
 @app.on_message(filters.command(["today", "topngay"]))
 async def vietnam_today_ranking(_, message):
-   # \"\"\"Show today's ranking with Vietnam timezone\"\"\"
+    """Show today's ranking with Vietnam timezone"""
     try:
         chat_id = message.chat.id
         today_data = current_data["today"].get(chat_id, {})
@@ -264,7 +275,7 @@ async def vietnam_today_ranking(_, message):
 
 @app.on_message(filters.command(["week", "toptuan"]))
 async def vietnam_week_ranking(_, message):
-    #\"\"\"Show this week's ranking with Vietnam timezone\"\"\"
+    """Show this week's ranking with Vietnam timezone"""
     try:
         chat_id = message.chat.id
         week_data = current_data["week"].get(chat_id, {})
@@ -323,7 +334,7 @@ async def vietnam_week_ranking(_, message):
 
 @app.on_message(filters.command(["month", "topthang"]))  
 async def vietnam_month_ranking(_, message):
-  #  \"\"\"Show this month's ranking with Vietnam timezone\"\"\"
+    """Show this month's ranking with Vietnam timezone"""
     try:
         chat_id = message.chat.id
         month_data = current_data["month"].get(chat_id, {})
@@ -390,7 +401,7 @@ async def vietnam_month_ranking(_, message):
 
 @app.on_message(filters.command("7ngay"))
 async def vietnam_seven_days_ranking(_, message):
-  #  \"\"\"Show 7 days detailed history with Vietnam timezone\"\"\"
+    """Show 7 days detailed history with Vietnam timezone"""
     try:
         chat_id = message.chat.id
         seven_days_data = current_data["daily_7days"].get(chat_id, {})
@@ -452,7 +463,7 @@ async def vietnam_seven_days_ranking(_, message):
 
 @app.on_message(filters.command(["time", "vietnam", "vntime"]))
 async def vietnam_time_info(_, message):
-  #  \"\"\"Show current Vietnam time information\"\"\"
+    """Show current Vietnam time information"""
     try:
         vn_time = get_vietnam_time()
         
@@ -492,7 +503,7 @@ async def vietnam_time_info(_, message):
 # ------------------- Auto Reset Functions với Vietnam Time ----------------------- #
 
 async def vietnam_daily_reset():
-  #  \"\"\"Reset daily stats and save snapshot - Vietnam timezone\"\"\"
+    """Reset daily stats and save snapshot - Vietnam timezone"""
     try:
         print(f"🔄 Starting daily reset at Vietnam time: {get_vietnam_datetime_str()}")
         date_key = get_vietnam_date_key()
@@ -522,7 +533,7 @@ async def vietnam_daily_reset():
 
 
 async def vietnam_weekly_reset():
-    #\"\"\"Reset weekly stats and save snapshot - Vietnam timezone\"\"\"
+    """Reset weekly stats and save snapshot - Vietnam timezone"""
     try:
         print(f"🔄 Starting weekly reset at Vietnam time: {get_vietnam_datetime_str()}")
         week_key = get_vietnam_week_key()
@@ -541,7 +552,7 @@ async def vietnam_weekly_reset():
 
 
 async def vietnam_monthly_reset():
-  #  \"\"\"Reset monthly stats and save snapshot - Vietnam timezone\"\"\"
+    """Reset monthly stats and save snapshot - Vietnam timezone"""
     try:
         print(f"🔄 Starting monthly reset at Vietnam time: {get_vietnam_datetime_str()}")
         month_key = get_vietnam_month_key()
@@ -562,7 +573,7 @@ async def vietnam_monthly_reset():
 # ------------------- Vietnam Timezone Scheduler ----------------------- #
 
 async def vietnam_scheduler():
- #   \"\"\"Main scheduler for auto resets - Vietnam timezone\"\"\"
+    """Main scheduler for auto resets - Vietnam timezone"""
     print(f"🕐 Vietnam timezone scheduler started at {get_vietnam_datetime_str()}")
     
     while True:
@@ -594,30 +605,30 @@ async def vietnam_scheduler():
 
 @app.on_callback_query(filters.regex("today_ranking"))
 async def cb_vietnam_today_ranking(_, query):
-  #  \"\"\"Callback for today's ranking\"\"\"
+    """Callback for today's ranking"""
     message = query.message
     await vietnam_today_ranking(_, message)
 
 
 @app.on_callback_query(filters.regex("week_ranking"))
 async def cb_vietnam_week_ranking(_, query):
- #   \"\"\"Callback for week's ranking\"\"\"
+    """Callback for week's ranking"""
     message = query.message
     await vietnam_week_ranking(_, message)
 
 
 @app.on_callback_query(filters.regex("month_ranking"))
 async def cb_vietnam_month_ranking(_, query):
-   # \"\"\"Callback for month's ranking\"\"\"
+    """Callback for month's ranking"""
     message = query.message
     await vietnam_month_ranking(_, message)
 
 
 @app.on_callback_query(filters.regex("week_history"))
 async def cb_vietnam_week_history(_, query):
-   # \"\"\"Callback for 7 days history\"\"\"
+    """Callback for 7 days history"""
     message = query.message
-    await vietnam_seven_days_ranking(_, message)
+    await vietnam_seven_days_ranking(_, query)
 
 
 # Start Vietnam timezone scheduler
