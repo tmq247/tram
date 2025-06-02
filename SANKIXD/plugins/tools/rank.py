@@ -458,6 +458,67 @@ async def vietnam_seven_days_ranking(_, message):
         await message.reply_text(response, reply_markup=InlineKeyboardMarkup(buttons))
         
     except Exception as e:
+        await message.reply_text(f"❌  **Lỗi:** {str(e)}")
+
+#@app.on_message(filters.command("7ngay"))
+async def vietnam_seven_days_ranking1(_, message):
+    """Show 7 days detailed history with Vietnam timezone"""
+    try:
+        chat_id = query.message.chat.id
+        seven_days_data = current_data["daily_7days"].get(chat_id, {})
+        
+        if not seven_days_data:
+            await query.message.reply_text("📭 **Không có dữ liệu 7 ngày.**")
+            return
+        
+        vn_time_str = get_vietnam_time_str()
+        response = f"**📋 CHI TIẾT 7 NGÀY QUA**\n🕐 {vn_time_str}\n\n"
+        
+        # Vietnamese day names
+        day_names_vn = {
+            0: "T2", 1: "T3", 2: "T4", 3: "T5", 4: "T6", 5: "T7", 6: "CN"
+        }
+        
+        for i, date_key in enumerate(get_vietnam_7days_keys()):
+            day_data = seven_days_data.get(date_key, {})
+            if not day_data:
+                continue
+                
+            # Get top 3 for each day
+            sorted_day_users = sorted(
+                day_data.items(), 
+                key=lambda x: x[1], 
+                reverse=True
+            )[:3]
+            
+            # Convert to Vietnam date
+            date_obj = datetime.strptime(date_key, "%Y-%m-%d")
+            vn_date_obj = VIETNAM_TZ.localize(date_obj)
+            day_name = day_names_vn[vn_date_obj.weekday()]
+            day_str = vn_date_obj.strftime(f"{day_name} %d/%m")
+            total_msgs = sum(day_data.values())
+            
+            response += f"**{day_str}** • `{total_msgs}` tin nhắn\n"
+            
+            for idx, (user_id, msg_count) in enumerate(sorted_day_users):
+                try:
+                    user = await app.get_users(user_id)
+                    user_name = user.first_name[:12] if user.first_name else "Unknown"
+                except:
+                    user_name = "Unknown"
+                
+                medal = ["🥇", "🥈", "🥉"][idx] if idx < 3 else "🏅"
+                response += f"  {medal} {user_name} (`{msg_count}`)\n"
+            response += "\n"
+        
+        buttons = [
+            [InlineKeyboardButton("📅 Hôm nay", callback_data="today_ranking")],
+            [InlineKeyboardButton("📋 Lịch sử chat", callback_data="chat_history")]
+        ]
+        
+        await message.reply_text(response, reply_markup=InlineKeyboardMarkup(buttons))
+        
+    except Exception as e:
         await query.message.reply_text(f"❌  **Lỗi:** {str(e)}")
 
 @app.on_message(filters.command(["time", "vietnam", "vntime"]))
