@@ -461,7 +461,7 @@ async def vietnam_seven_days_ranking(_, message):
         await message.reply_text(f"❌  **Lỗi:** {str(e)}")
 
 #@app.on_message(filters.command("7ngay"))
-async def vietnam_seven_days_ranking1(_, message):
+async def vietnam_seven_days_ranking1(_, query):
     """Show 7 days detailed history with Vietnam timezone"""
     try:
         chat_id = query.message.chat.id
