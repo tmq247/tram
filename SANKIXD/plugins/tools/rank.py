@@ -458,8 +458,7 @@ async def vietnam_seven_days_ranking(_, message):
         await message.reply_text(response, reply_markup=InlineKeyboardMarkup(buttons))
         
     except Exception as e:
-        await message.reply_text(f"❌ **Lỗi:** {str(e)}")
-
+        await query.message.reply_text(f"❌  **Lỗi:** {str(e)}")
 
 @app.on_message(filters.command(["time", "vietnam", "vntime"]))
 async def vietnam_time_info(_, message):
