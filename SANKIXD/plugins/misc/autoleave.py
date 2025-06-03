@@ -1,3 +1,4 @@
+
 import asyncio
 from datetime import datetime
 
@@ -54,15 +55,18 @@ async def auto_end():
     while not await asyncio.sleep(5):
         if not await is_autoend():
             continue
-        for chat_id in autoend:
+        # Sử dụng list() để tránh lỗi "dictionary changed size during iteration"
+        for chat_id in list(autoend.keys()):
             timer = autoend.get(chat_id)
             if not timer:
                 continue
             if datetime.now() > timer:
                 if not await is_active_chat(chat_id):
-                    autoend[chat_id] = {}
+                    if chat_id in autoend:
+                        autoend[chat_id] = {}
                     continue
-                autoend[chat_id] = {}
+                if chat_id in autoend:
+                    autoend[chat_id] = {}
                 try:
                     await SANKI.stop_stream(chat_id)
                 except:
