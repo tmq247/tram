@@ -9,19 +9,31 @@ from pytgcalls import PyTgCalls
 
 # Import với compatibility checking
 try:
-    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
-    print("✅ New exceptions imported")
+    from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall, TelegramServerError
+    AlreadyJoined = AlreadyJoinedError
+    NotInCall = NoActiveGroupCall
+    print("✅ PyTgCalls exceptions imported successfully")
 except ImportError:
     try:
-        from pytgcalls.exceptions import AlreadyJoinedError as AlreadyJoined
-        from pytgcalls.exceptions import NoActiveGroupCall as NotInCall
-        from pytgcalls.exceptions import TelegramServerError
-        print("✅ Old exceptions imported")
+        from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
+        print("✅ Alternative exceptions imported")
     except ImportError:
         AlreadyJoined = Exception
         NotInCall = Exception  
         TelegramServerError = Exception
         print("⚠️ Using generic exceptions")
+
+# Import StreamType với fallback
+try:
+    from pytgcalls import StreamType
+    print("✅ StreamType imported")
+except ImportError:
+    # Fallback cho StreamType
+    class StreamType:
+        @staticmethod
+        def pulse_stream():
+            return None
+    print("⚠️ Using fallback StreamType")
 
 # Import stream types dengan fallback
 try:
@@ -77,63 +89,91 @@ counter = {}
 
 
 async def _clear_(chat_id):
-    db[chat_id] = []
-    await remove_active_video_chat(chat_id)
-    await remove_active_chat(chat_id)
+    try:
+        if chat_id in db:
+            db[chat_id] = []
+        await remove_active_video_chat(chat_id)
+        await remove_active_chat(chat_id)
+        # Dọn dẹp autoend và counter
+        if chat_id in autoend:
+            del autoend[chat_id]
+        if chat_id in counter:
+            del counter[chat_id]
+    except Exception as e:
+        LOGGER(__name__).error(f"Error clearing chat {chat_id}: {e}")
 
 
 class Call(PyTgCalls):
     def __init__(self):
+        # Tối ưu cho VPS - giảm cache duration
         self.userbot1 = Client(
             name="SANKIAss1",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
+            workdir="./sessions",
+            sleep_threshold=180,  # Tối ưu cho VPS
         )
         self.one = PyTgCalls(
             self.userbot1,
-            cache_duration=100,
+            cache_duration=50,  # Giảm cache để tiết kiệm RAM
         )
-        self.userbot2 = Client(
-            name="SANKIAss2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-        )
-        self.two = PyTgCalls(
-            self.userbot2,
-            cache_duration=100,
-        )
-        self.userbot3 = Client(
-            name="SANKIAss3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-        )
-        self.three = PyTgCalls(
-            self.userbot3,
-            cache_duration=100,
-        )
-        self.userbot4 = Client(
-            name="SANKIAss4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-        )
-        self.four = PyTgCalls(
-            self.userbot4,
-            cache_duration=100,
-        )
-        self.userbot5 = Client(
-            name="SANKIAss5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-        )
-        self.five = PyTgCalls(
-            self.userbot5,
-            cache_duration=100,
-        )
+        # Chỉ khởi tạo userbot nếu có STRING session tương ứng
+        if config.STRING2:
+            self.userbot2 = Client(
+                name="SANKIAss2",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING2),
+                workdir="./sessions",
+                sleep_threshold=180,
+            )
+            self.two = PyTgCalls(self.userbot2, cache_duration=50)
+        else:
+            self.userbot2 = None
+            self.two = None
+            
+        if config.STRING3:
+            self.userbot3 = Client(
+                name="SANKIAss3",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING3),
+                workdir="./sessions",
+                sleep_threshold=180,
+            )
+            self.three = PyTgCalls(self.userbot3, cache_duration=50)
+        else:
+            self.userbot3 = None
+            self.three = None
+            
+        if config.STRING4:
+            self.userbot4 = Client(
+                name="SANKIAss4",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING4),
+                workdir="./sessions",
+                sleep_threshold=180,
+            )
+            self.four = PyTgCalls(self.userbot4, cache_duration=50)
+        else:
+            self.userbot4 = None
+            self.four = None
+            
+        if config.STRING5:
+            self.userbot5 = Client(
+                name="SANKIAss5",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(config.STRING5),
+                workdir="./sessions",
+                sleep_threshold=180,
+            )
+            self.five = PyTgCalls(self.userbot5, cache_duration=50)
+        else:
+            self.userbot5 = None
+            self.five = None
 
     async def call_py_method(self, assistant, method_name, *args, **kwargs):
        # \"\"\"Universal method caller with fallbacks\"\"\"
@@ -421,6 +461,17 @@ class Call(PyTgCalls):
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
+        if not check:
+            # Nếu không có queue, thoát ngay
+            await _clear_(chat_id)
+            for method_name in ["leave_group_call", "leave_call", "stop"]:
+                if hasattr(client, method_name):
+                    try:
+                        return await getattr(client, method_name)(chat_id)
+                    except:
+                        continue
+            return
+            
         popped = None
         loop = await get_loop(chat_id)
         try:
@@ -430,19 +481,30 @@ class Call(PyTgCalls):
                 loop = loop - 1
                 await set_loop(chat_id, loop)
             await auto_clean(popped)
-            if not check:
+            
+            # Kiểm tra lại sau khi pop
+            if not check or len(check) == 0:
                 await _clear_(chat_id)
                 for method_name in ["leave_group_call", "leave_call", "stop"]:
                     if hasattr(client, method_name):
-                        return await getattr(client, method_name)(chat_id)
-        except:
+                        try:
+                            return await getattr(client, method_name)(chat_id)
+                        except:
+                            continue
+                return
+        except Exception as e:
+            # Nếu có lỗi, dọn dẹp và thoát
             try:
                 await _clear_(chat_id)
                 for method_name in ["leave_group_call", "leave_call", "stop"]:
                     if hasattr(client, method_name):
-                        return await getattr(client, method_name)(chat_id)
+                        try:
+                            await getattr(client, method_name)(chat_id)
+                        except:
+                            continue
             except:
-                return
+                pass
+            return
         else:
             queued = check[0]["file"]
             language = await get_lang(chat_id)
@@ -652,9 +714,28 @@ class Call(PyTgCalls):
                             async def on_stream_end_handler(client_instance, update):
                                 try:
                                     if hasattr(update, 'chat_id'):
-                                        await self.change_stream(client_instance, update.chat_id)
-                                except:
-                                    pass
+                                        chat_id = update.chat_id
+                                        # Kiểm tra xem còn bài hát trong queue không
+                                        queue = db.get(chat_id, [])
+                                        if not queue or len(queue) <= 1:
+                                            # Nếu không còn bài, thoát ngay
+                                            await _clear_(chat_id)
+                                            for method_name in ["leave_group_call", "leave_call", "stop"]:
+                                                if hasattr(client_instance, method_name):
+                                                    try:
+                                                        await getattr(client_instance, method_name)(chat_id)
+                                                        break
+                                                    except:
+                                                        continue
+                                        else:
+                                            # Nếu còn bài, chuyển sang bài tiếp theo
+                                            await self.change_stream(client_instance, chat_id)
+                                except Exception as e:
+                                    LOGGER(__name__).error(f"Error in stream end handler: {e}")
+                                    try:
+                                        await _clear_(chat_id)
+                                    except:
+                                        pass
                     except Exception as e:
                         LOGGER(__name__).error(f"Error setting decorators for client: {e}")
                         
