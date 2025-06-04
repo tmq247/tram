@@ -2,7 +2,7 @@
 import asyncio
 import os
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Optional
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
