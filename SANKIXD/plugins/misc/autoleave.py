@@ -24,7 +24,7 @@ async def auto_leave():
                         chat_type = i.chat.type
                         if chat_type in [
                             "supergroup",
-                            "group", 
+                            "group",
                             "channel",
                         ]:
                             chat_id = i.chat.id
@@ -33,18 +33,17 @@ async def auto_leave():
                                 and i.chat.id != -1001919135283
                                 and i.chat.id != -1001841879487
                             ):
-                                if left >= 20:
-                                    break
+                                if left == 20:
+                                    continue
                                 if not await is_active_chat(chat_id):
                                     try:
-                                        await client.leave_chat(chat_id)
+                                        await client.leave_chat(
+                                            chat_id
+                                        )
                                         left += 1
-                                        print(f"✅ Left inactive chat: {chat_id}")
-                                    except Exception as e:
-                                        print(f"⚠️ Failed to leave chat {chat_id}: {e}")
+                                    except:
                                         continue
-                except Exception as e:
-                    print(f"Error in auto_leave for assistant {num}: {e}")
+                except:
                     pass
 
 
@@ -56,69 +55,60 @@ async def auto_end():
         await asyncio.sleep(5)
         if not await is_autoend():
             continue
-            
-        # Tạo copy của keys để tránh RuntimeError
-        chat_ids_to_check = list(autoend.keys())
-        
-        for chat_id in chat_ids_to_check:
+        # Sử dụng list() để tránh lỗi "dictionary changed size during iteration"
+        for chat_id in list(autoend.keys()):
             timer = autoend.get(chat_id)
             if not timer:
                 continue
-                
             if datetime.now() > timer:
                 if not await is_active_chat(chat_id):
-                    # Xóa chat khỏi autoend nếu không active
                     if chat_id in autoend:
                         del autoend[chat_id]
                     continue
                 
-                # Xóa chat khỏi autoend trước khi thực hiện các action
+                # Xóa chat_id khỏi autoend trước khi thực hiện cleanup
                 if chat_id in autoend:
                     del autoend[chat_id]
                 
-                print(f"🕐 Auto ending chat {chat_id}")
-                
                 try:
-                    # Method 1: Sử dụng leave_group_call của py-tgcalls 2.2.1
-                    from SANKIXD.core.userbot import assistants
-                    from SANKIXD.utils.database import group_assistant
+                    # Clear queue trước khi stop stream
+                    from SANKIXD.misc import db
+                    try:
+                        # Xóa queue của chat
+                        db[chat_id] = []
+                    except:
+                        pass
                     
-                    # Lấy assistant cho chat này
-                    assistant = await group_assistant(SANKI, chat_id)
+                    # Clear current playing song
+                    try:
+                        from SANKIXD.core.call import queues
+                        if chat_id in queues:
+                            queues[chat_id].clear()
+                    except:
+                        pass
                     
-                    # Dừng stream trước
+                    # Stop stream và leave voice chat
                     await SANKI.stop_stream(chat_id)
                     await asyncio.sleep(1)
                     
-                    # Thử leave group call với py-tgcalls 2.2.1
-                    if hasattr(SANKI, 'leave_group_call'):
-                        try:
-                            await SANKI.leave_group_call(chat_id)
-                            print(f"✅ Left group call using leave_group_call: {chat_id}")
-                        except Exception as e:
-                            print(f"⚠️ leave_group_call failed: {e}")
-                            
-                            # Fallback: Thử với pytgcalls client trực tiếp
+                    # Force leave voice chat
+                    try:
+                        from SANKIXD.utils.database import group_assistant
+                        assistant = await group_assistant(SANKI, chat_id)
+                        if assistant:
+                            # Thử leave group call
                             try:
-                                if hasattr(assistant, 'leave_group_call'):
-                                    await assistant.leave_group_call(chat_id)
-                                    print(f"✅ Left using assistant.leave_group_call: {chat_id}")
-                                elif hasattr(assistant, 'call'):
-                                    await assistant.call.leave_group_call(chat_id)
-                                    print(f"✅ Left using assistant.call.leave_group_call: {chat_id}")
-                            except Exception as e2:
-                                print(f"⚠️ Assistant leave failed: {e2}")
-                    
-                    # Method 2: Force disconnect bằng cách restart pytgcalls cho chat đó
-                    elif hasattr(SANKI, 'pytgcalls'):
-                        try:
-                            await SANKI.pytgcalls.leave_group_call(chat_id)
-                            print(f"✅ Left using pytgcalls.leave_group_call: {chat_id}")
-                        except Exception as e:
-                            print(f"⚠️ pytgcalls leave failed: {e}")
+                                await assistant.leave_group_call(chat_id)
+                            except:
+                                try:
+                                    await assistant.leave_call(chat_id)
+                                except:
+                                    pass
+                    except:
+                        pass
                     
                 except Exception as e:
-                    print(f"❌ Error leaving voice chat {chat_id}: {e}")
+                    print(f"Error in auto_end cleanup: {e}")
                     continue
                 
                 try:
@@ -126,9 +116,8 @@ async def auto_end():
                         chat_id,
                         "» ʙᴏᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ ʟᴇғᴛ ᴠɪᴅᴇᴏᴄʜᴀᴛ ʙᴇᴄᴀᴜsᴇ ɴᴏ ᴏɴᴇ ᴡᴀs ʟɪsᴛᴇɴɪɴɢ ᴏɴ ᴠɪᴅᴇᴏᴄʜᴀᴛ.",
                     )
-                    print(f"✅ Sent auto-end message to {chat_id}")
                 except Exception as e:
-                    print(f"⚠️ Failed to send message to {chat_id}: {e}")
+                    print(f"Error sending auto-end message: {e}")
                     continue
 
 
