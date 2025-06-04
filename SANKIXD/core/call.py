@@ -1,3 +1,4 @@
+
 import asyncio
 import os
 from datetime import datetime, timedelta
@@ -35,7 +36,7 @@ except ImportError:
             return None
     print("⚠️ Using fallback StreamType")
 
-# Import stream types dengan fallback
+# Import stream types với fallback
 try:
     from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
     from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
@@ -176,7 +177,7 @@ class Call(PyTgCalls):
             self.five = None
 
     async def call_py_method(self, assistant, method_name, *args, **kwargs):
-       # \"\"\"Universal method caller with fallbacks\"\"\"
+        """Universal method caller with fallbacks"""
         methods_to_try = [
             method_name,
             method_name.replace('_', ''),
@@ -238,7 +239,7 @@ class Call(PyTgCalls):
             pass
 
     def prepare_stream(self, path, is_video=False, additional_params=""):
-      #  \"\"\"Prepare stream based on available types\"\"\"
+        """Prepare stream based on available types"""
         try:
             if is_video:
                 if AudioVideoPiped != str:
@@ -673,7 +674,7 @@ class Call(PyTgCalls):
             return "0"
 
     async def start(self):
-        LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
+        LOGGER(__name__).info("Starting PyTgCalls Client...\n")
         try:
             for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
                 if client:
@@ -744,3 +745,65 @@ class Call(PyTgCalls):
 
 
 SANKI = Call()
+
+# Helper functions
+async def validate_chat_id(chat_id: Union[int, str]) -> Optional[int]:
+    """Validate và convert chat_id về int"""
+    try:
+        if isinstance(chat_id, str):
+            # Remove @ symbol if present
+            if chat_id.startswith('@'):
+                chat_id = chat_id[1:]
+            # Try to convert to int
+            try:
+                return int(chat_id)
+            except ValueError:
+                # If can't convert, try to get chat info
+                if SANKI and SANKI.userbot1:
+                    try:
+                        chat = await SANKI.userbot1.get_chat(chat_id)
+                        return chat.id
+                    except:
+                        return None
+        elif isinstance(chat_id, int):
+            return chat_id
+        return None
+    except Exception as e:
+        print(f"Error validating chat_id {chat_id}: {e}")
+        return None
+
+async def safe_leave_call(chat_id: int) -> bool:
+    """Safely leave voice call with comprehensive cleanup"""
+    try:
+        # Validate chat_id
+        validated_chat_id = await validate_chat_id(chat_id)
+        if not validated_chat_id:
+            return False
+            
+        # Clear database first
+        await _clear_(validated_chat_id)
+        
+        # Try to leave call using all available clients
+        success = False
+        for client in [SANKI.one, SANKI.two, SANKI.three, SANKI.four, SANKI.five]:
+            if client:
+                try:
+                    for method_name in ["leave_group_call", "leave_call", "stop", "disconnect"]:
+                        if hasattr(client, method_name):
+                            try:
+                                await getattr(client, method_name)(validated_chat_id)
+                                success = True
+                                break
+                            except:
+                                continue
+                    if success:
+                        break
+                except Exception as e:
+                    print(f"Error with client: {e}")
+                    continue
+        
+        return success
+        
+    except Exception as e:
+        print(f"Error in safe_leave_call: {e}")
+        return False
