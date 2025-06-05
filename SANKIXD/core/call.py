@@ -1,8 +1,7 @@
-
 import asyncio
 import os
 from datetime import datetime, timedelta
-from typing import Union, Optional
+from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
@@ -10,33 +9,21 @@ from pytgcalls import PyTgCalls
 
 # Import với compatibility checking
 try:
-    from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall, TelegramServerError
-    AlreadyJoined = AlreadyJoinedError
-    NotInCall = NoActiveGroupCall
-    print("✅ PyTgCalls exceptions imported successfully")
+    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
+    print("✅ New exceptions imported")
 except ImportError:
     try:
-        from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
-        print("✅ Alternative exceptions imported")
+        from pytgcalls.exceptions import AlreadyJoinedError as AlreadyJoined
+        from pytgcalls.exceptions import NoActiveGroupCall as NotInCall
+        from pytgcalls.exceptions import TelegramServerError
+        print("✅ Old exceptions imported")
     except ImportError:
         AlreadyJoined = Exception
         NotInCall = Exception  
         TelegramServerError = Exception
         print("⚠️ Using generic exceptions")
 
-# Import StreamType với fallback
-try:
-    from pytgcalls import StreamType
-    print("✅ StreamType imported")
-except ImportError:
-    # Fallback cho StreamType
-    class StreamType:
-        @staticmethod
-        def pulse_stream():
-            return None
-    print("⚠️ Using fallback StreamType")
-
-# Import stream types với fallback
+# Import stream types dengan fallback
 try:
     from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
     from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
@@ -90,94 +77,66 @@ counter = {}
 
 
 async def _clear_(chat_id):
-    try:
-        if chat_id in db:
-            db[chat_id] = []
-        await remove_active_video_chat(chat_id)
-        await remove_active_chat(chat_id)
-        # Dọn dẹp autoend và counter
-        if chat_id in autoend:
-            del autoend[chat_id]
-        if chat_id in counter:
-            del counter[chat_id]
-    except Exception as e:
-        LOGGER(__name__).error(f"Error clearing chat {chat_id}: {e}")
+    db[chat_id] = []
+    await remove_active_video_chat(chat_id)
+    await remove_active_chat(chat_id)
 
 
 class Call(PyTgCalls):
     def __init__(self):
-        # Tối ưu cho VPS - giảm cache duration
         self.userbot1 = Client(
             name="SANKIAss1",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
-            workdir="./sessions",
-            sleep_threshold=180,  # Tối ưu cho VPS
         )
         self.one = PyTgCalls(
             self.userbot1,
-            cache_duration=50,  # Giảm cache để tiết kiệm RAM
+            cache_duration=100,
         )
-        # Chỉ khởi tạo userbot nếu có STRING session tương ứng
-        if config.STRING2:
-            self.userbot2 = Client(
-                name="SANKIAss2",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING2),
-                workdir="./sessions",
-                sleep_threshold=180,
-            )
-            self.two = PyTgCalls(self.userbot2, cache_duration=50)
-        else:
-            self.userbot2 = None
-            self.two = None
-            
-        if config.STRING3:
-            self.userbot3 = Client(
-                name="SANKIAss3",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING3),
-                workdir="./sessions",
-                sleep_threshold=180,
-            )
-            self.three = PyTgCalls(self.userbot3, cache_duration=50)
-        else:
-            self.userbot3 = None
-            self.three = None
-            
-        if config.STRING4:
-            self.userbot4 = Client(
-                name="SANKIAss4",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING4),
-                workdir="./sessions",
-                sleep_threshold=180,
-            )
-            self.four = PyTgCalls(self.userbot4, cache_duration=50)
-        else:
-            self.userbot4 = None
-            self.four = None
-            
-        if config.STRING5:
-            self.userbot5 = Client(
-                name="SANKIAss5",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(config.STRING5),
-                workdir="./sessions",
-                sleep_threshold=180,
-            )
-            self.five = PyTgCalls(self.userbot5, cache_duration=50)
-        else:
-            self.userbot5 = None
-            self.five = None
+        self.userbot2 = Client(
+            name="SANKIAss2",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING2),
+        )
+        self.two = PyTgCalls(
+            self.userbot2,
+            cache_duration=100,
+        )
+        self.userbot3 = Client(
+            name="SANKIAss3",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING3),
+        )
+        self.three = PyTgCalls(
+            self.userbot3,
+            cache_duration=100,
+        )
+        self.userbot4 = Client(
+            name="SANKIAss4",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING4),
+        )
+        self.four = PyTgCalls(
+            self.userbot4,
+            cache_duration=100,
+        )
+        self.userbot5 = Client(
+            name="SANKIAss5",
+            api_id=config.API_ID,
+            api_hash=config.API_HASH,
+            session_string=str(config.STRING5),
+        )
+        self.five = PyTgCalls(
+            self.userbot5,
+            cache_duration=100,
+        )
 
     async def call_py_method(self, assistant, method_name, *args, **kwargs):
-        """Universal method caller with fallbacks"""
+       # \"\"\"Universal method caller with fallbacks\"\"\"
         methods_to_try = [
             method_name,
             method_name.replace('_', ''),
@@ -224,22 +183,60 @@ class Call(PyTgCalls):
             pass
 
     async def stop_stream_force(self, chat_id: int):
-        for client in [self.one, self.two, self.three, self.four, self.five]:
-            if client:
-                try:
-                    for method in ["leave_group_call", "leave_call", "stop", "disconnect"]:
-                        if hasattr(client, method):
-                            await getattr(client, method)(chat_id)
-                            break
-                except:
-                    pass
+        """Force stop với tất cả client cho pytgcalls 2.2.1"""
+        print(f"🔨 Force stopping stream in chat {chat_id}")
+        
+        # Clear data ngay lập tức
         try:
             await _clear_(chat_id)
         except:
             pass
+        
+        left_successfully = False
+        
+        # Thử với từng client theo thứ tự
+        for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
+            if client and not left_successfully:
+                try:
+                    # Thử các method leave cho pytgcalls 2.2.1
+                    for method in ["leave_group_call", "leave_call", "stop_stream", "stop", "disconnect"]:
+                        if hasattr(client, method):
+                            try:
+                                await getattr(client, method)(chat_id)
+                                left_successfully = True
+                                print(f"✅ Successfully left chat {chat_id} using client {i} method {method}")
+                                break
+                            except Exception as e:
+                                print(f"⚠️ Client {i} method {method} failed: {e}")
+                                continue
+                    
+                    if left_successfully:
+                        break
+                        
+                except Exception as e:
+                    print(f"❌ Client {i} error: {e}")
+                    continue
+        
+        # Cleanup cuối cùng
+        try:
+            if chat_id in autoend:
+                del autoend[chat_id]
+            if chat_id in counter:
+                del counter[chat_id]
+            await remove_active_chat(chat_id)
+            await remove_active_video_chat(chat_id)
+        except:
+            pass
+        
+        if left_successfully:
+            print(f"✅ Force stop completed for chat {chat_id}")
+        else:
+            print(f"⚠️ Force stop may not have fully completed for chat {chat_id}")
+        
+        return left_successfully
 
     def prepare_stream(self, path, is_video=False, additional_params=""):
-        """Prepare stream based on available types"""
+      #  \"\"\"Prepare stream based on available types\"\"\"
         try:
             if is_video:
                 if AudioVideoPiped != str:
@@ -460,21 +457,65 @@ class Call(PyTgCalls):
         except:
             pass
 
+    async def _reliable_leave_call(self, client, chat_id):
+        """Hàm thoát cuộc gọi đáng tin cậy với pytgcalls 2.2.1"""
+        left_successfully = False
+        
+        # Thử các method leave theo thứ tự ưu tiên
+        leave_methods = [
+            "leave_group_call",  # Method chính của pytgcalls 2.2.1
+            "leave_call",
+            "stop_stream", 
+            "stop",
+            "disconnect"
+        ]
+        
+        for method_name in leave_methods:
+            if hasattr(client, method_name):
+                try:
+                    method = getattr(client, method_name)
+                    await method(chat_id)
+                    left_successfully = True
+                    print(f"✅ Successfully left chat {chat_id} using {method_name}")
+                    break
+                except Exception as e:
+                    print(f"⚠️ Failed to leave chat {chat_id} with {method_name}: {e}")
+                    continue
+        
+        # Nếu tất cả method đều thất bại, thử với tất cả client có sẵn
+        if not left_successfully:
+            print(f"🔄 Trying with all available clients for chat {chat_id}")
+            for client_instance in [self.one, self.two, self.three, self.four, self.five]:
+                if client_instance and not left_successfully:
+                    for method_name in leave_methods:
+                        if hasattr(client_instance, method_name):
+                            try:
+                                method = getattr(client_instance, method_name)
+                                await method(chat_id)
+                                left_successfully = True
+                                print(f"✅ Left chat {chat_id} using backup client with {method_name}")
+                                break
+                            except:
+                                continue
+                    if left_successfully:
+                        break
+        
+        if not left_successfully:
+            print(f"❌ Could not leave chat {chat_id} with any method")
+        
+        return left_successfully
+
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
-        if not check:
-            # Nếu không có queue, thoát ngay
-            await _clear_(chat_id)
-            for method_name in ["leave_group_call", "leave_call", "stop"]:
-                if hasattr(client, method_name):
-                    try:
-                        return await getattr(client, method_name)(chat_id)
-                    except:
-                        continue
-            return
-            
         popped = None
         loop = await get_loop(chat_id)
+        
+        # Nếu không có queue, thoát ngay lập tức
+        if not check:
+            await _clear_(chat_id)
+            await self._reliable_leave_call(client, chat_id)
+            return
+            
         try:
             if loop == 0:
                 popped = check.pop(0)
@@ -483,30 +524,20 @@ class Call(PyTgCalls):
                 await set_loop(chat_id, loop)
             await auto_clean(popped)
             
-            # Kiểm tra lại sau khi pop
-            if not check or len(check) == 0:
+            # Kiểm tra lại queue sau khi pop
+            if not check:
                 await _clear_(chat_id)
-                for method_name in ["leave_group_call", "leave_call", "stop"]:
-                    if hasattr(client, method_name):
-                        try:
-                            return await getattr(client, method_name)(chat_id)
-                        except:
-                            continue
+                await self._reliable_leave_call(client, chat_id)
                 return
         except Exception as e:
-            # Nếu có lỗi, dọn dẹp và thoát
-            try:
+            # Nếu có lỗi và queue trống, thoát
+            check = db.get(chat_id)
+            if not check:
                 await _clear_(chat_id)
-                for method_name in ["leave_group_call", "leave_call", "stop"]:
-                    if hasattr(client, method_name):
-                        try:
-                            await getattr(client, method_name)(chat_id)
-                        except:
-                            continue
-            except:
-                pass
-            return
+                await self._reliable_leave_call(client, chat_id)
+                return
         else:
+            # Nếu có queue, tiếp tục play bài tiếp theo
             queued = check[0]["file"]
             language = await get_lang(chat_id)
             _ = get_string(language)
@@ -674,7 +705,7 @@ class Call(PyTgCalls):
             return "0"
 
     async def start(self):
-        LOGGER(__name__).info("Starting PyTgCalls Client...\n")
+        LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
         try:
             for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
                 if client:
@@ -716,25 +747,24 @@ class Call(PyTgCalls):
                                 try:
                                     if hasattr(update, 'chat_id'):
                                         chat_id = update.chat_id
-                                        # Kiểm tra xem còn bài hát trong queue không
-                                        queue = db.get(chat_id, [])
-                                        if not queue or len(queue) <= 1:
-                                            # Nếu không còn bài, thoát ngay
+                                        print(f"🎵 Stream ended in chat {chat_id}")
+                                        
+                                        # Kiểm tra queue trước khi xử lý
+                                        check = db.get(chat_id)
+                                        if not check or len(check) == 0:
+                                            print(f"🚪 No more songs in queue for chat {chat_id}, auto-leaving...")
                                             await _clear_(chat_id)
-                                            for method_name in ["leave_group_call", "leave_call", "stop"]:
-                                                if hasattr(client_instance, method_name):
-                                                    try:
-                                                        await getattr(client_instance, method_name)(chat_id)
-                                                        break
-                                                    except:
-                                                        continue
+                                            await self._reliable_leave_call(client_instance, chat_id)
                                         else:
-                                            # Nếu còn bài, chuyển sang bài tiếp theo
+                                            print(f"🎵 Queue has {len(check)} songs, playing next...")
                                             await self.change_stream(client_instance, chat_id)
                                 except Exception as e:
-                                    LOGGER(__name__).error(f"Error in stream end handler: {e}")
+                                    print(f"❌ Error in stream end handler: {e}")
+                                    # Fallback: cố gắng thoát nếu có lỗi
                                     try:
-                                        await _clear_(chat_id)
+                                        chat_id = getattr(update, 'chat_id', None)
+                                        if chat_id:
+                                            await self._reliable_leave_call(client_instance, chat_id)
                                     except:
                                         pass
                     except Exception as e:
@@ -745,65 +775,3 @@ class Call(PyTgCalls):
 
 
 SANKI = Call()
-
-# Helper functions
-async def validate_chat_id(chat_id: Union[int, str]) -> Optional[int]:
-    """Validate và convert chat_id về int"""
-    try:
-        if isinstance(chat_id, str):
-            # Remove @ symbol if present
-            if chat_id.startswith('@'):
-                chat_id = chat_id[1:]
-            # Try to convert to int
-            try:
-                return int(chat_id)
-            except ValueError:
-                # If can't convert, try to get chat info
-                if SANKI and SANKI.userbot1:
-                    try:
-                        chat = await SANKI.userbot1.get_chat(chat_id)
-                        return chat.id
-                    except:
-                        return None
-        elif isinstance(chat_id, int):
-            return chat_id
-        return None
-    except Exception as e:
-        print(f"Error validating chat_id {chat_id}: {e}")
-        return None
-
-async def safe_leave_call(chat_id: int) -> bool:
-    """Safely leave voice call with comprehensive cleanup"""
-    try:
-        # Validate chat_id
-        validated_chat_id = await validate_chat_id(chat_id)
-        if not validated_chat_id:
-            return False
-            
-        # Clear database first
-        await _clear_(validated_chat_id)
-        
-        # Try to leave call using all available clients
-        success = False
-        for client in [SANKI.one, SANKI.two, SANKI.three, SANKI.four, SANKI.five]:
-            if client:
-                try:
-                    for method_name in ["leave_group_call", "leave_call", "stop", "disconnect"]:
-                        if hasattr(client, method_name):
-                            try:
-                                await getattr(client, method_name)(validated_chat_id)
-                                success = True
-                                break
-                            except:
-                                continue
-                    if success:
-                        break
-                except Exception as e:
-                    print(f"Error with client: {e}")
-                    continue
-        
-        return success
-        
-    except Exception as e:
-        print(f"Error in safe_leave_call: {e}")
-        return False
