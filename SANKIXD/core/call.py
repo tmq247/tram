@@ -505,34 +505,71 @@ class Call(PyTgCalls):
         
         return left_successfully
 
+    async def force_next_song(self, chat_id):
+        """Force chuyển sang bài tiếp theo trong queue ngay lập tức"""
+        try:
+            check = db.get(chat_id)
+            if not check or len(check) == 0:
+                print(f"🚪 No songs to play for chat {chat_id}")
+                return False
+                
+            assistant = await group_assistant(self, chat_id)
+            if not assistant:
+                print(f"❌ No assistant available for chat {chat_id}")
+                return False
+                
+            # Trigger change_stream để chuyển bài
+            await self.change_stream(assistant, chat_id)
+            print(f"✅ Forced next song for chat {chat_id}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error forcing next song for chat {chat_id}: {e}")
+            return False
+
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
         popped = None
         loop = await get_loop(chat_id)
         
+        print(f"🔄 Change stream called for chat {chat_id}, queue length: {len(check) if check else 0}")
+        
         # Nếu không có queue, thoát ngay lập tức
-        if not check:
+        if not check or len(check) == 0:
+            print(f"🚪 No songs in queue for chat {chat_id}, leaving...")
             await _clear_(chat_id)
             await self._reliable_leave_call(client, chat_id)
             return
             
         try:
+            # Luôn luôn pop bài đầu tiên (bài vừa kết thúc) nếu không có loop
             if loop == 0:
-                popped = check.pop(0)
+                if len(check) > 0:
+                    popped = check.pop(0)
+                    print(f"🎵 Removed finished song from queue, remaining: {len(check)}")
             else:
+                # Nếu có loop, giảm counter
                 loop = loop - 1
                 await set_loop(chat_id, loop)
-            await auto_clean(popped)
+                print(f"🔁 Loop mode, remaining loops: {loop}")
+            
+            # Cleanup bài vừa pop
+            if popped:
+                await auto_clean(popped)
             
             # Kiểm tra lại queue sau khi pop
-            if not check:
+            if not check or len(check) == 0:
+                print(f"🚪 Queue empty after processing for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
                 await self._reliable_leave_call(client, chat_id)
                 return
+                
         except Exception as e:
-            # Nếu có lỗi và queue trống, thoát
+            print(f"❌ Error in change_stream processing: {e}")
+            # Kiểm tra queue sau lỗi
             check = db.get(chat_id)
-            if not check:
+            if not check or len(check) == 0:
+                print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
                 await self._reliable_leave_call(client, chat_id)
                 return
@@ -555,6 +592,8 @@ class Call(PyTgCalls):
                 db[chat_id][0]["speed"] = 1.0
             video = True if str(streamtype) == "video" else False
             
+            print(f"🎵 Playing next song: {title} for chat {chat_id}")
+            
             if "live_" in queued:
                 n, link = await YouTube.video(videoid, True)
                 if n == 0:
@@ -563,11 +602,24 @@ class Call(PyTgCalls):
                 stream = self.prepare_stream(link, is_video=video)
                     
                 try:
+                    success = False
                     for method_name in ["change_stream", "play", "switch"]:
                         if hasattr(client, method_name):
-                            await getattr(client, method_name)(chat_id, stream)
-                            break
-                except Exception:
+                            try:
+                                await getattr(client, method_name)(chat_id, stream)
+                                print(f"✅ Successfully changed to next song using {method_name}")
+                                success = True
+                                break
+                            except Exception as e:
+                                print(f"⚠️ Failed with {method_name}: {e}")
+                                continue
+                    
+                    if not success:
+                        print(f"❌ Failed to change stream for chat {chat_id}")
+                        return await app.send_message(original_chat_id, text=_["call_6"])
+                        
+                except Exception as e:
+                    print(f"❌ Exception in stream change: {e}")
                     return await app.send_message(original_chat_id, text=_["call_6"])
                     
                 img = await get_thumb(videoid)
@@ -757,7 +809,16 @@ class Call(PyTgCalls):
                                             await self._reliable_leave_call(client_instance, chat_id)
                                         else:
                                             print(f"🎵 Queue has {len(check)} songs, playing next...")
-                                            await self.change_stream(client_instance, chat_id)
+                                            # Đảm bảo chuyển bài ngay lập tức
+                                            try:
+                                                await self.change_stream(client_instance, chat_id)
+                                            except Exception as stream_error:
+                                                print(f"❌ Error changing stream: {stream_error}")
+                                                # Thử lại với force method
+                                                try:
+                                                    await self.force_next_song(chat_id)
+                                                except:
+                                                    print(f"❌ Force next song also failed for chat {chat_id}")
                                 except Exception as e:
                                     print(f"❌ Error in stream end handler: {e}")
                                     # Fallback: cố gắng thoát nếu có lỗi
