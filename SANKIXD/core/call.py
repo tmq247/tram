@@ -5,50 +5,16 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-from pytgcalls import PyTgCalls
-
-# Import với compatibility checking
-try:
-    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
-    print("✅ New exceptions imported")
-except ImportError:
-    try:
-        from pytgcalls.exceptions import AlreadyJoinedError as AlreadyJoined
-        from pytgcalls.exceptions import NoActiveGroupCall as NotInCall
-        from pytgcalls.exceptions import TelegramServerError
-        print("✅ Old exceptions imported")
-    except ImportError:
-        AlreadyJoined = Exception
-        NotInCall = Exception  
-        TelegramServerError = Exception
-        print("⚠️ Using generic exceptions")
-
-# Import stream types dengan fallback
-try:
-    from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-    from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-    print("✅ New stream types imported")
-except ImportError:
-    try:
-        from pytgcalls.types import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
-        print("✅ Alternative stream types imported")
-    except ImportError:
-        print("⚠️ Creating fallback stream types")
-        # Fallback: sử dụng string path trực tiếp
-        AudioPiped = str
-        AudioVideoPiped = str
-        HighQualityAudio = lambda: None
-        MediumQualityVideo = lambda: None
-
-# Import other types
-try:
-    from pytgcalls.types import Update
-    from pytgcalls.types.stream import StreamAudioEnded
-    print("✅ Update types imported")
-except ImportError:
-    Update = object
-    StreamAudioEnded = object
-    print("⚠️ Using fallback update types")
+from pytgcalls import PyTgCalls, StreamType
+from pytgcalls.exceptions import (
+    AlreadyJoinedError,
+    NoActiveGroupCall,
+    TelegramServerError,
+)
+from pytgcalls.types import Update
+from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
+from pytgcalls.types.stream import StreamAudioEnded
 
 import config
 from SANKIXD import LOGGER, YouTube, app
@@ -71,8 +37,6 @@ from SANKIXD.utils.inline.play import stream_markup
 from SANKIXD.utils.stream.autoclear import auto_clean
 from SANKIXD.utils.thumbnails import get_thumb
 from strings import get_string
-
-
 
 autoend = {}
 counter = {}
@@ -605,42 +569,33 @@ class Call(PyTgCalls):
             await self.five.start()
 
     async def decorators(self):
-        try:
-            # Simplified decorators với error handling
-            clients = [self.one, self.two, self.three, self.four, self.five]
-            
-            for client in clients:
-                if client:
-                    try:
-                        # Try to set decorators if methods exist
-                        if hasattr(client, 'on_kicked'):
-                            @client.on_kicked()
-                            async def on_kicked_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_closed_voice_chat'):
-                            @client.on_closed_voice_chat()
-                            async def on_closed_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_left'):
-                            @client.on_left()
-                            async def on_left_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_stream_end'):
-                            @client.on_stream_end()
-                            async def on_stream_end_handler(client_instance, update):
-                                try:
-                                    if hasattr(update, 'chat_id'):
-                                        await self.change_stream(client_instance, update.chat_id)
-                                except:
-                                    pass
-                    except Exception as e:
-                        LOGGER(__name__).error(f"Error setting decorators for client: {e}")
-                        
-        except Exception as e:
-            LOGGER(__name__).error(f"Error setting decorators: {e}")
+        @self.one.on_kicked()
+        @self.two.on_kicked()
+        @self.three.on_kicked()
+        @self.four.on_kicked()
+        @self.five.on_kicked()
+        @self.one.on_closed_voice_chat()
+        @self.two.on_closed_voice_chat()
+        @self.three.on_closed_voice_chat()
+        @self.four.on_closed_voice_chat()
+        @self.five.on_closed_voice_chat()
+        @self.one.on_left()
+        @self.two.on_left()
+        @self.three.on_left()
+        @self.four.on_left()
+        @self.five.on_left()
+        async def stream_services_handler(_, chat_id: int):
+            await self.stop_stream(chat_id)
+
+        @self.one.on_stream_end()
+        @self.two.on_stream_end()
+        @self.three.on_stream_end()
+        @self.four.on_stream_end()
+        @self.five.on_stream_end()
+        async def stream_end_handler1(client, update: Update):
+            if not isinstance(update, StreamAudioEnded):
+                return
+            await self.change_stream(client, update.chat_id)
 
 
 SANKI = Call()
