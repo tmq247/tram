@@ -50,7 +50,7 @@ async def init():
         pass
     await SANKI.decorators()
     LOGGER("SANKIXD").info(
-        "╔═════ஜ۩۞۩ஜ════╗\n  ❥𓆩🥀❱MUỘI💸✘𝗗❱\n╚═════ஜ۩۞۩ஜ════╝"
+        "╔═════ஜ۩۞۩ஜ════╗\n  ❥𓆩🥀❱𝐒 𝐀 𝐍 𝐊 𝐈💸✘𝗗❱\n╚═════ஜ۩۞۩ஜ════╝"
     )
     await idle()
     await app.stop()
