@@ -429,7 +429,7 @@ class Call(PyTgCalls):
                 stream = (
                     AudioVideoPiped(file_path, HighQualityAudio(), MediumQualityVideo())
                     if video
-                    else AudioPiped(file_path, HighQualityAudio())
+                    else AudioPiped(file_path, HighQualityAudio()))
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
