@@ -290,17 +290,6 @@ async def play_commnd(
             return await mystic.delete()
         else:
             try:
-                await SANKI.stream_call(url)
-            except NoActiveGroupCall:
-                await mystic.edit_text(_["black_9"])
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=_["play_17"],
-                )
-            except Exception as e:
-                return await mystic.edit_text(_["general_2"].format(type(e).__name__))
-            await mystic.edit_text(_["str_2"])
-            try:
                 await stream(
                     _,
                     mystic,
@@ -312,6 +301,12 @@ async def play_commnd(
                     video=video,
                     streamtype="index",
                     forceplay=fplay,
+                )
+            except NoActiveGroupCall:
+                await mystic.edit_text(_["black_9"])
+                return await app.send_message(
+                    chat_id=config.LOGGER_ID,
+                    text=_["play_17"],
                 )
             except Exception as e:
                 ex_type = type(e).__name__
@@ -462,6 +457,8 @@ async def play_music(client, CallbackQuery, _):
         details, track_id = await YouTube.track(vidid, True)
     except:
         return await mystic.edit_text(_["play_3"])
+    
+    # Kiểm tra duration limit
     if details["duration_min"]:
         duration_sec = time_to_seconds(details["duration_min"])
         if duration_sec > config.DURATION_LIMIT:
@@ -469,6 +466,7 @@ async def play_music(client, CallbackQuery, _):
                 _["play_6"].format(config.DURATION_LIMIT_MIN, app.mention)
             )
     else:
+        # Xử lý live stream
         buttons = livestream_markup(
             _,
             track_id,
@@ -481,6 +479,7 @@ async def play_music(client, CallbackQuery, _):
             _["play_13"],
             reply_markup=InlineKeyboardMarkup(buttons),
         )
+    
     video = True if mode == "v" else None
     ffplay = True if fplay == "f" else None
     try:
@@ -661,5 +660,4 @@ async def slider_queries(client, CallbackQuery, _):
             ),
         )
         return await CallbackQuery.edit_message_media(
-            media=med, reply_markup=InlineKeyboardMarkup(buttons)
-        )
+            media=med, reply_markup=InlineKeyboardMarkup(buttons))
