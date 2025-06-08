@@ -7,15 +7,16 @@ from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
-    GroupCallAlreadyJoined,  # Đã đổi tên
+    GroupCallAlreadyJoined,
     NoActiveGroupCall,
-    NotInGroupCall  # Đã đổi tên
+    NotInGroupCall,  # Đã sửa tên exception
+    GroupCallNotFound  # Đã sửa tên exception
 )
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 from pytgcalls.types.stream import StreamEnded
-from pytgcalls.types import StreamType  # Đã sửa import StreamType
+from pytgcalls.types import StreamType
 
 import config
 from SANKIXD import LOGGER, YouTube, app
@@ -106,14 +107,14 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         try:
             await assistant.pause_stream(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             raise AssistantErr("No active group call")
 
     async def resume_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
             await assistant.resume_stream(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             raise AssistantErr("No active group call")
 
     async def stop_stream(self, chat_id: int):
@@ -121,34 +122,34 @@ class Call(PyTgCalls):
         try:
             await _clear_(chat_id)
             await assistant.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
 
     async def stop_stream_force(self, chat_id: int):
         try:
             if config.STRING1:
                 await self.one.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
         try:
             if config.STRING2:
                 await self.two.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
         try:
             if config.STRING3:
                 await self.three.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
         try:
             if config.STRING4:
                 await self.four.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
         try:
             if config.STRING5:
                 await self.five.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
         await _clear_(chat_id)
 
@@ -157,7 +158,7 @@ class Call(PyTgCalls):
         if str(speed) != "1.0":
             base = os.path.basename(file_path)
             chatdir = os.path.join(os.getcwd(), "playback", str(speed))
-            os.makedirs(chatdir, exist_ok=True)
+            os.makedirs(chatdir, exist_ok=True)  # Đảm bảo thư mục tồn tại
             out = os.path.join(chatdir, base)
             
             if not os.path.isfile(out):
@@ -175,7 +176,10 @@ class Call(PyTgCalls):
                     stdin=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
-                await proc.communicate()
+                stdout, stderr = await proc.communicate()
+                if proc.returncode != 0:
+                    LOGGER.error(f"FFmpeg error: {stderr.decode().strip()}")
+                    out = file_path  # Fallback to original file
         else:
             out = file_path
             
@@ -201,7 +205,7 @@ class Call(PyTgCalls):
         
         try:
             await assistant.change_stream(chat_id, stream)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             raise AssistantErr("No active group call")
         
         if str(db[chat_id][0]["file"]) == str(file_path):
@@ -229,7 +233,7 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         try:
             await assistant.leave_group_call(chat_id)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             pass
 
     async def skip_stream(
@@ -247,7 +251,7 @@ class Call(PyTgCalls):
         )
         try:
             await assistant.change_stream(chat_id, stream)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             raise AssistantErr("No active group call")
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
@@ -268,7 +272,7 @@ class Call(PyTgCalls):
         )
         try:
             await assistant.change_stream(chat_id, stream)
-        except (GroupCallNotFound, NotInGroupCallError):
+        except (GroupCallNotFound, NotInGroupCall):  # Đã sửa tên exception
             raise AssistantErr("No active group call")
 
     async def stream_call(self, link):
@@ -277,7 +281,7 @@ class Call(PyTgCalls):
             await assistant.join_group_call(
                 config.LOGGER_ID,
                 AudioVideoPiped(link, HighQualityAudio(), MediumQualityVideo()),
-                stream_type=StreamType.LIVE_STREAM,  # Sử dụng StreamType.LIVE_STREAM
+                stream_type=StreamType.LIVE_STREAM,
             )
             await asyncio.sleep(0.2)
             await assistant.leave_group_call(config.LOGGER_ID)
@@ -304,7 +308,7 @@ class Call(PyTgCalls):
             await assistant.join_group_call(
                 chat_id,
                 stream,
-                stream_type=StreamType.LIVE_STREAM,  # Sử dụng StreamType.LIVE_STREAM
+                stream_type=StreamType.LIVE_STREAM,
             )
         except NoActiveGroupCall:
             raise AssistantErr(_["call_8"])
