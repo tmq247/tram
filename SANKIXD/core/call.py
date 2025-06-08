@@ -5,13 +5,15 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-from pytgcalls import PyTgCalls, StreamType
+from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
     AlreadyJoinedError,
     NoActiveGroupCall,
     TelegramServerError,
 )
-from pytgcalls.types import Update, MediaStream  # Thêm MediaStream
+from pytgcalls.types import Update, MediaStream  # Sửa import StreamType -> MediaStream
+from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
 from pytgcalls.types.stream import StreamAudioEnded
 
 import config
@@ -237,12 +239,14 @@ class Call(PyTgCalls):
         image: Union[bool, str] = None,
     ):
         assistant = await group_assistant(self, chat_id)
-        # Cập nhật cách tạo stream
-        stream = MediaStream(
-            link,
-            audio_flags=MediaStream.REQUIRED,
-            video_flags=MediaStream.REQUIRED if video else MediaStream.IGNORE,
-        )
+        if video:
+            stream = AudioVideoPiped(
+                link,
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
+            )
+        else:
+            stream = AudioPiped(link, audio_parameters=HighQualityAudio())
         await assistant.change_stream(
             chat_id,
             stream,
@@ -268,16 +272,11 @@ class Call(PyTgCalls):
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOGGER_ID)
-        # Cập nhật cách tạo stream
-        stream = MediaStream(
-            link,
-            audio_flags=MediaStream.REQUIRED,
-            video_flags=MediaStream.IGNORE,
-        )
         await assistant.join_group_call(
             config.LOGGER_ID,
-            stream,
-            stream_type=StreamType().pulse_stream,
+            AudioVideoPiped(link),
+            # Sửa StreamType().pulse_stream -> MediaStream.AUDIO_VIDEO_STREAM
+            stream_type=MediaStream.AUDIO_VIDEO_STREAM,
         )
         await asyncio.sleep(0.2)
         await assistant.leave_group_call(config.LOGGER_ID)
@@ -293,19 +292,30 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         language = await get_lang(chat_id)
         _ = get_string(language)
-        
-        # Tạo stream theo cách mới
-        stream = MediaStream(
-            link,
-            audio_flags=MediaStream.REQUIRED,
-            video_flags=MediaStream.REQUIRED if video else MediaStream.IGNORE,
-        )
-        
+        if video:
+            stream = AudioVideoPiped(
+                link,
+                audio_parameters=HighQualityAudio(),
+                video_parameters=MediumQualityVideo(),
+            )
+        else:
+            stream = (
+                AudioVideoPiped(
+                    link,
+                    audio_parameters=HighQualityAudio(),
+                    video_parameters=MediumQualityVideo(),
+                )
+                if video
+                else AudioPiped(link, audio_parameters=HighQualityAudio())
+            )
         try:
+            # Sửa StreamType().pulse_stream -> MediaStream.AUDIO_STREAM hoặc AUDIO_VIDEO_STREAM
+            stream_type = MediaStream.AUDIO_VIDEO_STREAM if video else MediaStream.AUDIO_STREAM
+            
             await assistant.join_group_call(
                 chat_id,
                 stream,
-                stream_type=StreamType().pulse_stream,
+                stream_type=stream_type,  # Sử dụng biến stream_type đã xác định
             )
         except NoActiveGroupCall:
             raise AssistantErr(_["call_8"])
@@ -367,12 +377,17 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                # Cập nhật cách tạo stream
-                stream = MediaStream(
-                    link,
-                    audio_flags=MediaStream.REQUIRED,
-                    video_flags=MediaStream.REQUIRED if video else MediaStream.IGNORE,
-                )
+                if video:
+                    stream = AudioVideoPiped(
+                        link,
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
+                    )
+                else:
+                    stream = AudioPiped(
+                        link,
+                        audio_parameters=HighQualityAudio(),
+                    )
                 try:
                     await client.change_stream(chat_id, stream)
                 except Exception:
@@ -408,12 +423,17 @@ class Call(PyTgCalls):
                     return await mystic.edit_text(
                         _["call_6"], disable_web_page_preview=True
                     )
-                # Cập nhật cách tạo stream
-                stream = MediaStream(
-                    file_path,
-                    audio_flags=MediaStream.REQUIRED,
-                    video_flags=MediaStream.REQUIRED if video else MediaStream.IGNORE,
-                )
+                if video:
+                    stream = AudioVideoPiped(
+                        file_path,
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
+                    )
+                else:
+                    stream = AudioPiped(
+                        file_path,
+                        audio_parameters=HighQualityAudio(),
+                    )
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
@@ -438,11 +458,14 @@ class Call(PyTgCalls):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
             elif "index_" in queued:
-                # Cập nhật cách tạo stream
-                stream = MediaStream(
-                    videoid,
-                    audio_flags=MediaStream.REQUIRED,
-                    video_flags=MediaStream.REQUIRED if str(streamtype)=="video" else MediaStream.IGNORE,
+                stream = (
+                    AudioVideoPiped(
+                        videoid,
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
+                    )
+                    if str(streamtype) == "video"
+                    else AudioPiped(videoid, audio_parameters=HighQualityAudio())
                 )
                 try:
                     await client.change_stream(chat_id, stream)
@@ -461,12 +484,17 @@ class Call(PyTgCalls):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             else:
-                # Cập nhật cách tạo stream
-                stream = MediaStream(
-                    queued,
-                    audio_flags=MediaStream.REQUIRED,
-                    video_flags=MediaStream.REQUIRED if video else MediaStream.IGNORE,
-                )
+                if video:
+                    stream = AudioVideoPiped(
+                        queued,
+                        audio_parameters=HighQualityAudio(),
+                        video_parameters=MediumQualityVideo(),
+                    )
+                else:
+                    stream = AudioPiped(
+                        queued,
+                        audio_parameters=HighQualityAudio(),
+                    )
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
