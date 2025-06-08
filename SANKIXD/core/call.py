@@ -7,11 +7,9 @@ from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 from pytgcalls.exceptions import (
-    AlreadyJoinedError,
+    GroupCallAlreadyJoined,  # Đã đổi tên
     NoActiveGroupCall,
-    TelegramServerError,
-    GroupCallNotFound,
-    NotInGroupCallError,
+    NotInGroupCall  # Đã đổi tên
 )
 from pytgcalls.types import Update
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
@@ -283,7 +281,7 @@ class Call(PyTgCalls):
             )
             await asyncio.sleep(0.2)
             await assistant.leave_group_call(config.LOGGER_ID)
-        except (GroupCallNotFound, AlreadyJoinedError, TelegramServerError):
+        except (NotInGroupCall, GroupCallAlreadyJoined, TelegramServerError):
             pass
 
     async def join_call(
@@ -310,11 +308,11 @@ class Call(PyTgCalls):
             )
         except NoActiveGroupCall:
             raise AssistantErr(_["call_8"])
-        except AlreadyJoinedError:
+        except GroupCallAlreadyJoined:
             raise AssistantErr(_["call_9"])
         except TelegramServerError:
             raise AssistantErr(_["call_10"])
-        except GroupCallNotFound:
+        except NotInGroupCall:
             raise AssistantErr("Group call not found")
             
         await add_active_chat(chat_id)
