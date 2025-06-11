@@ -39,29 +39,18 @@ async def init():
     LOGGER("SANKIXD.plugins").info("𝐀𝐥𝐥 𝐅𝐞𝐚𝐭𝐮𝐫𝐞𝐬 𝐋𝐨𝐚𝐝𝐞𝐝 𝐁𝐚𝐛𝐲🥳...")
     await userbot.start()
     await SANKI.start()
-    
     try:
-        # Cập nhật cách test call sử dụng join_call mới
-        await SANKI.join_call(
-            config.LOGGER_ID,
-            config.LOGGER_ID,
-            "https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4",
-            video=True
-        )
-        await asyncio.sleep(0.5)
-        await SANKI.stop_stream(config.LOGGER_ID)
+        await SANKI.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
     except NoActiveGroupCall:
         LOGGER("SANKIXD").error(
             "𝗣𝗹𝗭 𝗦𝗧𝗔𝗥𝗧 𝗬𝗢𝗨𝗥 𝗟𝗢𝗚 𝗚𝗥𝗢𝗨𝗣 𝗩𝗢𝗜𝗖𝗘𝗖𝗛𝗔𝗧\𝗖𝗛𝗔𝗡𝗡𝗘𝗟\n\n𝗗𝗔𝗫𝗫 𝗕𝗢𝗧 𝗦𝗧𝗢𝗣........"
         )
         exit()
-    except Exception as e:
-        LOGGER("SANKIXD").error(f"Error during test call: {e}")
-        exit()
-    
+    except:
+        pass
     await SANKI.decorators()
     LOGGER("SANKIXD").info(
-        "╔═════ஜ۩۞۩ஜ════╗\n  ❥𓆩🥀❱MUỘI💸✘𝗗❱\n╚═════ஜ۩۞۩ஜ════╝"
+        "╔═════ஜ۩۞۩ஜ════╗\n  ❥𓆩🥀❱𝐒 𝐀 𝐍 𝐊 𝐈💸✘𝗗❱\n╚═════ஜ۩۞۩ஜ════╝"
     )
     await idle()
     await app.stop()
