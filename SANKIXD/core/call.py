@@ -1,58 +1,75 @@
+
 import asyncio
 import os
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Optional
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 
-# StreamType is not available in py-tgcalls 2.2.1+, handle gracefully
-try:
-    from pytgcalls import StreamType
-    STREAM_TYPE_AVAILABLE = True
-    print("✅ StreamType imported from py-tgcalls")
-except ImportError:
-    STREAM_TYPE_AVAILABLE = False
-    print("⚠️ StreamType not available in this py-tgcalls version")
-
-try:
-    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
-    NoActiveGroupCall = NotInCall
-    AlreadyJoinedError = AlreadyJoined
-    print("✅ Using py-tgcalls 2.2.1+ exceptions")
-except ImportError:
-    from pytgcalls.exceptions import (
-        AlreadyJoinedError,
-        NoActiveGroupCall,
-        TelegramServerError,
-    )
-    print("✅ Using py-tgcalls legacy exceptions")
-
-from pytgcalls.types import Update
-try:
-    from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-    from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-    print("✅ Using py-tgcalls 2.2.1+ stream types")
-except ImportError:
-    try:
-        from pytgcalls.types import AudioPiped, AudioVideoPiped
-        from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-        print("✅ Using py-tgcalls alternative stream types")
-    except ImportError:
-        from pytgcalls.types import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
-        print("✅ Using py-tgcalls fallback stream types")
-
-from pytgcalls.types.stream import StreamAudioEnded
-
-# Import nt-calls as fallback
+# Import ntgcalls for fallback
 try:
     from ntgcalls import NTgCalls
+    from ntgcalls.exceptions import TelegramServerError as NTTelegramServerError
+    from ntgcalls.exceptions import ConnectionNotFound
     NT_CALLS_AVAILABLE = True
-    print("✅ nt-calls imported successfully as fallback")
+    print("✅ nt-calls imported successfully")
 except ImportError:
     NT_CALLS_AVAILABLE = False
     print("⚠️ nt-calls not available")
+
+# Handle pytgcalls imports for different versions
+try:
+    from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall, TelegramServerError
+    print("✅ Using py-tgcalls legacy exceptions")
+except ImportError:
+    try:
+        from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
+        NoActiveGroupCall = NotInCall
+        AlreadyJoinedError = AlreadyJoined
+        print("✅ Using py-tgcalls 2.2.1+ exceptions")
+    except ImportError:
+        # Fallback to generic exceptions
+        NoActiveGroupCall = Exception
+        AlreadyJoinedError = Exception
+        TelegramServerError = Exception
+        print("⚠️ Using fallback exceptions")
+
+from pytgcalls.types import Update
+
+# Handle stream types imports
+try:
+    from pytgcalls.types import (
+        AudioQuality,
+        ChatUpdate,
+        MediaStream,
+        UpdatedGroupCallParticipant,
+        VideoQuality,
+        stream,
+        GroupCallConfig,
+        CallConfig,
+    )
+    MODERN_STREAM_TYPES = True
+    print("✅ Using modern stream types")
+except ImportError:
+    try:
+        from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+        from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
+        MODERN_STREAM_TYPES = False
+        print("✅ Using legacy stream types")
+    except ImportError:
+        from pytgcalls.types import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
+        MODERN_STREAM_TYPES = False
+        print("✅ Using fallback stream types")
+
+try:
+    from pytgcalls.types.stream import StreamAudioEnded
+except ImportError:
+    try:
+        from pytgcalls.types import StreamAudioEnded
+    except ImportError:
+        StreamAudioEnded = type('StreamAudioEnded', (), {})
 
 import config
 from SANKIXD import LOGGER, YouTube, app
@@ -194,6 +211,36 @@ class Call(PyTgCalls):
         else:
             self.nt_five = None
 
+    def _create_stream(self, link: str, video: bool = False, ffmpeg_params: str = None):
+        """Create appropriate stream object based on available types"""
+        if MODERN_STREAM_TYPES:
+            return MediaStream(
+                audio_path=link,
+                media_path=link if video else None,
+                audio_parameters=AudioQuality.HIGH if video else AudioQuality.STUDIO,
+                video_parameters=VideoQuality.FHD_1080p if video else VideoQuality.SD_360p,
+                audio_flags=MediaStream.Flags.REQUIRED,
+                video_flags=(
+                    MediaStream.Flags.AUTO_DETECT if video else MediaStream.Flags.IGNORE
+                ),
+                ffmpeg_parameters=ffmpeg_params,
+            )
+        else:
+            # Legacy stream types
+            if video:
+                return AudioVideoPiped(
+                    link,
+                    audio_parameters=HighQualityAudio(),
+                    video_parameters=MediumQualityVideo(),
+                    additional_ffmpeg_parameters=ffmpeg_params,
+                )
+            else:
+                return AudioPiped(
+                    link,
+                    audio_parameters=HighQualityAudio(),
+                    additional_ffmpeg_parameters=ffmpeg_params,
+                )
+
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         await assistant.pause_stream(chat_id)
@@ -281,20 +328,13 @@ class Call(PyTgCalls):
         dur = int(dur)
         played, con_seconds = speed_converter(playing[0]["played"], speed)
         duration = seconds_to_min(dur)
-        stream = (
-            AudioVideoPiped(
-                out,
-                audio_parameters=HighQualityAudio(),
-                video_parameters=MediumQualityVideo(),
-                additional_ffmpeg_parameters=f"-ss {played} -to {duration}",
-            )
-            if playing[0]["streamtype"] == "video"
-            else AudioPiped(
-                out,
-                audio_parameters=HighQualityAudio(),
-                additional_ffmpeg_parameters=f"-ss {played} -to {duration}",
-            )
+        
+        stream = self._create_stream(
+            out, 
+            video=playing[0]["streamtype"] == "video",
+            ffmpeg_params=f"-ss {played} -to {duration}"
         )
+        
         if str(db[chat_id][0]["file"]) == str(file_path):
             await assistant.change_stream(chat_id, stream)
         else:
@@ -332,50 +372,28 @@ class Call(PyTgCalls):
         image: Union[bool, str] = None,
     ):
         assistant = await group_assistant(self, chat_id)
-        if video:
-            stream = AudioVideoPiped(
-                link,
-                audio_parameters=HighQualityAudio(),
-                video_parameters=MediumQualityVideo(),
-            )
-        else:
-            stream = AudioPiped(link, audio_parameters=HighQualityAudio())
-        await assistant.change_stream(
-            chat_id,
-            stream,
-        )
+        stream = self._create_stream(link, video=bool(video))
+        await assistant.change_stream(chat_id, stream)
 
     async def seek_stream(self, chat_id, file_path, to_seek, duration, mode):
         assistant = await group_assistant(self, chat_id)
-        stream = (
-            AudioVideoPiped(
-                file_path,
-                audio_parameters=HighQualityAudio(),
-                video_parameters=MediumQualityVideo(),
-                additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
-            )
-            if mode == "video"
-            else AudioPiped(
-                file_path,
-                audio_parameters=HighQualityAudio(),
-                additional_ffmpeg_parameters=f"-ss {to_seek} -to {duration}",
-            )
+        stream = self._create_stream(
+            file_path,
+            video=mode == "video",
+            ffmpeg_params=f"-ss {to_seek} -to {duration}"
         )
         await assistant.change_stream(chat_id, stream)
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOGGER_ID)
-        if STREAM_TYPE_AVAILABLE:
-            await assistant.join_group_call(
-                config.LOGGER_ID,
-                AudioVideoPiped(link),
-                stream_type=StreamType().pulse_stream,
-            )
+        stream = self._create_stream(link, video=True)
+        
+        if MODERN_STREAM_TYPES:
+            call_config = GroupCallConfig(auto_start=False) if config.LOGGER_ID < 0 else CallConfig(timeout=50)
+            await assistant.play(config.LOGGER_ID, stream, call_config)
         else:
-            await assistant.join_group_call(
-                config.LOGGER_ID,
-                AudioVideoPiped(link),
-            )
+            await assistant.join_group_call(config.LOGGER_ID, stream)
+        
         await asyncio.sleep(0.2)
         await assistant.leave_group_call(config.LOGGER_ID)
 
@@ -390,41 +408,23 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         language = await get_lang(chat_id)
         _ = get_string(language)
-        if video:
-            stream = AudioVideoPiped(
-                link,
-                audio_parameters=HighQualityAudio(),
-                video_parameters=MediumQualityVideo(),
-            )
-        else:
-            stream = (
-                AudioVideoPiped(
-                    link,
-                    audio_parameters=HighQualityAudio(),
-                    video_parameters=MediumQualityVideo(),
-                )
-                if video
-                else AudioPiped(link, audio_parameters=HighQualityAudio())
-            )
+        
+        stream = self._create_stream(link, video=bool(video))
+        
         try:
-            if STREAM_TYPE_AVAILABLE:
-                await assistant.join_group_call(
-                    chat_id,
-                    stream,
-                    stream_type=StreamType().pulse_stream,
-                )
+            if MODERN_STREAM_TYPES:
+                call_config = GroupCallConfig(auto_start=False) if chat_id < 0 else CallConfig(timeout=50)
+                await assistant.play(chat_id, stream, call_config)
             else:
-                await assistant.join_group_call(
-                    chat_id,
-                    stream,
-                )
+                await assistant.join_group_call(chat_id, stream)
         except NoActiveGroupCall:
             # Try nt-calls as fallback
             if NT_CALLS_AVAILABLE:
                 try:
-                    from SANKIXD.plugins.tools.vctools import safe_join_call
                     nt_assistant = getattr(self, f"nt_{assistant._client.session_name.lower().replace('sankiass', '')}", None)
-                    if nt_assistant and await safe_join_call(assistant, chat_id, link, nt_assistant):
+                    if nt_assistant:
+                        await nt_assistant.start(assistant._client)
+                        await nt_assistant.join_call(chat_id, link)
                         print("✅ nt-calls fallback succeeded")
                     else:
                         raise AssistantErr(_["call_8"])
@@ -437,6 +437,7 @@ class Call(PyTgCalls):
             raise AssistantErr(_["call_9"])
         except TelegramServerError:
             raise AssistantErr(_["call_10"])
+        
         await add_active_chat(chat_id)
         await music_on(chat_id)
         if video:
@@ -491,17 +492,7 @@ class Call(PyTgCalls):
                         original_chat_id,
                         text=_["call_6"],
                     )
-                if video:
-                    stream = AudioVideoPiped(
-                        link,
-                        audio_parameters=HighQualityAudio(),
-                        video_parameters=MediumQualityVideo(),
-                    )
-                else:
-                    stream = AudioPiped(
-                        link,
-                        audio_parameters=HighQualityAudio(),
-                    )
+                stream = self._create_stream(link, video=video)
                 try:
                     await client.change_stream(chat_id, stream)
                 except Exception:
@@ -537,17 +528,7 @@ class Call(PyTgCalls):
                     return await mystic.edit_text(
                         _["call_6"], disable_web_page_preview=True
                     )
-                if video:
-                    stream = AudioVideoPiped(
-                        file_path,
-                        audio_parameters=HighQualityAudio(),
-                        video_parameters=MediumQualityVideo(),
-                    )
-                else:
-                    stream = AudioPiped(
-                        file_path,
-                        audio_parameters=HighQualityAudio(),
-                    )
+                stream = self._create_stream(file_path, video=video)
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
@@ -572,15 +553,7 @@ class Call(PyTgCalls):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "stream"
             elif "index_" in queued:
-                stream = (
-                    AudioVideoPiped(
-                        videoid,
-                        audio_parameters=HighQualityAudio(),
-                        video_parameters=MediumQualityVideo(),
-                    )
-                    if str(streamtype) == "video"
-                    else AudioPiped(videoid, audio_parameters=HighQualityAudio())
-                )
+                stream = self._create_stream(videoid, video=str(streamtype) == "video")
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
@@ -598,17 +571,7 @@ class Call(PyTgCalls):
                 db[chat_id][0]["mystic"] = run
                 db[chat_id][0]["markup"] = "tg"
             else:
-                if video:
-                    stream = AudioVideoPiped(
-                        queued,
-                        audio_parameters=HighQualityAudio(),
-                        video_parameters=MediumQualityVideo(),
-                    )
-                else:
-                    stream = AudioPiped(
-                        queued,
-                        audio_parameters=HighQualityAudio(),
-                    )
+                stream = self._create_stream(queued, video=video)
                 try:
                     await client.change_stream(chat_id, stream)
                 except:
