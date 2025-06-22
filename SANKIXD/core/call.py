@@ -5,7 +5,17 @@ from typing import Union
 
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
-from pytgcalls import PyTgCalls, StreamType
+from pytgcalls import PyTgCalls
+
+# StreamType is not available in py-tgcalls 2.2.1+, handle gracefully
+try:
+    from pytgcalls import StreamType
+    STREAM_TYPE_AVAILABLE = True
+    print("✅ StreamType imported from py-tgcalls")
+except ImportError:
+    STREAM_TYPE_AVAILABLE = False
+    print("⚠️ StreamType not available in this py-tgcalls version")
+
 try:
     from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
     NoActiveGroupCall = NotInCall
@@ -88,6 +98,18 @@ class Call(PyTgCalls):
             self.userbot1,
             cache_duration=200,
         )
+        
+        # Initialize nt-calls clients as fallback
+        if NT_CALLS_AVAILABLE:
+            try:
+                self.nt_one = NTgCalls()
+                print("✅ nt-calls client 1 initialized")
+            except Exception as e:
+                print(f"⚠️ nt-calls client 1 failed: {e}")
+                self.nt_one = None
+        else:
+            self.nt_one = None
+            
         self.userbot2 = Client(
             name="SANKIAss2",
             api_id=config.API_ID,
@@ -98,6 +120,17 @@ class Call(PyTgCalls):
             self.userbot2,
             cache_duration=100,
         )
+        
+        if NT_CALLS_AVAILABLE:
+            try:
+                self.nt_two = NTgCalls()
+                print("✅ nt-calls client 2 initialized")
+            except Exception as e:
+                print(f"⚠️ nt-calls client 2 failed: {e}")
+                self.nt_two = None
+        else:
+            self.nt_two = None
+            
         self.userbot3 = Client(
             name="SANKIAss3",
             api_id=config.API_ID,
@@ -108,6 +141,17 @@ class Call(PyTgCalls):
             self.userbot3,
             cache_duration=100,
         )
+        
+        if NT_CALLS_AVAILABLE:
+            try:
+                self.nt_three = NTgCalls()
+                print("✅ nt-calls client 3 initialized")
+            except Exception as e:
+                print(f"⚠️ nt-calls client 3 failed: {e}")
+                self.nt_three = None
+        else:
+            self.nt_three = None
+            
         self.userbot4 = Client(
             name="SANKIAss4",
             api_id=config.API_ID,
@@ -118,6 +162,17 @@ class Call(PyTgCalls):
             self.userbot4,
             cache_duration=100,
         )
+        
+        if NT_CALLS_AVAILABLE:
+            try:
+                self.nt_four = NTgCalls()
+                print("✅ nt-calls client 4 initialized")
+            except Exception as e:
+                print(f"⚠️ nt-calls client 4 failed: {e}")
+                self.nt_four = None
+        else:
+            self.nt_four = None
+            
         self.userbot5 = Client(
             name="SANKIAss5",
             api_id=config.API_ID,
@@ -128,6 +183,16 @@ class Call(PyTgCalls):
             self.userbot5,
             cache_duration=100,
         )
+        
+        if NT_CALLS_AVAILABLE:
+            try:
+                self.nt_five = NTgCalls()
+                print("✅ nt-calls client 5 initialized")
+            except Exception as e:
+                print(f"⚠️ nt-calls client 5 failed: {e}")
+                self.nt_five = None
+        else:
+            self.nt_five = None
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -300,11 +365,17 @@ class Call(PyTgCalls):
 
     async def stream_call(self, link):
         assistant = await group_assistant(self, config.LOGGER_ID)
-        await assistant.join_group_call(
-            config.LOGGER_ID,
-            AudioVideoPiped(link),
-            stream_type=StreamType().pulse_stream,
-        )
+        if STREAM_TYPE_AVAILABLE:
+            await assistant.join_group_call(
+                config.LOGGER_ID,
+                AudioVideoPiped(link),
+                stream_type=StreamType().pulse_stream,
+            )
+        else:
+            await assistant.join_group_call(
+                config.LOGGER_ID,
+                AudioVideoPiped(link),
+            )
         await asyncio.sleep(0.2)
         await assistant.leave_group_call(config.LOGGER_ID)
 
@@ -336,13 +407,32 @@ class Call(PyTgCalls):
                 else AudioPiped(link, audio_parameters=HighQualityAudio())
             )
         try:
-            await assistant.join_group_call(
-                chat_id,
-                stream,
-                stream_type=StreamType().pulse_stream,
-            )
+            if STREAM_TYPE_AVAILABLE:
+                await assistant.join_group_call(
+                    chat_id,
+                    stream,
+                    stream_type=StreamType().pulse_stream,
+                )
+            else:
+                await assistant.join_group_call(
+                    chat_id,
+                    stream,
+                )
         except NoActiveGroupCall:
-            raise AssistantErr(_["call_8"])
+            # Try nt-calls as fallback
+            if NT_CALLS_AVAILABLE:
+                try:
+                    from SANKIXD.plugins.tools.vctools import safe_join_call
+                    nt_assistant = getattr(self, f"nt_{assistant._client.session_name.lower().replace('sankiass', '')}", None)
+                    if nt_assistant and await safe_join_call(assistant, chat_id, link, nt_assistant):
+                        print("✅ nt-calls fallback succeeded")
+                    else:
+                        raise AssistantErr(_["call_8"])
+                except Exception as e:
+                    print(f"⚠️ nt-calls fallback failed: {e}")
+                    raise AssistantErr(_["call_8"])
+            else:
+                raise AssistantErr(_["call_8"])
         except AlreadyJoinedError:
             raise AssistantErr(_["call_9"])
         except TelegramServerError:
