@@ -1,6 +1,8 @@
 
 import asyncio
 import os
+import re
+import time
 from datetime import datetime, timedelta
 from typing import Union, Optional
 
@@ -101,6 +103,40 @@ async def _clear_(chat_id):
     db[chat_id] = []
     await remove_active_video_chat(chat_id)
     await remove_active_chat(chat_id)
+
+
+def _format_bytes(size: int) -> str:
+    """Format a size in bytes into a human-readable format."""
+    if size < 1024:
+        return f"{size} B"
+    for unit in ["KB", "MB", "GB", "TB"]:
+        size /= 1024
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+    return f"{size:.1f} PB"
+
+
+def _format_time(seconds: float) -> str:
+    """Format a time in seconds into a human-readable format."""
+    if seconds < 60:
+        return f"{int(seconds)}s"
+    minutes, seconds = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{int(minutes)}m {int(seconds)}s"
+    hours, minutes = divmod(minutes, 60)
+    return f"{int(hours)}h {int(minutes)}m"
+
+
+def _create_progress_bar(percentage: int, length: int = 10) -> str:
+    """Generate a textual progress bar representation."""
+    filled = round(length * percentage / 100)
+    return "⬢" * filled + "⬡" * (length - filled)
+
+
+def extract_number(text: str) -> float | None:
+    """Extract number from text using regex."""
+    match = re.search(r"[-+]?\d*\.?\d+", text)
+    return float(match.group()) if match else None
 
 
 class Call(PyTgCalls):
@@ -397,6 +433,60 @@ class Call(PyTgCalls):
         await asyncio.sleep(0.2)
         await assistant.leave_group_call(config.LOGGER_ID)
 
+    async def safe_join_call(self, assistant, chat_id, link, nt_assistant=None):
+        """Safe method to join call with multiple API attempts including nt-calls"""
+        try:
+            # Try with regular pytgcalls first
+            stream = self._create_stream(link)
+            await assistant.join_group_call(chat_id, stream)
+            return True
+        except (NoActiveGroupCall, Exception) as e:
+            print(f"pytgcalls failed: {e}")
+            if NT_CALLS_AVAILABLE and nt_assistant:
+                try:
+                    await nt_assistant.start(assistant._client)
+                    await nt_assistant.join_call(chat_id, link)
+                    print("✅ ntgcalls fallback successful")
+                    return True
+                except Exception as nt_e:
+                    print(f"⚠️ ntgcalls fallback failed: {nt_e}")
+            return False
+
+    async def safe_leave_call(self, assistant, chat_id, nt_assistant=None):
+        """Safe method to leave call with multiple API attempts including nt-calls"""
+        leave_methods = ["leave_group_call", "leave_call", "disconnect"]
+        
+        # Try different leave methods with py-tgcalls
+        for method_name in leave_methods:
+            if hasattr(assistant, method_name):
+                try:
+                    method = getattr(assistant, method_name)
+                    await method(chat_id)
+                    print(f"✅ py-tgcalls {method_name} succeeded")
+                    return True
+                except Exception as e:
+                    print(f"⚠️ py-tgcalls {method_name} failed: {e}")
+                    continue
+
+        # Try nt-calls as fallback
+        if nt_assistant:
+            try:
+                nt_methods = ["leave_group_call", "leave_call"]
+                for method_name in nt_methods:
+                    if hasattr(nt_assistant, method_name):
+                        try:
+                            method = getattr(nt_assistant, method_name)
+                            await method(chat_id)
+                            print(f"✅ nt-calls {method_name} succeeded")
+                            return True
+                        except Exception as e:
+                            print(f"⚠️ nt-calls {method_name} failed: {e}")
+                            continue
+            except ImportError:
+                print("⚠️ nt-calls not available")
+
+        return False
+
     async def join_call(
         self,
         chat_id: int,
@@ -650,33 +740,50 @@ class Call(PyTgCalls):
             await self.five.start()
 
     async def decorators(self):
-        @self.one.on_kicked()
-        @self.two.on_kicked()
-        @self.three.on_kicked()
-        @self.four.on_kicked()
-        @self.five.on_kicked()
-        @self.one.on_closed_voice_chat()
-        @self.two.on_closed_voice_chat()
-        @self.three.on_closed_voice_chat()
-        @self.four.on_closed_voice_chat()
-        @self.five.on_closed_voice_chat()
-        @self.one.on_left()
-        @self.two.on_left()
-        @self.three.on_left()
-        @self.four.on_left()
-        @self.five.on_left()
+        # Updated event handlers for py-tgcalls 2.2.1+
+        clients = []
+        if config.STRING1:
+            clients.append(self.one)
+        if config.STRING2:
+            clients.append(self.two)
+        if config.STRING3:
+            clients.append(self.three)
+        if config.STRING4:
+            clients.append(self.four)
+        if config.STRING5:
+            clients.append(self.five)
+
         async def stream_services_handler(_, chat_id: int):
             await self.stop_stream(chat_id)
 
-        @self.one.on_stream_end()
-        @self.two.on_stream_end()
-        @self.three.on_stream_end()
-        @self.four.on_stream_end()
-        @self.five.on_stream_end()
         async def stream_end_handler1(client, update: Update):
             if not isinstance(update, StreamAudioEnded):
                 return
             await self.change_stream(client, update.chat_id)
+
+        # Register event handlers with proper method names
+        for client in clients:
+            if hasattr(client, 'on_kicked'):
+                client.on_kicked()(stream_services_handler)
+            elif hasattr(client, 'on_participant_kicked'):
+                client.on_participant_kicked()(stream_services_handler)
+            
+            if hasattr(client, 'on_closed_voice_chat'):
+                client.on_closed_voice_chat()(stream_services_handler)
+            elif hasattr(client, 'on_call_ended'):
+                client.on_call_ended()(stream_services_handler)
+            
+            if hasattr(client, 'on_left'):
+                client.on_left()(stream_services_handler)
+            elif hasattr(client, 'on_participant_left'):
+                client.on_participant_left()(stream_services_handler)
+            
+            if hasattr(client, 'on_stream_end'):
+                client.on_stream_end()(stream_end_handler1)
+            elif hasattr(client, 'on_stream_ended'):
+                client.on_stream_ended()(stream_end_handler1)
+            
+        print("✅ Event handlers registered successfully")
 
 
 SANKI = Call()
