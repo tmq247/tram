@@ -760,19 +760,21 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
-        duration = check[0]["seconds"]
-        async def watchdog(chat_id, seconds):
-            await asyncio.sleep(seconds + 2)
-            queue = db.get(chat_id)
-            if queue and queue[0]["seconds"] <= 5:
+        async def watchdog_stream(chat_id, seconds):
+            await asyncio.sleep(seconds + 2)  # chờ stream kết thúc "đúng giờ"
+            check = db.get(chat_id)
+            if check and check[0]["seconds"] <= 5:
+                print(f"[watchdog] Force stop call for chat {chat_id} vì không có stream_end event.")
                 await _clear_(chat_id)
                 assistant = await group_assistant(self, chat_id)
                 try:
                     await assistant.leave_group_call(chat_id)
-                except:
-                    pass
+                except Exception as e:
+                    print(f"[watchdog-error] {e}")
+        
+        duration = check[0]["seconds"]
+        asyncio.create_task(watchdog_stream(chat_id, duration))
 
-        asyncio.create_task(watchdog(chat_id, duration))
 
 
     #@self.one.on_stream_end()
