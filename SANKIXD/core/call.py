@@ -598,6 +598,23 @@ class Call(PyTgCalls):
                 print(f"[stream_check] Giây còn lại: {check[0].get('seconds')} – Tiêu đề: {check[0].get('title')}")
 
                 return
+            async def watchdog(chat_id, duration):
+                await asyncio.sleep(duration + 2)
+                queue = db.get(chat_id)
+                if not queue:
+                    return
+                song = queue[0]
+                if song.get("seconds", 0) <= 5:
+                    print(f"[watchdog] Force stop {chat_id} – stream không kết thúc hợp lệ.")
+                    await _clear_(chat_id)
+                    assistant = await group_assistant(self, chat_id)
+                    try:
+                        await assistant.leave_group_call(chat_id)
+                    except Exception as e:
+                        print(f"[watchdog-error] {e}")
+
+            duration = check[0].get("seconds", 0)
+            asyncio.create_task(watchdog(chat_id, duration))
                 
         except Exception as e:
             print(f"❌ Error in change_stream processing: {e}")
@@ -609,6 +626,23 @@ class Call(PyTgCalls):
                 assistant = await group_assistant(self, chat_id)
                 await self._reliable_leave_call(client, chat_id)
                 return
+            async def watchdog(chat_id, duration):
+                await asyncio.sleep(duration + 2)
+                queue = db.get(chat_id)
+                if not queue:
+                    return
+                song = queue[0]
+                if song.get("seconds", 0) <= 5:
+                    print(f"[watchdog] Force stop {chat_id} – stream không kết thúc hợp lệ.")
+                    await _clear_(chat_id)
+                    assistant = await group_assistant(self, chat_id)
+                    try:
+                        await assistant.leave_group_call(chat_id)
+                    except Exception as e:
+                        print(f"[watchdog-error] {e}")
+            
+            duration = check[0].get("seconds", 0)
+            asyncio.create_task(watchdog(chat_id, duration))
         else:
             # Nếu có queue, tiếp tục play bài tiếp theo
             queued = check[0]["file"]
