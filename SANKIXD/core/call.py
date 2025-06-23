@@ -549,23 +549,23 @@ async def change_stream(self, client, chat_id):
 			    print(f"🎵 Removed finished song from queue, remaining: {len(check)}")
 	    else:
 		# Nếu có loop, giảm counter
-		loop = loop - 1
-		await set_loop(chat_id, loop)
-		print(f"🔁 Loop mode, remaining loops: {loop}")
+		    loop = loop - 1
+		    await set_loop(chat_id, loop)
+		    print(f"🔁 Loop mode, remaining loops: {loop}")
 	    
 	    # Cleanup bài vừa pop
 	    if popped:
-		await auto_clean(popped)
+		    await auto_clean(popped)
 	    
 	    # Kiểm tra lại queue sau khi pop
 	    if not check or len(check) == 0:
-			await _clear_(chat_id)
-			assistant = await group_assistant(self, chat_id)
-			try:
-				await assistant.leave_group_call(chat_id)
-			except:
-				 pass
-			return
+		    await _clear_(chat_id)
+		    assistant = await group_assistant(self, chat_id)
+		    try:
+			    await assistant.leave_group_call(chat_id)	    
+		    except:
+			    pass
+		    return
 		
 	except Exception as e:
 	    print(f"❌ Error in change_stream processing: {e}")
