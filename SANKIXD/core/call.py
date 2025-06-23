@@ -770,18 +770,10 @@ class Call(PyTgCalls):
         await self.change_stream(client, update.chat_id)
 
     async def ping(self):
-        import inspect
         pings = []
-        for idx, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
-            if client:
-                try:
-                    ping_fn = getattr(client, "ping", None)
-                    if inspect.iscoroutinefunction(ping_fn):
-                        result = await ping_fn()
-                        pings.append(result)
-                except Exception as e:
-                    print(f"[Assistant #{idx}] Ping lỗi: {e}")
-        return str(round(sum(pings) / len(pings), 3)) if pings else "0"
+        if config.STRING1:
+            pings.append(await self.one.ping)
+        return str(round(sum(pings) / len(pings), 3))
 
 
     async def start(self):
