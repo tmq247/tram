@@ -206,6 +206,9 @@ class Call:  # ✅ sửa lại
         video: Union[bool, str] = None,
         image: Union[bool, str] = None,
     ):
+        db[chat_id][0]["start_time"] = datetime.now()
+        db[chat_id][0]["played"] = 0
+
         assistant = await group_assistant(self, chat_id)
         language = await get_lang(chat_id)
         _ = get_string(language)
@@ -820,6 +823,8 @@ class Call:  # ✅ sửa lại
 
     async def auto_leaver_loop(self):
         LOGGER(__name__).info("👀 [auto_leaver_loop] Started auto leave monitor")
+        LOGGER(__name__).info(f"📦 DB Snapshot: {db}")
+
     
         while True:
             try:
@@ -887,5 +892,20 @@ async def diagnose_stream(self, chat_id: int):
     except Exception as e:
         print(f"❌ Lỗi khi chạy diagnose: {e}")
 
+@app.on_message(filters.command("test") & filters.user(config.OWNER_ID))
+async def test_autoleaver(client, message):
+    chat_id = message.chat.id
+    db[chat_id] = [{
+        "title": "Test Song",
+        "file": "https://example.com/audio.mp3",
+        "seconds": 5,
+        "start_time": datetime.now(),
+        "streamtype": "audio",
+        "chat_id": chat_id,
+        "by": "Tester",
+        "vidid": "telegram",
+        "dur": "0:05",
+    }]
+    await message.reply_text("🧪 Test song injected. Wait 6 seconds to see if bot auto-leaves.")
 
 SANKI = Call()
