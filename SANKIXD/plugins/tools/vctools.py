@@ -232,7 +232,7 @@ async def start_group_call(c: Client, m: Message):
     try:
 
     # Nếu chưa có trong storage, thử lấy thông tin chat để lưu vào storage
-        await assistant.get_chat(chat_id)
+        #await assistant.get_chat(chat_id)
         peer = await assistant.resolve_peer(chat_id)
         await assistant.invoke(
             CreateGroupCall(
@@ -247,14 +247,14 @@ async def start_group_call(c: Client, m: Message):
     except ChatAdminRequired:
       try:    
         await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-                can_manage_chat=False,
-                can_delete_messages=False,
+                #can_manage_chat=False,
+                #can_delete_messages=False,
                 can_manage_video_chats=True,
-                can_restrict_members=False,
-                can_change_info=False,
-                can_invite_users=False,
-                can_pin_messages=False,
-                can_promote_members=False,
+                #can_restrict_members=False,
+                #can_change_info=False,
+                #can_invite_users=False,
+                #can_pin_messages=False,
+                #can_promote_members=False,
             ),
         )
         peer = await assistant.resolve_peer(chat_id)
@@ -268,14 +268,14 @@ async def start_group_call(c: Client, m: Message):
             )
         )
         await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-            can_manage_chat=False,
-            can_delete_messages=False,
+            #can_manage_chat=False,
+            #can_delete_messages=False,
             can_manage_video_chats=False,
-            can_restrict_members=False,
-            can_change_info=False,
-            can_invite_users=False,
-            can_pin_messages=False,
-            can_promote_members=False,
+            #can_restrict_members=False,
+            #can_change_info=False,
+            #can_invite_users=False,
+            #can_pin_messages=False,
+            #can_promote_members=False,
             ),
         )                              
         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
@@ -305,14 +305,14 @@ async def stop_group_call(c: Client, m: Message):
       if "GROUPCALL_FORBIDDEN" in str(e):
        try:    
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-                can_manage_chat=False,
-                can_delete_messages=False,
+                #can_manage_chat=False,
+                #can_delete_messages=False,
                 can_manage_video_chats=True,
-                can_restrict_members=False,
-                can_change_info=False,
-                can_invite_users=False,
-                can_pin_messages=False,
-                can_promote_members=False,
+                #can_restrict_members=False,
+                #can_change_info=False,
+                #can_invite_users=False,
+                #can_pin_messages=False,
+                #can_promote_members=False,
              ),
          )
          if not (
@@ -323,14 +323,14 @@ async def stop_group_call(c: Client, m: Message):
            return
          await assistant.invoke(DiscardGroupCall(call=group_call))
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-            can_manage_chat=False,
-            can_delete_messages=False,
+            #can_manage_chat=False,
+            #can_delete_messages=False,
             can_manage_video_chats=False,
-            can_restrict_members=False,
-            can_change_info=False,
-            can_invite_users=False,
-            can_pin_messages=False,
-            can_promote_members=False,
+            #can_restrict_members=False,
+            #can_change_info=False,
+            #can_invite_users=False,
+            #can_pin_messages=False,
+            #can_promote_members=False,
             ),
          )                              
          await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴄʟᴏꜱᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
