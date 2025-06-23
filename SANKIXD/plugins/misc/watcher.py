@@ -4,8 +4,8 @@ from pyrogram.types import Message
 from SANKIXD import app
 from SANKIXD.core.call import SANKI
 
-welcome = 20
-close = 30
+welcome = 1
+close = 2
 
 
 @app.on_message(filters.video_chat_started, group=welcome)
