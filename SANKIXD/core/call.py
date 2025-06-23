@@ -534,9 +534,10 @@ class Call(PyTgCalls):
         loop = await get_loop(chat_id)
         
         print(f"🔄 Change stream called for chat {chat_id}, queue length: {len(check) if check else 0}")
+        print(f"[stream_check] Giây còn lại: {check[0].get('seconds')} – Tiêu đề: {check[0].get('title')}")
         
         # Nếu không có queue, thoát ngay lập tức
-        if not check or len(check) == 0:
+        if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
             print(f"🚪 No songs in queue for chat {chat_id}, leaving...")
             await _clear_(chat_id)
             await self._reliable_leave_call(client, chat_id)
@@ -557,7 +558,7 @@ class Call(PyTgCalls):
             # Cleanup bài vừa pop
             if popped:
                 await auto_clean(popped)
-                if not check or len(check) == 0:
+                if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
                     await _clear_(chat_id)
                     assistant = await group_assistant(self, chat_id)
                     try:
@@ -579,7 +580,7 @@ class Call(PyTgCalls):
             print(f"❌ Error in change_stream processing: {e}")
             # Kiểm tra queue sau lỗi
             check = db.get(chat_id)
-            if not check or len(check) == 0:
+            if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
                 print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
                 await self._reliable_leave_call(client, chat_id)
