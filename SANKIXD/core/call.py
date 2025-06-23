@@ -544,9 +544,9 @@ async def change_stream(self, client, chat_id):
 	try:
 	    # Luôn luôn pop bài đầu tiên (bài vừa kết thúc) nếu không có loop
 	    if loop == 0:
-		if len(check) > 0:
-		    popped = check.pop(0)
-		    print(f"🎵 Removed finished song from queue, remaining: {len(check)}")
+		    if len(check) > 0:
+			    popped = check.pop(0)
+			    print(f"🎵 Removed finished song from queue, remaining: {len(check)}")
 	    else:
 		# Nếu có loop, giảm counter
 		loop = loop - 1
