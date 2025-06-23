@@ -1,5 +1,6 @@
 import asyncio
 import os
+import inspect
 from datetime import datetime, timedelta
 from typing import Union
 
@@ -771,11 +772,11 @@ class Call(PyTgCalls):
     async def ping(self):
         pings = []
         try:
-            for client in [self.one, self.two, self.three, self.four, self.five]:
+            for client in [self.one]:
                 if client and hasattr(client, 'ping'):
-                    ping_fn = getattr(client, "ping", None)
-                    if callable(ping_fn):
-                        result = await ping_fn()  # ✅ Gọi và await đúng cách
+                    ping_fn = getattr(client, "ping")
+                    if inspect.iscoroutinefunction(ping_fn):
+                        result = await ping_fn()
                         pings.append(result)
             return str(round(sum(pings) / len(pings), 3)) if pings else "0"
         except Exception as e:
