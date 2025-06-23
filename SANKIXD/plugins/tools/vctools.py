@@ -245,8 +245,8 @@ async def start_group_call(c: Client, m: Message):
         )
         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
     except ChatAdminRequired:
-    try:    
-        await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
+        try:    
+            await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
                 #can_manage_chat=False,
                 #can_delete_messages=False,
                 can_manage_video_chats=True,
@@ -257,8 +257,8 @@ async def start_group_call(c: Client, m: Message):
                 #can_promote_members=False,
             ),
         )
-        peer = await assistant.resolve_peer(chat_id)
-        await assistant.invoke(
+            peer = await assistant.resolve_peer(chat_id)
+            await assistant.invoke(
             CreateGroupCall(
                 peer=InputPeerChannel(
                     channel_id=peer.channel_id,
@@ -267,7 +267,7 @@ async def start_group_call(c: Client, m: Message):
                 random_id=assistant.rnd_id() // 9000000000,
             )
         )
-        await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
+            await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
             #can_manage_chat=False,
             #can_delete_messages=False,
             can_manage_video_chats=False,
@@ -278,9 +278,9 @@ async def start_group_call(c: Client, m: Message):
             #can_promote_members=False,
             ),
         )                              
-        await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
-    except:
-        await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
+            await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+        except:
+            await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
 
 @app.on_message(filters.command(["vcend","endvc"], ["/", "!"]))
 async def stop_group_call(c: Client, m: Message):
