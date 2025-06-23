@@ -250,7 +250,7 @@ async def start_group_call(c: Client, m: Message):
                     real_id = int(str(chat_id)[4:])
                     peer = types.InputPeerChannel(
                         channel_id=real_id,
-                        access_hash=chat.access_hash  # nên lấy đúng access_hash nếu có
+                        access_hash=0  # nên lấy đúng access_hash nếu có
                     )
                 else:
                     # Đây là nhóm thường
