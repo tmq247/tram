@@ -772,7 +772,7 @@ class Call(PyTgCalls):
     async def ping(self):
         pings = []
         if config.STRING1:
-            pings.append(await self.one.ping)
+            pings.append(self.one.ping)
         return str(round(sum(pings) / len(pings), 3))
 
 
