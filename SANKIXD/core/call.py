@@ -530,6 +530,27 @@ class Call(PyTgCalls):
 
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
+        duration = check[0].get("seconds", 0)
+        db[chat_id][0]["played"] = 0
+        db[chat_id][0]["start_time"] = datetime.now()
+
+
+        async def watchdog(chat_id, seconds):
+            await asyncio.sleep(seconds + 2)
+            queue = db.get(chat_id)
+            if not queue:
+                return
+            current = queue[0]
+            if current.get("played", 0) >= current.get("seconds", 0) - 3:
+                print(f"[watchdog] Force stop {chat_id} vì stream không phát ra stream_end.")
+                await _clear_(chat_id)
+                assistant = await group_assistant(self, chat_id)
+                try:
+                    await assistant.leave_group_call(chat_id)
+                except Exception as e:
+                    print(f"[watchdog-error] {e}")
+        
+        asyncio.create_task(watchdog(chat_id, duration))
         popped = None
         loop = await get_loop(chat_id)
         
@@ -760,38 +781,6 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
-        async def watchdog_stream(chat_id, seconds):
-            await asyncio.sleep(seconds + 2)  # chờ stream kết thúc "đúng giờ"
-            check = db.get(chat_id)
-            if check and check[0]["seconds"] <= 5:
-                print(f"[watchdog] Force stop call for chat {chat_id} vì không có stream_end event.")
-                await _clear_(chat_id)
-                assistant = await group_assistant(self, chat_id)
-                try:
-                    await assistant.leave_group_call(chat_id)
-                except Exception as e:
-                    print(f"[watchdog-error] {e}")
-        
-        duration = check[0]["seconds"]
-        asyncio.create_task(watchdog_stream(chat_id, duration))
-
-
-
-    #@self.one.on_stream_end()
-    async def stream_end_handler1(client, update: Update):
-        try:
-            check = db.get(update.chat_id)
-            if not check or len(check) == 0 or check[0].get("seconds", 0) <= 5:
-                await _clear_(update.chat_id)
-                assistant = await group_assistant(self, update.chat_id)
-                try:
-                    await assistant.leave_group_call(update.chat_id)
-                except:
-                    pass
-                return
-            await self.change_stream(client, update.chat_id)
-        except Exception as e:
-            print(f"[stream_end] Lỗi: {e}")
 
     async def ping(self):
         pings = []
@@ -838,8 +827,11 @@ class Call(PyTgCalls):
                                 await self.stop_stream(chat_id)
                         
                         if hasattr(client, 'on_stream_end'):
-                            @client.on_stream_end()
-                            async def on_stream_end_handler(client_instance, update):
+                            @self.one.on_stream_end()
+                            async def stream_end_handler1(client, update: Update):
+                                if not isinstance(update, StreamAudioEnded):
+                                    return
+                                await self.change_stream(client, update.chat_id)
                                 try:
                                     if hasattr(update, 'chat_id'):
                                         chat_id = update.chat_id
