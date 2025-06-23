@@ -204,6 +204,12 @@ async def get_group_call(
     client: Client, message: Message, err_msg: str = ""
 ) -> Optional[InputGroupCall]:
     assistant = await get_assistant(message.chat.id)
+    try:
+        await assistant.get_chat_member(chat_id, (await assistant.get_me()).id)
+    except Exception:
+        await message.reply("❗ Assistant chưa tham gia nhóm này. Hãy mời assistant vào nhóm trước.")
+        return
+
     chat_peer = await assistant.resolve_peer(message.chat.id)
     if isinstance(chat_peer, (InputPeerChannel, InputPeerChat)):
         if isinstance(chat_peer, InputPeerChannel):
