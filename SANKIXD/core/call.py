@@ -527,8 +527,8 @@ class Call(PyTgCalls):
             print(f"❌ Error forcing next song for chat {chat_id}: {e}")
             return False
 
-    async def change_stream(self, client, chat_id):
-        check = db.get(chat_id)
+async def change_stream(self, client, chat_id):
+	check = db.get(chat_id)
         popped = None
         loop = await get_loop(chat_id)
         
@@ -554,9 +554,11 @@ class Call(PyTgCalls):
                 print(f"🔁 Loop mode, remaining loops: {loop}")
             
             # Cleanup bài vừa pop
-            if popped:
-                await auto_clean(popped)
-		if not check or len(check) == 0:
+	    if popped:
+		await auto_clean(popped)
+            
+            # Kiểm tra lại queue sau khi pop
+            if not check or len(check) == 0:
 			await _clear_(chat_id)
 			assistant = await group_assistant(self, chat_id)
 			try:
@@ -564,13 +566,6 @@ class Call(PyTgCalls):
 			except:
 				 pass
 			return
-            
-            # Kiểm tra lại queue sau khi pop
-            if not check or len(check) == 0:
-                print(f"🚪 Queue empty after processing for chat {chat_id}, leaving...")
-                await _clear_(chat_id)
-                await self._reliable_leave_call(client, chat_id)
-                return
                 
         except Exception as e:
             print(f"❌ Error in change_stream processing: {e}")
