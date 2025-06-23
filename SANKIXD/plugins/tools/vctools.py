@@ -247,10 +247,10 @@ async def start_group_call(c: Client, m: Message):
         
                 if str(chat_id).startswith("-100"):
             # Xử lý supergroup/channel
-                real_id = int(str(chat_id)[4:])
-                peer = types.InputPeerChannel(
-                channel_id=real_id,
-                access_hash=0  # Pyrogram sẽ tự điền
+                    real_id = int(str(chat_id)[4:])
+                    peer = types.InputPeerChannel(
+                    channel_id=real_id,
+                    access_hash=0  # Pyrogram sẽ tự điền
             )
                 else:
             # Xử lý chat thường
