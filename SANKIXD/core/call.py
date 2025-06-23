@@ -556,6 +556,14 @@ class Call(PyTgCalls):
             # Cleanup bài vừa pop
             if popped:
                 await auto_clean(popped)
+                if not check or len(check) == 0:
+                    await _clear_(chat_id)
+                    assistant = await group_assistant(self, chat_id)
+                    try:
+                        await assistant.leave_group_call(chat_id)
+                    except:
+                        pass
+                    return
             
             # Kiểm tra lại queue sau khi pop
             if not check or len(check) == 0:
@@ -745,6 +753,21 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
+
+
+    async def stream_end_handler1(client, update: Update):
+    if not isinstance(update, StreamAudioEnded):
+        return
+    check = db.get(update.chat_id)
+    if not check or len(check) == 0:
+        await _clear_(update.chat_id)
+        assistant = await group_assistant(self, update.chat_id)
+        try:
+            await assistant.leave_group_call(update.chat_id)
+        except:
+            pass
+        return
+    await self.change_stream(client, update.chat_id)
 
     async def ping(self):
         pings = []
