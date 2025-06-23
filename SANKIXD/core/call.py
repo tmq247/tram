@@ -572,10 +572,10 @@ async def change_stream(self, client, chat_id):
 	    # Kiểm tra queue sau lỗi
 	    check = db.get(chat_id)
 	    if not check or len(check) == 0:
-		print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
-		await _clear_(chat_id)
-		await self._reliable_leave_call(client, chat_id)
-		return
+		    print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
+		    await _clear_(chat_id)
+		    await self._reliable_leave_call(client, chat_id)
+		    return
 	else:
 	    # Nếu có queue, tiếp tục play bài tiếp theo
 	    queued = check[0]["file"]
