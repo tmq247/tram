@@ -17,6 +17,7 @@ from config import SUPPORT_CHAT, adminlist, confirmer
 from strings import get_string
 
 from ..formatters import int_to_alpha
+from SANKIXD.utils.debug import trace_peer_usage
 
 
 def AdminRightsCheck(mystic):
@@ -178,6 +179,7 @@ def ActualAdminCB(mystic):
         is_non_admin = await is_nonadmin_chat(CallbackQuery.message.chat.id)
         if not is_non_admin:
             try:
+                await trace_peer_usage(app, chat_id, "admins:182")
                 a = (
                     await app.get_chat_member(
                         CallbackQuery.message.chat.id,
