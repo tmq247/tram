@@ -531,26 +531,9 @@ class Call(PyTgCalls):
     async def change_stream(self, client, chat_id):
         check = db.get(chat_id)
         duration = check[0].get("seconds", 0)
-        db[chat_id][0]["played"] = 0
-        db[chat_id][0]["start_time"] = datetime.now()
-
-
-        async def watchdog(chat_id, seconds):
-            await asyncio.sleep(seconds + 2)
-            queue = db.get(chat_id)
-            if not queue:
-                return
-            current = queue[0]
-            if current.get("played", 0) >= current.get("seconds", 0) - 3:
-                print(f"[watchdog] Force stop {chat_id} vì stream không phát ra stream_end.")
-                await _clear_(chat_id)
-                assistant = await group_assistant(self, chat_id)
-                try:
-                    await assistant.leave_group_call(chat_id)
-                except Exception as e:
-                    print(f"[watchdog-error] {e}")
         
-        asyncio.create_task(watchdog(chat_id, duration))
+        db[chat_id][0]["start_time"] = datetime.now()
+        db[chat_id][0]["played"] = 0
         popped = None
         loop = await get_loop(chat_id)
         
