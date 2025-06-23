@@ -775,7 +775,7 @@ class Call(PyTgCalls):
 asyncio.create_task(watchdog(chat_id, duration))
 
 
-    @self.one.on_stream_end()
+    #@self.one.on_stream_end()
     async def stream_end_handler1(client, update: Update):
         try:
             check = db.get(update.chat_id)
