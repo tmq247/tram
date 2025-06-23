@@ -772,7 +772,7 @@ class Call(PyTgCalls):
                 except:
                     pass
 
-asyncio.create_task(watchdog(chat_id, duration))
+    asyncio.create_task(watchdog(chat_id, duration))
 
 
     #@self.one.on_stream_end()
