@@ -232,8 +232,29 @@ async def start_group_call(c: Client, m: Message):
     try:
 
     # Nếu chưa có trong storage, thử lấy thông tin chat để lưu vào storage
-        await assistant.get_chats(chat_id)
-        peer = await assistant.resolve_peer(chat_id)
+        try:
+    # Thử resolve_peer từ cache
+            peer = await assistant.resolve_peer(chat_id)
+        except (KeyError, ValueError):
+            try:
+        # Lấy thông tin chat từ server
+                await assistant.get_chat(chat_id)
+                # Thử lại sau khi đã cache
+                peer = await assistant.resolve_peer(chat_id)
+            except Exception as e:
+        # Xử lý fallback nếu vẫn lỗi
+                from pyrogram.raw import types
+        
+                if str(chat_id).startswith("-100"):
+            # Xử lý supergroup/channel
+                real_id = int(str(chat_id)[4:])
+                peer = types.InputPeerChannel(
+                channel_id=real_id,
+                access_hash=0  # Pyrogram sẽ tự điền
+            )
+                else:
+            # Xử lý chat thường
+                peer = types.InputPeerChat(chat_id=chat_id)
         await assistant.invoke(
             CreateGroupCall(
                 peer=InputPeerChannel(
