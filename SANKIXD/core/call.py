@@ -892,5 +892,19 @@ async def diagnose_stream(self, chat_id: int):
     except Exception as e:
         print(f"❌ Lỗi khi chạy diagnose: {e}")
 
-
+@app.on_message(filters.command("test") & filters.user(config.OWNER_ID))
+async def test_autoleaver(client, message):
+    chat_id = message.chat.id
+    db[chat_id] = [{
+        "title": "Test Song",
+        "file": "https://example.com/audio.mp3",
+        "seconds": 5,
+        "start_time": datetime.now(),
+        "streamtype": "audio",
+        "chat_id": chat_id,
+        "by": "Tester",
+        "vidid": "telegram",
+        "dur": "0:05",
+    }]
+    await message.reply_text("🧪 Test song injected. Wait 6 seconds to see if bot auto-leaves.")
 SANKI = Call()
