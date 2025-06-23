@@ -245,7 +245,7 @@ async def start_group_call(c: Client, m: Message):
         )
         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
     except ChatAdminRequired:
-      try:    
+    try:    
         await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
                 #can_manage_chat=False,
                 #can_delete_messages=False,
@@ -279,8 +279,8 @@ async def start_group_call(c: Client, m: Message):
             ),
         )                              
         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
-      except:
-         await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
+    except:
+        await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
 
 @app.on_message(filters.command(["vcend","endvc"], ["/", "!"]))
 async def stop_group_call(c: Client, m: Message):
