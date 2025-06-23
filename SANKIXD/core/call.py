@@ -775,8 +775,7 @@ class Call(PyTgCalls):
                 if client and hasattr(client, 'ping'):
                     ping_fn = getattr(client, "ping", None)
                     if asyncio.iscoroutinefunction(ping_fn):
-                        result = await ping_fn()
-                        pings.append(result)
+                        pings.append(await ping_fn())
             return str(round(sum(pings) / len(pings), 3)) if pings else "0"
         except Exception as e:
             print(f"Lỗi ping: {e}")
