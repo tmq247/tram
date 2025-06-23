@@ -249,7 +249,7 @@ async def start_group_call(c: Client, m: Message):
             # Xử lý supergroup/channel
                     real_id = int(str(chat_id)[4:])
                     peer = types.InputPeerChat(
-                    channel_id=real_id,
+                    chat_id=real_id,
                     access_hash=0  # Pyrogram sẽ tự điền
             )
                 else:
