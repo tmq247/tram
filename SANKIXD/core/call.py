@@ -769,18 +769,18 @@ class Call(PyTgCalls):
         await self.change_stream(client, update.chat_id)
 
     async def ping(self):
-    pings = []
-    try:
-        for client in [self.one, self.two, self.three, self.four, self.five]:
-            if client and hasattr(client, 'ping'):
-                ping_fn = getattr(client, "ping", None)
-                if asyncio.iscoroutinefunction(ping_fn):
-                    result = await ping_fn()
-                    pings.append(result)
-        return str(round(sum(pings) / len(pings), 3)) if pings else "0"
-    except Exception as e:
-        print(f"Lỗi ping: {e}")
-        return "0"
+        pings = []
+        try:
+            for client in [self.one, self.two, self.three, self.four, self.five]:
+                if client and hasattr(client, 'ping'):
+                    ping_fn = getattr(client, "ping", None)
+                    if asyncio.iscoroutinefunction(ping_fn):
+                        result = await ping_fn()
+                        pings.append(result)
+            return str(round(sum(pings) / len(pings), 3)) if pings else "0"
+        except Exception as e:
+            print(f"Lỗi ping: {e}")
+            return "0"
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
