@@ -556,14 +556,14 @@ class Call(PyTgCalls):
             # Cleanup bài vừa pop
             if popped:
                 await auto_clean(popped)
-		    if not check or len(check) == 0:
-    			await _clear_(chat_id)
-    			assistant = await group_assistant(self, chat_id)
-    			try:
-        			await assistant.leave_group_call(chat_id)
-    			except:
-       				 pass
-    			return
+		if not check or len(check) == 0:
+			await _clear_(chat_id)
+			assistant = await group_assistant(self, chat_id)
+			try:
+				await assistant.leave_group_call(chat_id)
+			except:
+				 pass
+			return
             
             # Kiểm tra lại queue sau khi pop
             if not check or len(check) == 0:
