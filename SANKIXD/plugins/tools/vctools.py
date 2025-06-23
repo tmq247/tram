@@ -219,92 +219,69 @@ async def get_group_call(
     await app.send_message(f"No group ᴠᴏɪᴄᴇ ᴄʜᴀᴛ Found** {err_msg}")
     return False
 
-@app.on_message(filters.command(["vcstart","startvc"], ["/", "!"]))
-async def start_group_call(c: Client, m: Message):
-    chat_id = m.chat.id
+@app.on_message(filters.command(["vcstart", "startvc"], ["/", "!"]))
+async def start_group_call(client: Client, message: Message):
+    chat_id = message.chat.id
     assistant = await get_assistant(chat_id)
-    ass = await assistant.get_me()
-    assid = ass.id
     if assistant is None:
-        await app.send_message(chat_id, "ᴇʀʀᴏʀ ᴡɪᴛʜ ᴀꜱꜱɪꜱᴛᴀɴᴛ")
+        await message.reply("⚠️ Không thể lấy trợ lý.")
         return
-    msg = await app.send_message(chat_id, "ꜱᴛᴀʀᴛɪɴɢ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ..")
-    try:
 
-    # Nếu chưa có trong storage, thử lấy thông tin chat để lưu vào storage
-        try:
-    # Thử resolve_peer từ cache
-            peer = await assistant.resolve_peer(chat_id)
-        except (KeyError, ValueError):
-            try:
-        # Lấy thông tin chat từ server
-                await assistant.get_chat(chat_id)
-                # Thử lại sau khi đã cache
-                peer = await assistant.resolve_peer(chat_id)
-            except Exception as e:
-        # Xử lý fallback nếu vẫn lỗi
-                from pyrogram.raw import types
-        
-                if str(chat_id).startswith("-100"):
-                    # Đây là supergroup/channel
-                    real_id = int(str(chat_id)[4:])
-                    peer = types.InputPeerChannel(
-                        channel_id=real_id,
-                        access_hash=0  # nên lấy đúng access_hash nếu có
-                    )
-                else:
-                    # Đây là nhóm thường
-                    peer = types.InputPeerChat(
-                        chat_id=int(chat_id)
-                    )
+    try:
+        chat = await assistant.get_chat(chat_id)
+    except Exception as e:
+        await message.reply(f"❌ Không lấy được thông tin chat: {e}")
+        return
+
+    if chat.type != "supergroup":
+        await message.reply("❌ Chỉ hỗ trợ tạo voice chat trong supergroup.")
+        return
+
+    try:
+        peer = await assistant.resolve_peer(chat_id)
+        if not isinstance(peer, InputPeerChannel):
+            await message.reply("❌ Không thể tạo cuộc gọi — không phải supergroup hoặc channel.")
+            return
+    except Exception as e:
+        await message.reply(f"❌ Không lấy được peer: {e}")
+        return
+
+    msg = await message.reply("🔄 Đang khởi động voice chat...")
+
+    try:
         await assistant.invoke(
             CreateGroupCall(
-                peer=InputPeerChannel(
-                    channel_id=peer.channel_id,
-                    access_hash=peer.access_hash,
-                ),
+                peer=peer,
                 random_id=assistant.rnd_id() // 9000000000,
             )
         )
-        await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
+        await msg.edit("✅ Voice chat đã được khởi tạo thành công!")
     except ChatAdminRequired:
-        try:    
-            await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-                #can_manage_chat=False,
-                #can_delete_messages=False,
-                can_manage_video_chats=True,
-                #can_restrict_members=False,
-                #can_change_info=False,
-                #can_invite_users=False,
-                #can_pin_messages=False,
-                #can_promote_members=False,
-            ),
-        )
-            await assistant.get_chats(chat_id)
-            peer = await assistant.resolve_peer(chat_id)
-            await assistant.invoke(
-            CreateGroupCall(
-                peer=InputPeerChannel(
-                    channel_id=peer.channel_id,
-                    access_hash=peer.access_hash,
-                ),
-                random_id=assistant.rnd_id() // 9000000000,
+        # Bot thiếu quyền — thử cấp quyền tạm thời
+        ass = await assistant.get_me()
+        assid = ass.id
+        try:
+            await client.promote_chat_member(
+                chat_id,
+                assid,
+                ChatPrivileges(can_manage_video_chats=True),
             )
-        )
-            await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
-            #can_manage_chat=False,
-            #can_delete_messages=False,
-            can_manage_video_chats=False,
-            #can_restrict_members=False,
-            #can_change_info=False,
-            #can_invite_users=False,
-            #can_pin_messages=False,
-            #can_promote_members=False,
-            ),
-        )                              
-            await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜱᴛᴀʀᴛᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
-        except:
-            await msg.edit_text("ɢɪᴠᴇ ᴛʜᴇ ʙᴏᴛ ᴀʟʟ ᴘᴇʀᴍɪꜱꜱɪᴏɴꜱ ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ ⚡")
+            await assistant.invoke(
+                CreateGroupCall(
+                    peer=peer,
+                    random_id=assistant.rnd_id() // 9000000000,
+                )
+            )
+            await client.promote_chat_member(
+                chat_id,
+                assid,
+                ChatPrivileges(can_manage_video_chats=False),
+            )
+            await msg.edit("✅ Voice chat đã được khởi tạo sau khi cấp quyền tạm thời!")
+        except Exception as e:
+            await msg.edit(f"❌ Không thể tạo voice chat: {e}")
+    except Exception as e:
+        await msg.edit(f"❌ Lỗi khi tạo voice chat: {e}")
 
 @app.on_message(filters.command(["vcend","endvc"], ["/", "!"]))
 async def stop_group_call(c: Client, m: Message):
