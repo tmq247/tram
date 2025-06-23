@@ -232,7 +232,7 @@ async def start_group_call(c: Client, m: Message):
     try:
 
     # Nếu chưa có trong storage, thử lấy thông tin chat để lưu vào storage
-        await assistant.get_chat(chat_id)
+        await assistant.get_chats(chat_id)
         peer = await assistant.resolve_peer(chat_id)
         await assistant.invoke(
             CreateGroupCall(
@@ -257,7 +257,7 @@ async def start_group_call(c: Client, m: Message):
                 #can_promote_members=False,
             ),
         )
-            await assistant.get_chat(chat_id)
+            await assistant.get_chats(chat_id)
             peer = await assistant.resolve_peer(chat_id)
             await assistant.invoke(
             CreateGroupCall(
