@@ -540,6 +540,7 @@ class Call(PyTgCalls):
         if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
             print(f"🚪 No songs in queue for chat {chat_id}, leaving...")
             await _clear_(chat_id)
+            assistant = await group_assistant(self, chat_id)
             await self._reliable_leave_call(client, chat_id)
             return
             
@@ -571,6 +572,7 @@ class Call(PyTgCalls):
             if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
                 print(f"🚪 Queue empty after processing for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
+                assistant = await group_assistant(self, chat_id)
                 await self._reliable_leave_call(client, chat_id)
                 print(f"[stream_check] Giây còn lại: {check[0].get('seconds')} – Tiêu đề: {check[0].get('title')}")
 
@@ -583,6 +585,7 @@ class Call(PyTgCalls):
             if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
                 print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
+                assistant = await group_assistant(self, chat_id)
                 await self._reliable_leave_call(client, chat_id)
                 return
         else:
@@ -757,20 +760,36 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
+        duration = check[0]["seconds"]
+        async def watchdog(chat_id, seconds):
+            await asyncio.sleep(seconds + 2)
+            queue = db.get(chat_id)
+            if queue and queue[0]["seconds"] <= 5:
+                await _clear_(chat_id)
+                assistant = await group_assistant(self, chat_id)
+                try:
+                    await assistant.leave_group_call(chat_id)
+                except:
+                    pass
 
+asyncio.create_task(watchdog(chat_id, duration))
+
+
+    @self.one.on_stream_end()
     async def stream_end_handler1(client, update: Update):
-        if not isinstance(update, StreamAudioEnded):
-            return
-        check = db.get(update.chat_id)
-        if not check or len(check) == 0:
-            await _clear_(update.chat_id)
-            assistant = await group_assistant(self, update.chat_id)
-            try:
-                await assistant.leave_group_call(update.chat_id)
-            except:
-                pass
-            return
-        await self.change_stream(client, update.chat_id)
+        try:
+            check = db.get(update.chat_id)
+            if not check or len(check) == 0 or check[0].get("seconds", 0) <= 5:
+                await _clear_(update.chat_id)
+                assistant = await group_assistant(self, update.chat_id)
+                try:
+                    await assistant.leave_group_call(update.chat_id)
+                except:
+                    pass
+                return
+            await self.change_stream(client, update.chat_id)
+        except Exception as e:
+            print(f"[stream_end] Lỗi: {e}")
 
     async def ping(self):
         pings = []
