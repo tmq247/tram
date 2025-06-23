@@ -246,19 +246,21 @@ async def start_group_call(c: Client, m: Message):
                 from pyrogram.raw import types
         
                 if str(chat_id).startswith("-100"):
-            # Xử lý supergroup/channel
+                    # Đây là supergroup/channel
                     real_id = int(str(chat_id)[4:])
-                    peer = types.InputPeerChat(
-                    chat_id=real_id,
-                    access_hash=0  # Pyrogram sẽ tự điền
-            )
+                    peer = types.InputPeerChannel(
+                        channel_id=real_id,
+                        access_hash=0  # nên lấy đúng access_hash nếu có
+                    )
                 else:
-            # Xử lý chat thường
-                    peer = types.InputPeerChat(chat_id=chat_id)
+                    # Đây là nhóm thường
+                    peer = types.InputPeerChat(
+                        chat_id=int(chat_id)
+                    )
         await assistant.invoke(
             CreateGroupCall(
-                peer=InputPeerChat(
-                    chat_id=peer.chat_id,
+                peer=InputPeerChannel(
+                    channel_id=peer.channel_id,
                     access_hash=peer.access_hash,
                 ),
                 random_id=assistant.rnd_id() // 9000000000,
@@ -282,8 +284,8 @@ async def start_group_call(c: Client, m: Message):
             peer = await assistant.resolve_peer(chat_id)
             await assistant.invoke(
             CreateGroupCall(
-                peer=InputPeerChat(
-                    chat_id=peer.chat_id,
+                peer=InputPeerChannel(
+                    channel_id=peer.channel_id,
                     access_hash=peer.access_hash,
                 ),
                 random_id=assistant.rnd_id() // 9000000000,
