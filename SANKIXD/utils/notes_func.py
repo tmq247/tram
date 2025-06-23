@@ -7,6 +7,7 @@ from SANKIXD import app
 from SANKIXD.mongo.notesdb import GetNote
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from SANKIXD.utils.msg_types import button_markdown_parser
+from SANKIXD.utils.debug import trace_peer_usage
 
 class NoteTypeMap(Enum):
     text = auto()
@@ -300,7 +301,7 @@ async def isUserAdmin(message: Message, pm_mode: bool = False, user_id: int = No
     if not pm_mode: 
         if message.chat.type == 'private':
             return True  
-
+    await trace_peer_usage(app, chat_id, "notes_func:304")
     GetData = await app.get_chat_member(
         chat_id=chat_id,
         user_id=user_id
