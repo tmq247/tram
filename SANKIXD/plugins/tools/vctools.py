@@ -257,7 +257,7 @@ async def start_group_call(c: Client, m: Message):
                     peer = types.InputPeerChat(chat_id=chat_id)
         await assistant.invoke(
             CreateGroupCall(
-                peer=InputPeerChannel(
+                peer=InputPeerChat(
                     channel_id=peer.channel_id,
                     access_hash=peer.access_hash,
                 ),
