@@ -772,16 +772,17 @@ class Call(PyTgCalls):
     async def ping(self):
         pings = []
         try:
-            for client in [self.one]:
+            for client in [self.one, self.two, self.three, self.four, self.five]:
                 if client and hasattr(client, 'ping'):
-                    ping_fn = getattr(client, "ping")
+                    ping_fn = getattr(client, "ping", None)
                     if inspect.iscoroutinefunction(ping_fn):
-                        result = await ping_fn()
-                        pings.append(result)
+                        ping_result = await ping_fn()  # ✅ Gọi và await đúng cách
+                        pings.append(ping_result)
             return str(round(sum(pings) / len(pings), 3)) if pings else "0"
         except Exception as e:
-            print(f"[ping error] {e}")
+            print(f"❌ Lỗi khi đo ping: {e}")
             return "0"
+
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
