@@ -158,7 +158,7 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            await trace_peer_usage(app, chat_id, "stream.py:160")
+            await trace_peer_usage(app, chat_id, "stream.py:161")
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
@@ -219,6 +219,7 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
+            await trace_peer_usage(app, chat_id, "stream.py:222")
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
@@ -271,6 +272,7 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
+            await trace_peer_usage(app, chat_id, "stream.py:275")
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
@@ -324,6 +326,7 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
+            await trace_peer_usage(app, chat_id, "stream.py:329")
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
