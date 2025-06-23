@@ -536,7 +536,7 @@ class Call(PyTgCalls):
         print(f"🔄 Change stream called for chat {chat_id}, queue length: {len(check) if check else 0}")
         
         # Nếu không có queue, thoát ngay lập tức
-        if not check or len(check) == 0:
+        if not check or len(check) == 0 or check[0].get("seconds", 0) <= 3:
             print(f"🚪 No songs in queue for chat {chat_id}, leaving...")
             await _clear_(chat_id)
             await self._reliable_leave_call(client, chat_id)
