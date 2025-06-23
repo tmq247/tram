@@ -527,10 +527,10 @@ class Call(PyTgCalls):
             print(f"❌ Error forcing next song for chat {chat_id}: {e}")
             return False
 
-async def change_stream(self, client, chat_id):
+    async def change_stream(self, client, chat_id):
 	check = db.get(chat_id)
-        popped = None
-        loop = await get_loop(chat_id)
+	popped = None
+	loop = await get_loop(chat_id)
         
         print(f"🔄 Change stream called for chat {chat_id}, queue length: {len(check) if check else 0}")
         
