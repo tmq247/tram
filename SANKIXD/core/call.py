@@ -8,49 +8,6 @@ from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls
 
-# Import với compatibility checking
-try:
-    from pytgcalls.exceptions import AlreadyJoined, NotInCall, TelegramServerError
-    print("✅ New exceptions imported")
-except ImportError:
-    try:
-        from pytgcalls.exceptions import AlreadyJoinedError as AlreadyJoined
-        from pytgcalls.exceptions import NoActiveGroupCall as NotInCall
-        from pytgcalls.exceptions import TelegramServerError
-        print("✅ Old exceptions imported")
-    except ImportError:
-        AlreadyJoined = Exception
-        NotInCall = Exception  
-        TelegramServerError = Exception
-        print("⚠️ Using generic exceptions")
-
-# Import stream types dengan fallback
-try:
-    from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-    from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQualityVideo
-    print("✅ New stream types imported")
-except ImportError:
-    try:
-        from pytgcalls.types import AudioPiped, AudioVideoPiped, HighQualityAudio, MediumQualityVideo
-        print("✅ Alternative stream types imported")
-    except ImportError:
-        print("⚠️ Creating fallback stream types")
-        # Fallback: sử dụng string path trực tiếp
-        AudioPiped = str
-        AudioVideoPiped = str
-        HighQualityAudio = lambda: None
-        MediumQualityVideo = lambda: None
-
-# Import other types
-try:
-    from pytgcalls.types import Update
-    from pytgcalls.types.stream import StreamAudioEnded
-    print("✅ Update types imported")
-except ImportError:
-    Update = object
-    StreamAudioEnded = object
-    print("⚠️ Using fallback update types")
-
 import config
 from SANKIXD import LOGGER, YouTube, app
 from SANKIXD.misc import db
@@ -73,6 +30,7 @@ from SANKIXD.utils.stream.autoclear import auto_clean
 from SANKIXD.utils.thumbnails import get_thumb
 from strings import get_string
 
+
 autoend = {}
 counter = {}
 
@@ -83,7 +41,7 @@ async def _clear_(chat_id):
     await remove_active_chat(chat_id)
 
 
-class Call(PyTgCalls):
+class Call:  # ✅ sửa lại
     def __init__(self):
         self.userbot1 = Client(
             name="SANKIAss1",
@@ -237,29 +195,8 @@ class Call(PyTgCalls):
         return left_successfully
 
     def prepare_stream(self, path, is_video=False, additional_params=""):
-      #  \"\"\"Prepare stream based on available types\"\"\"
-        try:
-            if is_video:
-                if AudioVideoPiped != str:
-                    return AudioVideoPiped(
-                        path,
-                        audio_parameters=HighQualityAudio(),
-                        video_parameters=MediumQualityVideo(),
-                        additional_ffmpeg_parameters=additional_params,
-                    )
-                else:
-                    return path  # Fallback to path string
-            else:
-                if AudioPiped != str:
-                    return AudioPiped(
-                        path,
-                        audio_parameters=HighQualityAudio(),
-                        additional_ffmpeg_parameters=additional_params,
-                    )
-                else:
-                    return path  # Fallback to path string
-        except:
-            return path
+        return path  # Với phiên bản mới, chỉ cần truyền str (path hoặc URL)
+
 
     async def join_call(
         self,
@@ -457,6 +394,8 @@ class Call(PyTgCalls):
                     break
         except:
             pass
+        await SANKI.diagnose_stream(chat_id)
+
 
     async def _reliable_leave_call(self, client, chat_id):
         """Hàm thoát cuộc gọi đáng tin cậy với pytgcalls 2.2.1"""
@@ -482,6 +421,9 @@ class Call(PyTgCalls):
                 except Exception as e:
                     print(f"⚠️ Failed to leave chat {chat_id} with {method_name}: {e}")
                     continue
+
+        await SANKI.diagnose_stream(chat_id)
+
         
         # Nếu tất cả method đều thất bại, thử với tất cả client có sẵn
         if not left_successfully:
@@ -505,6 +447,8 @@ class Call(PyTgCalls):
             print(f"❌ Could not leave chat {chat_id} with any method")
         
         return left_successfully
+        await SANKI.diagnose_stream(chat_id)
+
 
     async def force_next_song(self, chat_id):
         """Force chuyển sang bài tiếp theo trong queue ngay lập tức"""
@@ -528,104 +472,87 @@ class Call(PyTgCalls):
             print(f"❌ Error forcing next song for chat {chat_id}: {e}")
             return False
 
-    async def change_stream(self, client, chat_id):
+    async def change_stream(self, _, chat_id):
+        await SANKI.diagnose_stream(chat_id)
+
         check = db.get(chat_id)
-        duration = check[0].get("seconds", 0)
-        
-        db[chat_id][0]["start_time"] = datetime.now()
-        db[chat_id][0]["played"] = 0
-        popped = None
-        loop = await get_loop(chat_id)
-        
-        print(f"🔄 Change stream called for chat {chat_id}, queue length: {len(check) if check else 0}")
-        print(f"[stream_check] Giây còn lại: {check[0].get('seconds')} – Tiêu đề: {check[0].get('title')}")
-        
-        # Nếu không có queue, thoát ngay lập tức
-        if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
-            print(f"🚪 No songs in queue for chat {chat_id}, leaving...")
+        if not check or len(check) == 0:
+            print(f"🚪 Queue empty, leaving call for chat {chat_id}")
             await _clear_(chat_id)
             assistant = await group_assistant(self, chat_id)
-            await self._reliable_leave_call(client, chat_id)
-            return
-            
+            await self._reliable_leave_call(assistant, chat_id)
+            return await SANKI.diagnose_stream(chat_id)
+
+    
+        duration = check[0].get("seconds", 0)
+        db[chat_id][0]["start_time"] = datetime.now()
+        db[chat_id][0]["played"] = 0
+    
+        asyncio.create_task(self._watchdog_force_leave(chat_id, duration))
+        print(f"👀 Watchdog task scheduled for chat {chat_id} with duration {duration}s")
+
+    
+        loop = await get_loop(chat_id)
+        popped = None
+    
         try:
-            # Luôn luôn pop bài đầu tiên (bài vừa kết thúc) nếu không có loop
             if loop == 0:
-                if len(check) > 0:
-                    popped = check.pop(0)
-                    print(f"🎵 Removed finished song from queue, remaining: {len(check)}")
+                popped = check.pop(0)
+                print(f"🎵 Removed song from queue, remaining: {len(check)}")
             else:
-                # Nếu có loop, giảm counter
-                loop = loop - 1
-                await set_loop(chat_id, loop)
-                print(f"🔁 Loop mode, remaining loops: {loop}")
-            
-            # Cleanup bài vừa pop
+                await set_loop(chat_id, loop - 1)
+    
             if popped:
                 await auto_clean(popped)
-                if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
-                    await _clear_(chat_id)
-                    assistant = await group_assistant(self, chat_id)
-                    try:
-                        await assistant.leave_group_call(chat_id)
-                    except:
-                        pass
-                    return
-            
-            # Kiểm tra lại queue sau khi pop
+                await SANKI.diagnose_stream(chat_id)
+
+    
             if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
-                print(f"🚪 Queue empty after processing for chat {chat_id}, leaving...")
+                print(f"🚪 Queue empty after pop, leaving call for chat {chat_id}")
                 await _clear_(chat_id)
                 assistant = await group_assistant(self, chat_id)
-                await self._reliable_leave_call(client, chat_id)
-                print(f"[stream_check] Giây còn lại: {check[0].get('seconds')} – Tiêu đề: {check[0].get('title')}")
+                await self._reliable_leave_call(assistant, chat_id)
+                await SANKI.diagnose_stream(chat_id)
 
-                return
-            async def watchdog(chat_id, duration):
-                await asyncio.sleep(duration + 2)
-                queue = db.get(chat_id)
-                if not queue:
-                    return
-                song = queue[0]
-                if song.get("seconds", 0) <= 5:
-                    print(f"[watchdog] Force stop {chat_id} – stream không kết thúc hợp lệ.")
-                    await _clear_(chat_id)
-                    assistant = await group_assistant(self, chat_id)
+                return await SANKI.diagnose_stream(chat_id)
+
+    
+            stream = self.prepare_stream(
+                check[0]["file"], is_video=(check[0]["streamtype"] == "video")
+            )
+            assistant = await group_assistant(self, chat_id)
+            for method_name in ["change_stream", "play", "switch"]:
+                if hasattr(assistant, method_name):
                     try:
-                        await assistant.leave_group_call(chat_id)
-                    except Exception as e:
-                        print(f"[watchdog-error] {e}")
+                        await getattr(assistant, method_name)(chat_id, stream)
+                        await SANKI.diagnose_stream(chat_id)
 
-            duration = check[0].get("seconds", 0)
-            asyncio.create_task(watchdog(chat_id, duration))
-                
+                        break
+                    except Exception as e:
+                        print(f"⚠️ {method_name} failed: {e}")
+                        await SANKI.diagnose_stream(chat_id)
+
+                        continue
+    
         except Exception as e:
-            print(f"❌ Error in change_stream processing: {e}")
-            # Kiểm tra queue sau lỗi
+            print(f"❌ Error in change_stream: {e}")
             check = db.get(chat_id)
             if not check or len(check) == 0 or check[0].get("seconds", 0) <= 4:
-                print(f"🚪 Queue empty after error for chat {chat_id}, leaving...")
+                print(f"🚪 Queue empty after error, leaving call for chat {chat_id}")
                 await _clear_(chat_id)
                 assistant = await group_assistant(self, chat_id)
-                await self._reliable_leave_call(client, chat_id)
-                return
-            async def watchdog(chat_id, duration):
-                await asyncio.sleep(duration + 2)
-                queue = db.get(chat_id)
-                if not queue:
-                    return
-                song = queue[0]
-                if song.get("seconds", 0) <= 5:
-                    print(f"[watchdog] Force stop {chat_id} – stream không kết thúc hợp lệ.")
-                    await _clear_(chat_id)
-                    assistant = await group_assistant(self, chat_id)
-                    try:
-                        await assistant.leave_group_call(chat_id)
-                    except Exception as e:
-                        print(f"[watchdog-error] {e}")
-            
+                await self._reliable_leave_call(assistant, chat_id)
+                return await SANKI.diagnose_stream(chat_id)
+
+    
             duration = check[0].get("seconds", 0)
-            asyncio.create_task(watchdog(chat_id, duration))
+            db[chat_id][0]["start_time"] = datetime.now()
+            db[chat_id][0]["played"] = 0
+            asyncio.create_task(self._watchdog_force_leave(chat_id, duration))
+            print(f"👀 Watchdog task scheduled for chat {chat_id} with duration {duration}s")
+            await SANKI.diagnose_stream(chat_id)
+
+                
         else:
             # Nếu có queue, tiếp tục play bài tiếp theo
             queued = check[0]["file"]
@@ -799,93 +726,166 @@ class Call(PyTgCalls):
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
 
+    import inspect
     async def ping(self):
-        pings = []
-        if config.STRING1:
-            pings.append(self.one.ping)
-        return str(round(sum(pings) / len(pings), 3))
+             pings = []
+             if config.STRING1:
+                      ping_fn = getattr(self.one, "ping", None)
+                      if inspect.iscoroutinefunction(ping_fn):
+                         result = await ping_fn()
+                         pings.append(result)
+                         await SANKI.diagnose_stream(chat_id)
+                         return str(round(sum(pings) / len(pings), 3)) if pings else "0"
+             await SANKI.diagnose_stream(chat_id)
 
-
+        
+    
+    
+    
     async def start(self):
-        LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
+        LOGGER(__name__).info("🚀 [START] Initializing all PyTgCalls clients...")
+    
         try:
             for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
                 if client:
                     try:
                         await client.start()
-                        LOGGER(__name__).info(f"Started client {i}")
+                        LOGGER(__name__).info(f"✅ Started assistant client {i}")
                     except Exception as e:
-                        LOGGER(__name__).error(f"Error starting client {i}: {e}")
+                        LOGGER(__name__).error(f"❌ Error starting client {i}: {e}")
         except Exception as e:
-            LOGGER(__name__).error(f"Error starting PyTgCalls: {e}")
-
-    async def decorators(self):
+            LOGGER(__name__).error(f"🔥 Error during client startup: {e}")
+    
+        LOGGER(__name__).info("✅ All clients started. Starting auto leaver loop...")
+    
         try:
-            # Simplified decorators với error handling
-            clients = [self.one, self.two, self.three, self.four, self.five]
-            
-            for client in clients:
-                if client:
-                    try:
-                        # Try to set decorators if methods exist
-                        if hasattr(client, 'on_kicked'):
-                            @client.on_kicked()
-                            async def on_kicked_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_closed_voice_chat'):
-                            @client.on_closed_voice_chat()
-                            async def on_closed_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_left'):
-                            @client.on_left()
-                            async def on_left_handler(_, chat_id: int):
-                                await self.stop_stream(chat_id)
-                        
-                        if hasattr(client, 'on_stream_end'):
-                            @self.one.on_stream_end()
-                            async def stream_end_handler1(client, update: Update):
-                                if not isinstance(update, StreamAudioEnded):
-                                    return
-                                await self.change_stream(client, update.chat_id)
-                                try:
-                                    if hasattr(update, 'chat_id'):
-                                        chat_id = update.chat_id
-                                        print(f"🎵 Stream ended in chat {chat_id}")
-                                        
-                                        # Kiểm tra queue trước khi xử lý
-                                        check = db.get(chat_id)
-                                        if not check or len(check) == 0:
-                                            print(f"🚪 No more songs in queue for chat {chat_id}, auto-leaving...")
-                                            await _clear_(chat_id)
-                                            await self._reliable_leave_call(client_instance, chat_id)
-                                        else:
-                                            print(f"🎵 Queue has {len(check)} songs, playing next...")
-                                            # Đảm bảo chuyển bài ngay lập tức
-                                            try:
-                                                await self.change_stream(client_instance, chat_id)
-                                            except Exception as stream_error:
-                                                print(f"❌ Error changing stream: {stream_error}")
-                                                # Thử lại với force method
-                                                try:
-                                                    await self.force_next_song(chat_id)
-                                                except:
-                                                    print(f"❌ Force next song also failed for chat {chat_id}")
-                                except Exception as e:
-                                    print(f"❌ Error in stream end handler: {e}")
-                                    # Fallback: cố gắng thoát nếu có lỗi
-                                    try:
-                                        chat_id = getattr(update, 'chat_id', None)
-                                        if chat_id:
-                                            await self._reliable_leave_call(client_instance, chat_id)
-                                    except:
-                                        pass
-                    except Exception as e:
-                        LOGGER(__name__).error(f"Error setting decorators for client: {e}")
-                        
+            asyncio.create_task(self.auto_leaver_loop())
+            LOGGER(__name__).info("🟢 auto_leaver_loop task scheduled")
         except Exception as e:
-            LOGGER(__name__).error(f"Error setting decorators: {e}")
+            LOGGER(__name__).error(f"❌ Failed to start auto_leaver_loop: {e}")
+
+
+    
+    async def decorators(self):
+             try:
+                # Simplified decorators với error handling
+                clients = [self.one, self.two, self.three, self.four, self.five]
+                
+                for client in clients:
+                    if client:
+                        try:
+                            # Try to set decorators if methods exist
+                            if hasattr(client, 'on_kicked'):
+                                @client.on_kicked()
+                                async def on_kicked_handler(_, chat_id: int):
+                                    await self.stop_stream(chat_id)
+                            
+                            if hasattr(client, 'on_closed_voice_chat'):
+                                @client.on_closed_voice_chat()
+                                async def on_closed_handler(_, chat_id: int):
+                                    await self.stop_stream(chat_id)
+                            
+                            if hasattr(client, 'on_left'):
+                                @client.on_left()
+                                async def on_left_handler(_, chat_id: int):
+                                    await self.stop_stream(chat_id)
+                            
+                            
+                        except Exception as e:
+                            LOGGER(__name__).error(f"Error setting decorators for client: {e}")
+                            
+             except Exception as e:
+                LOGGER(__name__).error(f"Error setting decorators: {e}")
+
+    async def _watchdog_force_leave(self, chat_id: int, duration: int):
+            """Ép bot rời call nếu bài hát phát hết mà không tự dừng"""
+            await asyncio.sleep(duration + 3)
+            queue = db.get(chat_id)
+            if not queue or not queue[0]:
+                return
+            song = queue[0]
+            
+            start_time = song.get("start_time")
+            if not start_time:
+                return
+            
+            played = (datetime.now() - start_time).seconds
+            total = song.get("seconds", 0)
+            
+            if played >= total - 1:
+                print(f"[watchdog] 🛑 Forcing leave for chat {chat_id} after timeout")
+                await _clear_(chat_id)
+                assistant = await group_assistant(self, chat_id)
+                await self._reliable_leave_call(assistant, chat_id)
+
+    async def auto_leaver_loop(self):
+        LOGGER(__name__).info("👀 [auto_leaver_loop] Started auto leave monitor")
+    
+        while True:
+            try:
+                total_chats = len(db)
+                LOGGER(__name__).debug(f"🔁 [auto_leaver_loop] Checking {total_chats} chat(s)...")
+    
+                for chat_id, queue in db.items():
+                    if not queue or not queue[0]:
+                        continue
+    
+                    song = queue[0]
+                    start_time = song.get("start_time")
+                    seconds = song.get("seconds", 0)
+    
+                    if not start_time or not seconds:
+                        continue
+    
+                    elapsed = (datetime.now() - start_time).total_seconds()
+                    if elapsed >= seconds + 3:
+                        LOGGER(__name__).warning(
+                            f"⏰ [auto_leaver_loop] Leaving chat {chat_id} — elapsed {int(elapsed)}s / {seconds}s"
+                        )
+                        await _clear_(chat_id)
+                        assistant = await group_assistant(self, chat_id)
+                        await self._reliable_leave_call(assistant, chat_id)
+    
+            except Exception as e:
+                LOGGER(__name__).error(f"🔥 [auto_leaver_loop] Unhandled error: {e}")
+    
+            await asyncio.sleep(5)
+
+
+
+async def diagnose_stream(self, chat_id: int):
+    from pprint import pprint
+    
+    print(f"📋 [DIAGNOSE] Kiểm tra trạng thái phát nhạc của chat {chat_id}...\n")
+    
+    try:
+        queue = db.get(chat_id)
+        if not queue:
+            print("❌ Queue rỗng hoặc không tồn tại.")
+            return
+        
+        current = queue[0]
+        print("🎵 Bài hát hiện tại:")
+        pprint(current)
+        
+        start_time = current.get("start_time")
+        seconds = current.get("seconds", 0)
+        played = (datetime.now() - start_time).seconds if start_time else None
+        
+        print(f"\n⏱️ Tổng thời lượng: {seconds} giây")
+        print(f"⏱️ Đã phát được: {played} giây" if played is not None else "⛔ start_time chưa được gán.")
+        
+        assistant = await group_assistant(self, chat_id)
+        leaveable = False
+        for method in ["leave_group_call", "leave_call", "stop", "disconnect"]:
+            if hasattr(assistant, method):
+                leaveable = True
+                break
+        print(f"🎧 Assistant hiện tại: {assistant.__class__.__name__}")
+        print(f"✅ Có thể thoát call: {'Có' if leaveable else 'Không'}")
+    
+    except Exception as e:
+        print(f"❌ Lỗi khi chạy diagnose: {e}")
 
 
 SANKI = Call()
