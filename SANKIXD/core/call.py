@@ -556,7 +556,6 @@ class Call(PyTgCalls):
             # Cleanup bài vừa pop
             if popped:
                 await auto_clean(popped)
-		await auto_clean(popped)
 		if not check or len(check) == 0:
     			await _clear_(chat_id)
     			assistant = await group_assistant(self, chat_id)
