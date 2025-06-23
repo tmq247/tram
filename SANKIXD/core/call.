@@ -561,7 +561,7 @@ class Call(PyTgCalls):
             if not check or len(check) == 0:
                 print(f"🚪 Queue empty after processing for chat {chat_id}, leaving...")
                 await _clear_(chat_id)
-                await self._reliable_leave_call(client, chat_id)
+                await client._reliable_leave_call(client, chat_id)
                 return
                 
         except Exception as e:
