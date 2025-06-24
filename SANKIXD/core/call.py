@@ -751,7 +751,7 @@ class Call(PyTgCalls):
         try:
             for client in [self.one, self.two, self.three, self.four, self.five]:
                 if client and hasattr(client, 'ping'):
-                    pings.append(await client.ping)
+                    pings.append(await client.ping())  # Thêm dấu ngoặc để gọi coroutine
             return str(round(sum(pings) / len(pings), 3)) if pings else "0"
         except:
             return "0"
