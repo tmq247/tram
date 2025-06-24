@@ -16,7 +16,7 @@ for filename in os.listdir(r"./strings/langs/"):
         languages["ar"] = yaml.safe_load(
             open(r"./strings/langs/en.yml", encoding="utf8")
         )
-        languages_present["ar"] = languages["vn"]["name"]
+        languages_present["ar"] = languages["ar"]["name"]
     if filename.endswith(".yml"):
         language_name = filename[:-4]
         if language_name == "vn":
