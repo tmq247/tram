@@ -59,7 +59,7 @@ async def _filter2(client, message):
     content, text, data_type = await GetFIlterMessage(message)
     await add_filter_db(filter_name=filter_name, content=content, text=text, data_type=data_type)
     await message.reply(
-        f"Saved filter '`{filter_name}`'."
+        f"Saved filter '`{filter_name}`'.")
 
 @app.on_message(~filters.bot & filters.group, group=4)
 async def FilterCheckker(client, message):
