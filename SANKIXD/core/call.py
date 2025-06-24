@@ -803,35 +803,31 @@ class Call(PyTgCalls):
                             @client.on_stream_end()
                             async def on_stream_end_handler(client_instance, update):
                                 try:
-                                    if hasattr(update, 'chat_id'):
-                                        chat_id = update.chat_id
-                                        print(f"🎵 Stream ended in chat {chat_id}")
+                                    chat_id = getattr(update, 'chat_id', None)
+                                    if not chat_id:
+                                        return
                                         
-                                        # Kiểm tra queue trước khi xử lý
-                                        check = db.get(chat_id)
-                                        if not check or len(check) == 0:
-                                            print(f"🚪 No more songs in queue for chat {chat_id}, auto-leaving...")
-                                            await _clear_(chat_id)
-                                            await self._reliable_leave_call(client_instance, chat_id)
-                                        else:
-                                            print(f"🎵 Queue has {len(check)} songs, playing next...")
-                                            # Đảm bảo chuyển bài ngay lập tức
-                                            try:
-                                                await self.change_stream(client_instance, chat_id)
-                                            except Exception as stream_error:
-                                                print(f"❌ Error changing stream: {stream_error}")
-                                                # Thử lại với force method
-                                                try:
-                                                    await self.force_next_song(chat_id)
-                                                except:
-                                                    print(f"❌ Force next song also failed for chat {chat_id}")
+                                    print(f"🎵 Stream ended in chat {chat_id}")
+                                    check = db.get(chat_id)
+                                    if not check or len(check) == 0:
+                                        print(f"🚪 No songs left in queue for {chat_id}")
+                                        await _clear_(chat_id)
+                                        await SANKI._reliable_leave_call(client_instance, chat_id)
+                                        return
+                                    # Fallback: nếu queue có nhưng không phản hồi, kiểm tra thời gian còn lại
+                                    played = check[0]["played"]
+                                    total = check[0]["seconds"]
+                                    if total - played <= 3:
+                                        print(f"⏱ Detected end-of-stream for chat {chat_id}, forcing next song")
+                                        await SANKI.force_next_song(chat_id)
+                                    else:
+                                        print(f"⏸ Stream likely not ended yet. Remaining: {total - played} seconds")
                                 except Exception as e:
-                                    print(f"❌ Error in stream end handler: {e}")
-                                    # Fallback: cố gắng thoát nếu có lỗi
+                                    print(f"❌ Error in on_stream_end_handler: {e}")
                                     try:
                                         chat_id = getattr(update, 'chat_id', None)
                                         if chat_id:
-                                            await self._reliable_leave_call(client_instance, chat_id)
+                                            await SANKI._reliable_leave_call(client_instance, chat_id)
                                     except:
                                         pass
                     except Exception as e:
