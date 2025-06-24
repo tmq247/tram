@@ -22,7 +22,7 @@ photo = [
 async def join_watcher(_, message):    
     chat = message.chat
     member = await app.get_chat_member(chat.id, "me")
-    if not member.ChatPrivileges.can_invite_users:
+    if not member.privileges.can_invite_users:
         link = "Bot thiếu quyền tạo link mời!"
     else:
         link = await app.export_chat_invite_link(chat.id)
