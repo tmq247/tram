@@ -337,6 +337,7 @@ class Call(PyTgCalls):
                     autoend[chat_id] = datetime.now() + timedelta(minutes=1)
             except:
                 pass
+        asyncio.create_task(monitor_played(chat_id))
 
     async def skip_stream(
         self,
@@ -760,6 +761,7 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
+        asyncio.create_task(monitor_played(chat_id))
 
     async def ping(self):
         pings = []
