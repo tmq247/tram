@@ -157,6 +157,20 @@ class Call(PyTgCalls):
         print(f"⚠️ Method {method_name} not found, using fallback")
         return None
 
+    async def monitor_played(chat_id):
+        while True:
+            await asyncio.sleep(1)
+            check = db.get(chat_id)
+            if not check:
+                return
+            try:
+                check[0]["played"] += 1
+                if check[0]["played"] >= check[0]["seconds"]:
+                    await SANKI.force_next_song(chat_id)
+                    return
+            except Exception:
+                return
+
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
         try:
