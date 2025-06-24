@@ -61,35 +61,6 @@ async def _filter2(client, message):
     await message.reply(
         f"Saved filter '`{filter_name2}`'.")
 
-@app.on_message(~filters.bot & filters.group, group=4)
-async def FilterCheckker2(client, message):
-    if not message.text:
-        return
-    text = message.text
-    chat_id = message.chat.id
-    
-
-    ALL_FILTERS = await get_filters_list()
-    for filter_ in ALL_FILTERS:
-        
-        if (
-            message.command
-            and message.command[0] == 'filter'
-            and len(message.command) >= 2
-            and message.command[1] ==  filter_
-        ):
-            return
-            
-        pattern = r"( |^|[^\w])" + re.escape(filter_) + r"( |$|[^\w])"
-        if re.search(pattern, text, flags=re.IGNORECASE):
-            filter_name, content, text, data_type = await get_filter(filter_)
-            await SendFilterMessage(
-                message=message,
-                filter_name=filter_,
-                content=content,
-                text=text,
-                data_type=data_type
-            )
 
 @app.on_message(~filters.bot & filters.group, group=4)
 async def FilterCheckker(client, message):
