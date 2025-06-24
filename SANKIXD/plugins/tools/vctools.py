@@ -288,8 +288,7 @@ async def stop_group_call(c: Client, m: Message):
                await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ")
            )
          ):  
-           return   
-               print("292")
+           return   print("292")
          await assistant.invoke(DiscardGroupCall(call=group_call))
          print("294")
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
