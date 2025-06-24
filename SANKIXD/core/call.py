@@ -748,13 +748,18 @@ class Call(PyTgCalls):
 
     async def ping(self):
         pings = []
-        try:
-            for client in [self.one, self.two, self.three, self.four, self.five]:
-                if client and hasattr(client, 'ping'):
-                    pings.append(await client.ping)  # Thêm dấu ngoặc để gọi coroutine
-            return str(round(sum(pings) / len(pings), 3)) if pings else "0"
-        except:
-            return "0"
+        clients = [self.one, self.two, self.three, self.four, self.five]
+        for i, client in enumerate(clients, start=1):
+            if client and hasattr(client, "ping"):
+                try:
+                    fn = getattr(client, "ping")
+                    if inspect.iscoroutinefunction(fn):
+                        result = await fn()
+                        pings.append(result)
+                except Exception as e:
+                    print(f"⚠️ Ping failed for client {i}: {e}")
+                    continue
+        return str(round(sum(pings) / len(pings), 3)) if pings else "0"
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
