@@ -87,7 +87,6 @@ async def stream(
                     video=status,
                     image=thumbnail,
                 )
-                asyncio.create_task(monitor_played(chat_id))
                 await put_queue(
                     chat_id,
                     original_chat_id,
