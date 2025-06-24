@@ -21,7 +21,11 @@ photo = [
 @app.on_message(filters.new_chat_members, group=2)
 async def join_watcher(_, message):    
     chat = message.chat
-    link = await app.export_chat_invite_link(chat.id)
+    member = await app.get_chat_member(chat.id, "me")
+    if not member.privileges.can_invite_users:
+        link = "Bot thiếu quyền tạo link mời!"
+    else:
+        link = await app.export_chat_invite_link(chat.id)
     for member in message.new_chat_members:
         if member.id == app.id:
             count = await app.get_chat_members_count(chat.id)
