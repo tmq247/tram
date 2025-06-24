@@ -9,7 +9,7 @@ def get_string(lang: str):
     return languages.get(lang)
 
 lang_dir = r"./strings/langs/"
-with open(os.path.join(lang_dir, "vn.yml"), encoding="utf8") as file:
+with open(os.path.join(lang_dir, "vn.yml")) as file:
     languages["vn"] = yaml.safe_load(file)
     languages_present["vn"] = languages["vn"]["name"]
 
@@ -18,7 +18,7 @@ for filename in os.listdir(lang_dir):
         language_name = filename[:-4]
         file_path = os.path.join(lang_dir, filename)
         try:
-            with open(file_path, encoding="utf8") as file:
+            with open(file_path) as file:
                 languages[language_name] = yaml.safe_load(file)
             for item in languages["vn"]:
                 if item not in languages[language_name]:
