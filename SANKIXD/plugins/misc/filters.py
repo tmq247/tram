@@ -36,6 +36,30 @@ async def _filter(client, message):
         f"Saved filter '`{filter_name}`'."
     )
 
+@app.on_message(filters.command("filterall") & admin_filter)
+@user_admin
+async def _filter2(client, message):
+    
+    chat_id = message.chat.id 
+    if (
+        message.reply_to_message
+        and not len(message.command) == 2
+    ):
+        await message.reply("Bạn cần đặt tên cho bộ lọc!")  
+        return 
+    
+    filter_name, filter_reason = get_text_reason(message)
+    if (
+        message.reply_to_message
+        and not len(message.command) >=2
+    ):
+        await message.reply("Bạn cần cung cấp cho bộ lọc một số nội dung!")
+        return
+
+    content, text, data_type = await GetFIlterMessage(message)
+    await add_filter_db(filter_name=filter_name, content=content, text=text, data_type=data_type)
+    await message.reply(
+        f"Saved filter '`{filter_name}`'."
 
 @app.on_message(~filters.bot & filters.group, group=4)
 async def FilterCheckker(client, message):
@@ -61,7 +85,7 @@ async def FilterCheckker(client, message):
             
         pattern = r"( |^|[^\w])" + re.escape(filter_) + r"( |$|[^\w])"
         if re.search(pattern, text, flags=re.IGNORECASE):
-            filter_name, content, text, data_type = await get_filter(chat_id, filter_)
+            filter_name, content, text, data_type = await get_filter(filter_)
             await SendFilterMessage(
                 message=message,
                 filter_name=filter_,
