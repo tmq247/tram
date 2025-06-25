@@ -71,7 +71,7 @@ from SANKIXD.utils.inline.play import stream_markup
 from SANKIXD.utils.stream.autoclear import auto_clean
 from SANKIXD.utils.thumbnails import get_thumb
 from strings import get_string
-from SANKIXD.plugins.tools.vctools import get_group_call
+#from SANKIXD.plugins.tools.vctools import get_group_call
 
 autoend = {}
 counter = {}
