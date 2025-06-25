@@ -5,7 +5,7 @@ from SANKIXD.utils.msg_types import button_markdown_parser
 from SANKIXD.utils.notes_func import NoteFillings
 from emojis import decode
 from pyrogram.types import Message
-from SANKIXD.utils.debug import trace_peer_usage
+#from SANKIXD.utils.debug import trace_peer_usage
 
 
 async def SendFilterMessage(message: Message, filter_name: str, content: str, text: str, data_type: int):
@@ -22,7 +22,7 @@ async def SendFilterMessage(message: Message, filter_name: str, content: str, te
         reply_markup = None
 
     if data_type == 1:
-        await trace_peer_usage(app, chat_id, "filters_func:25")
+        #await trace_peer_usage(app, chat_id, "filters_func:25")
         await app.send_message(
             chat_id=chat_id,
             text=text,
