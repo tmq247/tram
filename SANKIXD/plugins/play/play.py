@@ -23,6 +23,7 @@ from SANKIXD.utils.inline import (
 from SANKIXD.utils.logger import play_logs
 from SANKIXD.utils.stream.stream import stream
 from config import BANNED_USERS, lyrical
+from SANKIXD.plugins.tools.vctools import get_group_call
 
 
 @app.on_message(
@@ -52,6 +53,8 @@ async def play_commnd(
     spotify = None
     user_id = message.from_user.id
     user_name = message.from_user.first_name
+    if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+            return 
     audio_telegram = (
         (message.reply_to_message.audio or message.reply_to_message.voice)
         if message.reply_to_message
