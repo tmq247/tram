@@ -250,12 +250,8 @@ async def stop_group_call(c: Client, m: Message):
         return
     msg = await app.send_message(chat_id, "ᴄʟᴏꜱɪɴɢ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ..")
     try:
-        if not (
-           group_call := (
-               await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ")
-           )
-        ):  
-           return 
+        if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+            return 
         await assistant.invoke(DiscardGroupCall(call=group_call))
         await msg.edit_text("ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴄʟᴏꜱᴇᴅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ⚡️~!")
     except Exception as e:
@@ -272,12 +268,8 @@ async def stop_group_call(c: Client, m: Message):
                 can_promote_members=False,
              ),
          )
-         if not (
-           group_call := (
-               await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ")
-           )
-         ):  
-           return
+         if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+             return
          await assistant.invoke(DiscardGroupCall(call=group_call))
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
             can_manage_chat=False,
