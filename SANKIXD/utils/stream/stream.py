@@ -14,7 +14,6 @@ from SANKIXD.utils.inline import aq_markup, close_markup, stream_markup
 from SANKIXD.utils.pastebin import SANKIBin
 from SANKIXD.utils.stream.queue import put_queue, put_queue_index
 from SANKIXD.utils.thumbnails import get_thumb
-from SANKIXD.utils.debug import trace_peer_usage
 
 
 async def stream(
@@ -158,7 +157,6 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            await trace_peer_usage(app, chat_id, "stream.py:161")
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
