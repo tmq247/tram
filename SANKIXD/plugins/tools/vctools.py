@@ -92,10 +92,10 @@ async def strcall(client, message):
         joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
         
         if not joined:
-            await message.reply("ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+            await message.reply("Cuộc gọi nhóm hiện không được mở")
             return
             
-        text = "- Beloveds in the call 🫶 :\\n\\n"
+        text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
         
         try:
             participants = await assistant.get_participants(message.chat.id)
@@ -103,15 +103,15 @@ async def strcall(client, message):
             for participant in participants:
                 info = participant
                 if info.muted == False:
-                    mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣 "
+                    mut = "Đang mở mic 🗣 "
                 else:
-                    mut = "ᴍᴜᴛᴇᴅ 🔕 "
+                    mut = "Đang tắt mic 🔕 "
                 user = await client.get_users(participant.user_id)
                 k += 1
                 text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
-            text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+            text += f"\nSố người đang tham gia : {len(participants)}"
         except Exception as e:
-            text = f"Error getting participants: {e}"
+            text = f"Lỗi không thể lấy danh sách người tham gia: {e}"
             
         await message.reply(f"{text}")
         await asyncio.sleep(7)
@@ -120,29 +120,29 @@ async def strcall(client, message):
     except Exception as e:
         error_msg = str(e).lower()
         if "no active" in error_msg or "notincall" in error_msg:
-            await message.reply(f"ᴛʜᴇ ᴄᴀʟʟ ɪꜱ ɴᴏᴛ ᴏᴘᴇɴ ᴀᴛ ᴀʟʟ")
+            await message.reply(f"Cuộc gọi hiện không có")
         elif "telegram server" in error_msg:
-            await message.reply(f"ꜱᴇɴᴅ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ ᴀɢᴀɪɴ, ᴛʜᴇʀᴇ ɪꜱ ᴀ ᴘʀᴏʙʟᴇᴍ ᴡɪᴛʜ ᴛʜᴇ ᴛᴇʟᴇɢʀᴀᴍ ꜱᴇʀᴠᴇʀ ❌")
+            await message.reply(f"Hãy gửi lại lệnh, máy chủ telegram đang gặp sự cố❌")
         elif "already joined" in error_msg:
             try:
-                text = "ʙᴇʟᴏᴠᴇᴅꜱ ɪɴ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ 🫶 :\\n\\n"
+                text = "Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
                 participants = await assistant.get_participants(message.chat.id)
                 k = 0
                 for participant in participants:
                     info = participant
                     if info.muted == False:
-                        mut = "ꜱᴘᴇᴀᴋɪɴɢ 🗣"
+                        mut = "Đang mở mic 🗣"
                     else:
-                        mut = "ᴍᴜᴛᴇᴅ 🔕 "
+                        mut = "Đang tắt mic 🔕 "
                     user = await client.get_users(participant.user_id)
                     k += 1
-                    text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
-                text += f"\\nɴᴜᴍʙᴇʀ ᴏꜰ ᴘᴀʀᴛɪᴄɪᴘᴀɴᴛꜱ : {len(participants)}"
+                    text += f"{k} ➤ {user.mention} ➤ {mut}\n"
+                text += f"\nSố người đang tham gia : {len(participants)}"
                 await message.reply(f"{text}")
             except:
-                await message.reply("Already in call but couldn't get participants")
+                await message.reply("Không lấy được danh sách người tham gia cuộc gọi nhóm")
         else:
-            await message.reply(f"Error: {str(e)}")
+            await message.reply(f"Lỗi: {str(e)}")
 
 
 other_filters = filters.group  & ~filters.via_bot & ~filters.forwarded
@@ -250,7 +250,7 @@ async def stop_group_call(c: Client, m: Message):
         return
     msg = await app.send_message(chat_id, "Đang tắt cuộc gọi nhóm..")
     try:
-        if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+        if not (group_call := (await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã bị tắt trước đó"))):  
             return 
         await assistant.invoke(DiscardGroupCall(call=group_call))
         await msg.edit_text("Cuộc gọi nhóm đã được tắt thành công⚡️~!")
@@ -268,7 +268,7 @@ async def stop_group_call(c: Client, m: Message):
                 can_promote_members=False,
              ),
          )
-         if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+         if not (group_call := (await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã bị tắt trước đó"))):  
              return
          await assistant.invoke(DiscardGroupCall(call=group_call))
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
