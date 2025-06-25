@@ -47,7 +47,7 @@ async def play_commnd(
 ):
     assistant = await group_assistant(SANKI, message.chat.id)
     if not (group_call := (await get_group_call(assistant, message, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
-            return 
+            return  await message.reply_text("Cuộc gọi nhóm chưa được mở.")
     mystic = await message.reply_text(
         _["play_2"].format(channel) if channel else _["play_1"]
     )
