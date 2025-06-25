@@ -108,7 +108,7 @@ async def strcall(client, message):
                     mut = "Đang tắt mic 🔕 "
                 user = await client.get_users(participant.user_id)
                 k += 1
-                text += f"{k} ➤ {user.mention} ➤ {mut}\\n"
+                text += f"{k} ➤ {user.mention} ➤ {mut}\n"
             text += f"\nSố người đang tham gia : {len(participants)}"
         except Exception as e:
             text = f"Lỗi không thể lấy danh sách người tham gia: {e}"
