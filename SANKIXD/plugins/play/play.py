@@ -24,6 +24,7 @@ from SANKIXD.utils.logger import play_logs
 from SANKIXD.utils.stream.stream import stream
 from config import BANNED_USERS, lyrical
 from SANKIXD.plugins.tools.vctools import get_group_call
+from SANKIXD.utils.database import group_assistant
 
 
 @app.on_message(
