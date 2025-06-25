@@ -1,6 +1,5 @@
 import asyncio
 import os
-import inspect
 from datetime import datetime, timedelta
 from typing import Union
 
@@ -156,20 +155,6 @@ class Call(PyTgCalls):
         # Nếu không tìm thấy method nào, thử fallback
         print(f"⚠️ Method {method_name} not found, using fallback")
         return None
-
-    async def monitor_played(chat_id):
-        while True:
-            await asyncio.sleep(1)
-            check = db.get(chat_id)
-            if not check:
-                return
-            try:
-                check[0]["played"] += 1
-                if check[0]["played"] >= check[0]["seconds"]:
-                    await SANKI.force_next_song(chat_id)
-                    return
-            except Exception:
-                return
 
     async def pause_stream(self, chat_id: int):
         assistant = await group_assistant(self, chat_id)
@@ -337,7 +322,6 @@ class Call(PyTgCalls):
                     autoend[chat_id] = datetime.now() + timedelta(minutes=1)
             except:
                 pass
-        asyncio.create_task(monitor_played(chat_id))
 
     async def skip_stream(
         self,
@@ -761,22 +745,16 @@ class Call(PyTgCalls):
                     )
                     db[chat_id][0]["mystic"] = run
                     db[chat_id][0]["markup"] = "stream"
-        asyncio.create_task(monitor_played(chat_id))
 
     async def ping(self):
         pings = []
-        clients = [self.one, self.two, self.three, self.four, self.five]
-        for i, client in enumerate(clients, start=1):
-            if client and hasattr(client, "ping"):
-                try:
-                    fn = getattr(client, "ping")
-                    if inspect.iscoroutinefunction(fn):
-                        result = await fn()
-                        pings.append(result)
-                except Exception as e:
-                    print(f"⚠️ Ping failed for client {i}: {e}")
-                    continue
-        return str(round(sum(pings) / len(pings), 3)) if pings else "0"
+        try:
+            for client in [self.one, self.two, self.three, self.four, self.five]:
+                if client and hasattr(client, 'ping'):
+                    pings.append(await client.ping)
+            return str(round(sum(pings) / len(pings), 3)) if pings else "0"
+        except:
+            return "0"
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
@@ -819,31 +797,35 @@ class Call(PyTgCalls):
                             @client.on_stream_end()
                             async def on_stream_end_handler(client_instance, update):
                                 try:
-                                    chat_id = getattr(update, 'chat_id', None)
-                                    if not chat_id:
-                                        return
+                                    if hasattr(update, 'chat_id'):
+                                        chat_id = update.chat_id
+                                        print(f"🎵 Stream ended in chat {chat_id}")
                                         
-                                    print(f"🎵 Stream ended in chat {chat_id}")
-                                    check = db.get(chat_id)
-                                    if not check or len(check) == 0:
-                                        print(f"🚪 No songs left in queue for {chat_id}")
-                                        await _clear_(chat_id)
-                                        await SANKI._reliable_leave_call(client_instance, chat_id)
-                                        return
-                                    # Fallback: nếu queue có nhưng không phản hồi, kiểm tra thời gian còn lại
-                                    played = check[0]["played"]
-                                    total = check[0]["seconds"]
-                                    if total - played <= 3:
-                                        print(f"⏱ Detected end-of-stream for chat {chat_id}, forcing next song")
-                                        await SANKI.force_next_song(chat_id)
-                                    else:
-                                        print(f"⏸ Stream likely not ended yet. Remaining: {total - played} seconds")
+                                        # Kiểm tra queue trước khi xử lý
+                                        check = db.get(chat_id)
+                                        if not check or len(check) == 0:
+                                            print(f"🚪 No more songs in queue for chat {chat_id}, auto-leaving...")
+                                            await _clear_(chat_id)
+                                            await self._reliable_leave_call(client_instance, chat_id)
+                                        else:
+                                            print(f"🎵 Queue has {len(check)} songs, playing next...")
+                                            # Đảm bảo chuyển bài ngay lập tức
+                                            try:
+                                                await self.change_stream(client_instance, chat_id)
+                                            except Exception as stream_error:
+                                                print(f"❌ Error changing stream: {stream_error}")
+                                                # Thử lại với force method
+                                                try:
+                                                    await self.force_next_song(chat_id)
+                                                except:
+                                                    print(f"❌ Force next song also failed for chat {chat_id}")
                                 except Exception as e:
-                                    print(f"❌ Error in on_stream_end_handler: {e}")
+                                    print(f"❌ Error in stream end handler: {e}")
+                                    # Fallback: cố gắng thoát nếu có lỗi
                                     try:
                                         chat_id = getattr(update, 'chat_id', None)
                                         if chat_id:
-                                            await SANKI._reliable_leave_call(client_instance, chat_id)
+                                            await self._reliable_leave_call(client_instance, chat_id)
                                     except:
                                         pass
                     except Exception as e:
