@@ -40,13 +40,13 @@ spotipy
 tgcrypto
 telegraph
 unidecode
-yt-dlp==2025.03.27
+yt-dlp
 youtube-search
 youtube-search-python
 gtts
 git+https://github.com/AsmSafone/SafoneAPI
 lexica-api==1.5.1
-httpx==0.25.2
+httpx
 gpytranslate
 openai==0.28.0
 pickledb
