@@ -71,6 +71,7 @@ from SANKIXD.utils.inline.play import stream_markup
 from SANKIXD.utils.stream.autoclear import auto_clean
 from SANKIXD.utils.thumbnails import get_thumb
 from strings import get_string
+from SANKIXD.plugins.tools.vctools import get_group_call
 
 autoend = {}
 counter = {}
@@ -271,7 +272,8 @@ class Call(PyTgCalls):
         assistant = await group_assistant(self, chat_id)
         language = await get_lang(chat_id)
         _ = get_string(language)
-        
+        if not (group_call := (await get_group_call(assistant, m, err_msg=", ɢʀᴏᴜᴘ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ᴀʟʀᴇᴀᴅʏ ᴇɴᴅᴇᴅ"))):  
+            return 
         stream = self.prepare_stream(link, is_video=bool(video))
         
         try:
