@@ -85,38 +85,48 @@ async def safe_leave_call(assistant, chat_id):
     
     return False
 
+from pyrogram import Client, filters
+import asyncio
+import traceback
+
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
-    #assistant_user = await SANKI.get_me()
-    #assistant_id = assistant_user.id  # Lấy ID của assistant
     userbot = await get_assistant(message.chat.id)
-    userbot_id = userbot.id  # Lấy ID của userbot
+    userbot_id = userbot.id
 
     try:
-        #joined = 
+        # Tham gia call bằng assistant
         await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
-        #if not joined:
-            #await message.reply("Cuộc gọi nhóm hiện không được mở")
-            #return
+
+        try:
+            participants = await assistant.get_participants(message.chat.id)
+        except Exception as e:
+            await message.reply(f"❌ Không thể lấy danh sách người tham gia: {e}")
+            return
 
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
         index = 1
-        participants = await assistant.get_participants(message.chat.id)
+
         for participant in participants:
             try:
-                user1 = await userbot.get_users(participant.user_id)
-                user = await client.send(GetUser(InputPeerUser(user1.id, access_hash=0)))
-                #user = await client.get_users(participant.user_id)
+                user = await userbot.get_users(participant.user_id)
                 if user.id == userbot_id:
-                    continue  # Bỏ qua bot hoặc assistant
-                mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
-                text += f"{index} ➤ {user.mention} ➤ {mut}\n"
+                    continue
+
+                mic = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                try:
+                    name = user.mention
+                except Exception:
+                    name = f"`{user.first_name}`"
+
+                text += f"{index} ➤ {name} ➤ {mic}\n"
                 index += 1
+
             except Exception as e:
-                # Log lỗi một cách an toàn, không làm crash bot
-                print(f"❗ Không thể lấy thông tin user_id {participant.user_id}: {e}")
+                print(f"⚠️ Không thể lấy thông tin user_id {participant.user_id}: {e}")
                 continue
+
         text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
         await message.reply(text)
         await asyncio.sleep(7)
@@ -125,36 +135,36 @@ async def strcall(client, message):
     except Exception as e:
         error_msg = str(e).lower()
         if "no active" in error_msg or "notincall" in error_msg:
-            await message.reply("Cuộc gọi hiện không có")
+            await message.reply("❌ Hiện không có cuộc gọi nhóm nào đang diễn ra.")
         elif "telegram server" in error_msg:
-            await message.reply("Hãy gửi lại lệnh, máy chủ Telegram đang gặp sự cố❌")
+            await message.reply("⚠️ Máy chủ Telegram đang gặp sự cố, hãy thử lại sau.")
         elif "already joined" in error_msg:
+            # Khi đã join rồi thì chỉ cần lấy danh sách
             try:
+                participants = await assistant.get_participants(message.chat.id)
                 text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
                 index = 1
-                participants = await assistant.get_participants(message.chat.id)
                 for participant in participants:
                     try:
-                        user1 = await userbot.get_users(participant.user_id)
-                        user = await client.send(GetUser(InputPeerUser(user1.id, access_hash=0)))
-                        #user = await client.get_users(participant.user_id)
+                        user = await userbot.get_users(participant.user_id)
                         if user.id == userbot_id:
-                            continue  # Bỏ qua bot hoặc assistant
-                        mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
-                        text += f"{index} ➤ {user.mention} ➤ {mut}\n"
+                            continue
+                        mic = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                        name = user.mention if hasattr(user, "mention") else f"`{user.full_name}`"
+                        text += f"{index} ➤ {name} ➤ {mic}\n"
                         index += 1
                     except Exception as e:
-                        # Log lỗi một cách an toàn, không làm crash bot
-                        print(f"❗ Không thể lấy thông tin user_id {participant.user_id}: {e}")
+                        print(f"⚠️ Không thể lấy user: {e}")
                         continue
                 text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
                 await message.reply(text)
-            except:
-                await message.reply("Không lấy được danh sách người tham gia cuộc gọi nhóm")
+            except Exception:
+                await message.reply("❌ Không lấy được danh sách người tham gia.")
                 print(traceback.format_exc())
         else:
-            await message.reply(f"Lỗi: {str(e)}")
+            await message.reply(f"💥 Lỗi không xác định: {str(e)}")
             print(traceback.format_exc())
+
 
 
 other_filters = filters.group  & ~filters.via_bot & ~filters.forwarded
