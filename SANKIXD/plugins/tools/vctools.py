@@ -94,10 +94,11 @@ async def strcall(client, message):
     userbot_id = userbot.id  # Lấy ID của userbot
 
     try:
-        joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
-        if not joined:
-            await message.reply("Cuộc gọi nhóm hiện không được mở")
-            return
+        #joined = 
+        await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
+        #if not joined:
+            #await message.reply("Cuộc gọi nhóm hiện không được mở")
+            #return
 
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
         index = 1
