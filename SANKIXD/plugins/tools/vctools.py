@@ -191,7 +191,8 @@ async def start_group_call(c: Client, m: Message):
         return
     msg = await app.send_message(chat_id, "Đang mở cuộc gọi nhóm..")
     try:
-        
+        if group_call := (await get_group_call(assistant, m)):  
+            return await msg.edit_text("Cuộc gọi nhóm đã được mở trước đó.")
     # Nếu chưa có trong storage, thử lấy thông tin chat để lưu vào storage
         await assistant.get_chat(chat_id)
         peer = await assistant.resolve_peer(chat_id)
@@ -217,9 +218,10 @@ async def start_group_call(c: Client, m: Message):
                 can_invite_users=False,
                 can_pin_messages=False,
                 can_promote_members=False,
-            ),
-        )
+        ),)
         peer = await assistant.resolve_peer(chat_id)
+        if group_call := (await get_group_call(assistant, m)):  
+            return await msg.edit_text("Cuộc gọi nhóm đã được mở trước đó.")
         await assistant.invoke(
             CreateGroupCall(
                 peer=InputPeerChannel(
@@ -255,8 +257,8 @@ async def stop_group_call(c: Client, m: Message):
         return
     msg = await app.send_message(chat_id, "Đang tắt cuộc gọi nhóm..")
     try:
-        if not (group_call := (await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã bị tắt trước đó"))):  
-            return 
+        if not (group_call := (await get_group_call(assistant, m))):  
+            return await msg.edit_text("Cuộc gọi nhóm đã được tắt trước đó.")
         await assistant.invoke(DiscardGroupCall(call=group_call))
         await msg.edit_text("Cuộc gọi nhóm đã được tắt thành công⚡️~!")
     except Exception as e:
@@ -273,8 +275,8 @@ async def stop_group_call(c: Client, m: Message):
                 can_promote_members=False,
              ),
          )
-         if not (group_call := (await get_group_call(assistant, m, err_msg=", Cuộc gọi nhóm đã bị tắt trước đó"))):  
-             return
+         if not (group_call := (await get_group_call(assistant, m))):  
+             return await msg.edit_text("Cuộc gọi nhóm đã được tắt trước đó")
          await assistant.invoke(DiscardGroupCall(call=group_call))
          await app.promote_chat_member(chat_id, assid, privileges=ChatPrivileges(
             can_manage_chat=False,
