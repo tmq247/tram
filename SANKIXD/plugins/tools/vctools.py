@@ -109,7 +109,7 @@ async def strcall(client, message):
                     mut = "Đang tắt mic 🔕 "
                 user = await client.get_users(participant.user_id)
                 if user == userbot.id:
-                    k += 0
+                    k += -1
                 else: 
                     k += 1
                 text += f"{k} ➤ {user.mention} ➤ {mut}\n"
