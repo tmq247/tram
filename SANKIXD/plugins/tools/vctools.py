@@ -108,7 +108,7 @@ async def strcall(client, message):
                 else:
                     mut = "Đang tắt mic 🔕 "
                 user = await client.get_users(participant.user_id)
-                if user == userbot.id:
+                if userbot.id in user:
                     k += -1
                 else: 
                     k += 1
@@ -139,7 +139,7 @@ async def strcall(client, message):
                     else:
                         mut = "Đang tắt mic 🔕 "
                     user = await client.get_users(participant.user_id)
-                    if user == userbot.id:
+                    if userbot.id in user:
                         k += -1
                     else:
                         k += 1
