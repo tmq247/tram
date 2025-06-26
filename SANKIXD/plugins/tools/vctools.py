@@ -114,11 +114,11 @@ async def strcall(client, message):
             text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
         except Exception as e:
             text = f"Lỗi không thể lấy danh sách người tham gia: {e}"
+            print(traceback.format_exc())
 
         await message.reply(text)
         await asyncio.sleep(7)
         await safe_leave_call(assistant, message.chat.id)
-        print(traceback.format_exc())
 
     except Exception as e:
         error_msg = str(e).lower()
@@ -143,6 +143,7 @@ async def strcall(client, message):
                 await message.reply(text)
             except:
                 await message.reply("Không lấy được danh sách người tham gia cuộc gọi nhóm")
+                print(traceback.format_exc())
         else:
             await message.reply(f"Lỗi: {str(e)}")
             print(traceback.format_exc())
