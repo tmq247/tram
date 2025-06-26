@@ -87,7 +87,7 @@ async def safe_leave_call(assistant, chat_id):
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
-    userbot = await get_assistant(chat_id)
+    userbot = await get_assistant(message.chat.id)
     try:
         # Try to join call
         joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
