@@ -103,7 +103,7 @@ async def strcall(client, message):
             index = 1
             for participant in participants:
                 user = await client.get_users(participant.user_id)
-                if user.id in [userbot_id, assistant_id]:
+                if user.id in userbot_id: # assistant_id]:
                     continue  # Bỏ qua userbot hoặc assistant
                 mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
                 text += f"{index} ➤ {user.mention} ➤ {mut}\n"
@@ -129,7 +129,7 @@ async def strcall(client, message):
                 index = 1
                 for participant in participants:
                     user = await client.get_users(participant.user_id)
-                    if user.id in [userbot_id, assistant_id]:
+                    if user.id in userbot_id: #assistant_id]:
                         continue
                     mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
                     text += f"{index} ➤ {user.mention} ➤ {mut}\n"
