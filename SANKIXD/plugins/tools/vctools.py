@@ -6,7 +6,7 @@ from pyrogram.types import Message, ChatPrivileges
 from pyrogram import Client, filters
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.messages import GetFullChat
-from pyrogram.raw.types import InputGroupCall, InputPeerChannel, InputPeerChat
+from pyrogram.raw.types import InputGroupCall, InputPeerChannel, InputPeerChat, InputPeerUser
 from SANKIXD.utils.database import *
 from pyrogram.raw.functions.phone import CreateGroupCall, DiscardGroupCall
 from pyrogram.errors import UserAlreadyParticipant, UserNotParticipant, ChatAdminRequired
@@ -15,7 +15,7 @@ from typing import List, Union
 from pyrogram import filters
 from SANKIXD.core.call import SANKI
 from pyrogram.types import VideoChatEnded, Message
-from pytgcalls import PyTgCalls
+from pytgcalls import PyTgCalls 
 
 # Import với compatibility checking
 try:
@@ -104,8 +104,8 @@ async def strcall(client, message):
         participants = await assistant.get_participants(message.chat.id)
         for participant in participants:
             try:
-                from pyrogram.raw.types import InputPeerUser
-                user = await client.send(GetUser(InputPeerUser((participant.user_id), access_hash=0)))
+                user1 = await client.get_users(participant.user_id)
+                user = await app.send(GetUser(InputPeerUser(user1, access_hash=0)))
                 #user = await client.get_users(participant.user_id)
                 if user.id == userbot_id:
                     continue  # Bỏ qua bot hoặc assistant
@@ -134,7 +134,8 @@ async def strcall(client, message):
                 participants = await assistant.get_participants(message.chat.id)
                 for participant in participants:
                     try:
-                        user = await client.send(GetUser(InputPeerUser((participant.user_id), access_hash=0)))
+                        user1 = await client.get_users(participant.user_id)
+                        user = await app.send(GetUser(InputPeerUser(user1, access_hash=0)))
                         #user = await client.get_users(participant.user_id)
                         if user.id == userbot_id:
                             continue  # Bỏ qua bot hoặc assistant
