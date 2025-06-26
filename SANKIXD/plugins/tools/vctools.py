@@ -100,22 +100,20 @@ async def strcall(client, message):
             return
 
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
-        try:
-            await client.resolve_peer(message.chat.id)
-            participants = await assistant.get_participants(message.chat.id)
-            index = 1
-            for participant in participants:
+        index = 1
+        for participant in participants:
+            try:
                 user = await client.get_users(participant.user_id)
-                if user.id == userbot_id: # assistant_id]:
-                    continue  # Bỏ qua userbot hoặc assistant
+                if user.id == userbot_id:
+                    continue  # Bỏ qua bot hoặc assistant
                 mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
                 text += f"{index} ➤ {user.mention} ➤ {mut}\n"
                 index += 1
-            text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
-        except Exception as e:
-            text = f"Lỗi không thể lấy danh sách người tham gia: {e}"
-            print(traceback.format_exc())
-
+            except Exception as e:
+                # Log lỗi một cách an toàn, không làm crash bot
+                print(f"❗ Không thể lấy thông tin user_id {participant.user_id}: {e}")
+                continue
+        text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
         await message.reply(text)
         await asyncio.sleep(7)
         await safe_leave_call(assistant, message.chat.id)
@@ -134,7 +132,7 @@ async def strcall(client, message):
                     try:
                         user = await client.get_users(participant.user_id)
                         if user.id == userbot_id:
-                        continue  # Bỏ qua bot hoặc assistant
+                            continue  # Bỏ qua bot hoặc assistant
                         mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
                         text += f"{index} ➤ {user.mention} ➤ {mut}\n"
                         index += 1
