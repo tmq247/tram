@@ -87,45 +87,54 @@ async def safe_leave_call(assistant, chat_id):
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
+    assistant_id = assistant.me.id  # Lấy ID của assistant
+    userbot = await get_assistant(message.chat.id)
+    userbot_id = userbot.id  # Lấy ID của userbot
+
     try:
-        # Try to join call
         joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
-        
         if not joined:
             await message.reply("Cuộc gọi nhóm hiện không được mở")
             return
-            
+
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
-        
         try:
             participants = await assistant.get_participants(message.chat.id)
-            for i, participant in enumerate(participants, start=1):
-                mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+            index = 1
+            for participant in participants:
                 user = await client.get_users(participant.user_id)
-                text += f"{i} ➤ {user.mention} ➤ {mut}\n"
-            text += f"\nSố người đang tham gia : {len(participants)}"
+                if user.id in [userbot_id, assistant_id]:
+                    continue  # Bỏ qua userbot hoặc assistant
+                mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                text += f"{index} ➤ {user.mention} ➤ {mut}\n"
+                index += 1
+            text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
         except Exception as e:
             text = f"Lỗi không thể lấy danh sách người tham gia: {e}"
-            
+
         await message.reply(text)
         await asyncio.sleep(7)
         await safe_leave_call(assistant, message.chat.id)
-        
+
     except Exception as e:
         error_msg = str(e).lower()
         if "no active" in error_msg or "notincall" in error_msg:
             await message.reply("Cuộc gọi hiện không có")
         elif "telegram server" in error_msg:
-            await message.reply("Hãy gửi lại lệnh, máy chủ telegram đang gặp sự cố❌")
+            await message.reply("Hãy gửi lại lệnh, máy chủ Telegram đang gặp sự cố❌")
         elif "already joined" in error_msg:
             try:
                 text = "Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
                 participants = await assistant.get_participants(message.chat.id)
-                for i, participant in enumerate(participants, start=1):
-                    mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                index = 1
+                for participant in participants:
                     user = await client.get_users(participant.user_id)
-                    text += f"{i} ➤ {user.mention} ➤ {mut}\n"
-                text += f"\nSố người đang tham gia : {len(participants)}"
+                    if user.id in [userbot_id, assistant_id]:
+                        continue
+                    mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                    text += f"{index} ➤ {user.mention} ➤ {mut}\n"
+                    index += 1
+                text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
                 await message.reply(text)
             except:
                 await message.reply("Không lấy được danh sách người tham gia cuộc gọi nhóm")
