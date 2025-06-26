@@ -25,6 +25,7 @@ async def join_watcher(_, message):
     if member and member.privileges and member.privileges.can_invite_users:
     # Không có quyền hoặc không lấy được thông tin
         link = "t.me/err"
+        #app.leave_chat(message.chat.id)
     else:
         link = await app.export_chat_invite_link(chat.id)
     for member in message.new_chat_members:
