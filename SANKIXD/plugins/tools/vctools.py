@@ -87,6 +87,7 @@ async def safe_leave_call(assistant, chat_id):
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
+    userbot = Userbot
     try:
         # Try to join call
         joined = await safe_join_call(assistant, message.chat.id, "./SANKIXD/assets/call.mp3")
@@ -107,7 +108,7 @@ async def strcall(client, message):
                 else:
                     mut = "Đang tắt mic 🔕 "
                 user = await client.get_users(participant.user_id)
-                if user == assistant.id:
+                if user == userbot.id:
                     k += 0
                 else: 
                     k += 1
