@@ -101,6 +101,7 @@ async def strcall(client, message):
 
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
         index = 1
+        participants = await assistant.get_participants(message.chat.id)
         for participant in participants:
             try:
                 user = await client.get_users(participant.user_id)
@@ -128,6 +129,7 @@ async def strcall(client, message):
             try:
                 text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
                 index = 1
+                participants = await assistant.get_participants(message.chat.id)
                 for participant in participants:
                     try:
                         user = await client.get_users(participant.user_id)
