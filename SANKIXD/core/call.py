@@ -758,7 +758,7 @@ class Call(PyTgCalls):
             return "0"
 
     async def start(self):
-        LOGGER(__name__).info("Starting PyTgCalls Client...\\n")
+        LOGGER(__name__).info("Starting PyTgCalls Client...\n")
         try:
             for i, client in enumerate([self.one, self.two, self.three, self.four, self.five], 1):
                 if client:
