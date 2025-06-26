@@ -128,17 +128,20 @@ async def strcall(client, message):
             await message.reply("Hãy gửi lại lệnh, máy chủ Telegram đang gặp sự cố❌")
         elif "already joined" in error_msg:
             try:
-                text = "Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
-                await client.resolve_peer(message.chat.id)
-                participants = await assistant.get_participants(message.chat.id)
+                text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
                 index = 1
                 for participant in participants:
-                    user = await client.get_users(participant.user_id)
-                    if user.id == userbot_id: #assistant_id]:
+                    try:
+                        user = await client.get_users(participant.user_id)
+                        if user.id == userbot_id:
+                        continue  # Bỏ qua bot hoặc assistant
+                        mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
+                        text += f"{index} ➤ {user.mention} ➤ {mut}\n"
+                        index += 1
+                    except Exception as e:
+                        # Log lỗi một cách an toàn, không làm crash bot
+                        print(f"❗ Không thể lấy thông tin user_id {participant.user_id}: {e}")
                         continue
-                    mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
-                    text += f"{index} ➤ {user.mention} ➤ {mut}\n"
-                    index += 1
                 text += f"\nSố người đang tham gia (không tính bot): {index - 1}"
                 await message.reply(text)
             except:
