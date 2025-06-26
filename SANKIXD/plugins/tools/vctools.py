@@ -104,7 +104,9 @@ async def strcall(client, message):
         participants = await assistant.get_participants(message.chat.id)
         for participant in participants:
             try:
-                user = await userbot.get_users(participant.user_id)
+                from pyrogram.raw.types import InputPeerUser
+                user = await client.send(GetUser(InputPeerUser((participant.user_id), access_hash=0)))
+                #user = await client.get_users(participant.user_id)
                 if user.id == userbot_id:
                     continue  # Bỏ qua bot hoặc assistant
                 mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
@@ -132,7 +134,8 @@ async def strcall(client, message):
                 participants = await assistant.get_participants(message.chat.id)
                 for participant in participants:
                     try:
-                        user = await userbot.get_users(participant.user_id)
+                        user = await client.send(GetUser(InputPeerUser((participant.user_id), access_hash=0)))
+                        #user = await client.get_users(participant.user_id)
                         if user.id == userbot_id:
                             continue  # Bỏ qua bot hoặc assistant
                         mut = "Đang mở mic 🗣" if not participant.muted else "Đang tắt mic 🔕"
