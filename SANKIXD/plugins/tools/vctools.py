@@ -106,7 +106,7 @@ async def strcall(client, message):
         for participant in participants:
             try:
                 user1 = await client.get_users(participant.user_id)
-                user = await app.send(GetUser(InputPeerUser(user1, access_hash=0)))
+                user = await client.send(GetUser(InputPeerUser(user1, access_hash=0)))
                 #user = await client.get_users(participant.user_id)
                 if user.id == userbot_id:
                     continue  # Bỏ qua bot hoặc assistant
@@ -136,7 +136,7 @@ async def strcall(client, message):
                 for participant in participants:
                     try:
                         user1 = await client.get_users(participant.user_id)
-                        user = await app.send(GetUser(InputPeerUser(user1, access_hash=0)))
+                        user = await client.send(GetUser(InputPeerUser(user1, access_hash=0)))
                         #user = await client.get_users(participant.user_id)
                         if user.id == userbot_id:
                             continue  # Bỏ qua bot hoặc assistant
