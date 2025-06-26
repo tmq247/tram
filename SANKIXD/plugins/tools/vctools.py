@@ -87,8 +87,8 @@ async def safe_leave_call(assistant, chat_id):
 @app.on_message(filters.command(["vcinfo"], ["/", "!"]))
 async def strcall(client, message):
     assistant = await group_assistant(SANKI, message.chat.id)
-    assistant_user = await SANKI.get_me()
-    assistant_id = assistant_user.id  # Lấy ID của assistant
+    #assistant_user = await SANKI.get_me()
+    #assistant_id = assistant_user.id  # Lấy ID của assistant
     userbot = await get_assistant(message.chat.id)
     userbot_id = userbot.id  # Lấy ID của userbot
 
