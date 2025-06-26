@@ -100,6 +100,7 @@ async def strcall(client, message):
 
         text = "- Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
         try:
+            await client.resolve_peer(message.chat.id)
             participants = await assistant.get_participants(message.chat.id)
             index = 1
             for participant in participants:
@@ -116,6 +117,7 @@ async def strcall(client, message):
         await message.reply(text)
         await asyncio.sleep(7)
         await safe_leave_call(assistant, message.chat.id)
+        print(traceback.format_exc())
 
     except Exception as e:
         error_msg = str(e).lower()
@@ -126,6 +128,7 @@ async def strcall(client, message):
         elif "already joined" in error_msg:
             try:
                 text = "Những người đang tham gia cuộc gọi nhóm 🫶 :\n\n"
+                await client.resolve_peer(message.chat.id)
                 participants = await assistant.get_participants(message.chat.id)
                 index = 1
                 for participant in participants:
@@ -141,6 +144,7 @@ async def strcall(client, message):
                 await message.reply("Không lấy được danh sách người tham gia cuộc gọi nhóm")
         else:
             await message.reply(f"Lỗi: {str(e)}")
+            print(traceback.format_exc())
 
 
 other_filters = filters.group  & ~filters.via_bot & ~filters.forwarded
