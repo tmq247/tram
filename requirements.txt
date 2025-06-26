@@ -30,7 +30,7 @@ search_engine_parser
 py-tgcalls==0.9.7
 pykeyboard
 pyshorteners
-pyrogram
+pyrogram==2.0.106
 python-dotenv
 pyyaml==6.0.1
 requests
@@ -40,13 +40,13 @@ spotipy
 tgcrypto
 telegraph
 unidecode
-yt-dlp
+yt-dlp==2025.03.27
 youtube-search
 youtube-search-python
 gtts
 git+https://github.com/AsmSafone/SafoneAPI
 lexica-api==1.5.1
-httpx
+httpx==0.25.2
 gpytranslate
 openai==0.28.0
 pickledb
