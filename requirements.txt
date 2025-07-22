@@ -30,7 +30,7 @@ search_engine_parser
 py-tgcalls==0.9.7
 pykeyboard
 pyshorteners
-pyrogram==2.0.106
+pyrogram #==2.0.106
 python-dotenv
 pyyaml==6.0.1
 requests
@@ -40,7 +40,7 @@ spotipy
 tgcrypto
 telegraph
 unidecode
-yt-dlp==2025.03.27
+yt-dlp #==2025.03.27
 youtube-search
 youtube-search-python
 gtts
@@ -50,7 +50,7 @@ httpx==0.25.2
 gpytranslate
 openai==0.28.0
 pickledb
-python-telegram-bot==20.7
+python-telegram-bot #==20.7
 img2pdf
 cloudscraper
 pycryptodome
