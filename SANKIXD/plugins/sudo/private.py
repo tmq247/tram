@@ -12,15 +12,15 @@ from pyrogram.types import Message
 
 import config
 from strings import command
-from YukkiMusic import app
-from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database import (
+from SANKIXD import app
+from SANKIXD.misc import SUDOERS
+from SANKIXD.utils.database import (
     add_private_chat,
     get_private_served_chats,
     is_served_private_chat,
     remove_private_chat,
 )
-from YukkiMusic.utils.decorators.language import language
+from SANKIXD.utils.decorators.language import language
 
 
 @app.on_message(filters.command(["addgr"]) & SUDOERS)
