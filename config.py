@@ -25,7 +25,7 @@ BOT_NAME = getenv("BOT_NAME" , "Muội Muội Bot")
 ASSUSERNAME = getenv("ASSUSERNAME" , "muoimuoimusic")
 # ---------------------------------------------------------
 
-PRIVATE_BOT_MODE = is_bool(getenv("PRIVATE_BOT_MODE", "False"))
+PRIVATE_BOT_MODE = is_bool(getenv("PRIVATE_BOT_MODE", "True"))
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------
