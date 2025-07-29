@@ -19,6 +19,7 @@ from SANKIXD.utils.database import (
     get_playtype,
     is_active_chat,
     is_maintenance,
+    is_served_private_chat,
 )
 from SANKIXD.utils.inline import botplaylist_markup
 from config import PLAYLIST_IMG_URL, SUPPORT_CHAT, adminlist, PRIVATE_BOT_MODE
