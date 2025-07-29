@@ -336,3 +336,20 @@ song_8 : "Bắt đầu tải xuống\n\nVui lòng chờ vài giây..."
 song_9 : "Không thể tải bài hát từ yt-dl\n\n**Lý do:** {0}"
 song_10 : "Không thể tải lên máy chủ Telegram."
 song_11 : "Đang tải lên nha cưng\n\nVui lòng đợi..."
+
+
+# Private Bot Mode
+pbot_1: "**CÁCH DÙNG:**\n/authorize [CHAT_ID]"
+pbot_2: "**CÁCH DÙNG:**\n/unauthorize [CHAT_ID]"
+pbot_3: "✅ Đã thêm cuộc trò chuyện vào danh sách được ủy quyền."
+pbot_4: "✅ Đã xóa cuộc trò chuyện khỏi danh sách được ủy quyền."
+pbot_5: "🔒 Cuộc trò chuyện đã có trong danh sách được ủy quyền từ trước."
+pbot_6: "🚫 Không có cuộc trò chuyện nào như vậy trong danh sách được ủy quyền."
+pbot_7: "❌ Không thể xác minh chat_id.\n\nHãy đảm bảo đó là một số và đúng định dạng. Không sử dụng tên người dùng hoặc liên kết nhóm."
+pbot_8: "⏳ Vui lòng đợi... Đang lấy danh sách các cuộc trò chuyện được ủy quyền..."
+pbot_9: "**<b>Danh sách cuộc trò chuyện đã lấy:</b>**\n\n"
+pbot_10: "🤖 Cuộc trò chuyện riêng tư"
+pbot_11: "🔍 Không tìm thấy cuộc trò chuyện nào được ủy quyền."
+pbot_12: "🚫 Chế độ bot riêng tư hiện đang tắt.\n\nĐể sử dụng bot ở chế độ riêng tư, hãy đặt **PRIVATE_BOT_MODE** = **TRUE**"
+pbot_13: "\n**<b>Các cuộc trò chuyện chưa được lấy:</b>**\n\n"
+
