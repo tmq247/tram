@@ -21,7 +21,7 @@ from SANKIXD.utils.database import (
     is_maintenance,
 )
 from SANKIXD.utils.inline import botplaylist_markup
-from config import PLAYLIST_IMG_URL, SUPPORT_CHAT, adminlist
+from config import PLAYLIST_IMG_URL, SUPPORT_CHAT, adminlist, PRIVATE_BOT_MODE
 from strings import get_string
 
 links = {}
@@ -50,6 +50,12 @@ def PlayWrapper(command):
                     text=f"{app.mention} đang bảo trì, xin vui lòng ghé thăm <a href={SUPPORT_CHAT}>sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ</a> để biết lý do.",
                     disable_web_page_preview=True,
                 )
+        if PRIVATE_BOT_MODE:
+            if not await is_served_private_chat(message.chat.id):
+                await message.reply_text(
+                    "**BOT NHẠC TRẢ PHÍ**\n\nChỉ Dành Cho Các Cuộc Trò Chuyện Đã Được Chủ Sở Hữu Cho Phép — Hãy Liên Hệ Chủ Sở Hữu Để Được Phép Dùng Bot Trong Nhóm Của Bạn."
+                )
+                return await app.leave_chat(message.chat.id)
 
         try:
             await message.delete()
