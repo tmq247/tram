@@ -24,6 +24,7 @@ from SANKIXD.utils.decorators.language import language
 
 
 @app.on_message(filters.command(["addgr"]) & SUDOERS)
+@language
 async def authorize(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
@@ -41,6 +42,7 @@ async def authorize(client, message: Message, _):
 
 
 @app.on_message(filters.command(["delgr"]) & SUDOERS)
+@language
 async def unauthorize(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
@@ -58,6 +60,7 @@ async def unauthorize(client, message: Message, _):
 
 
 @app.on_message(filters.command(["listgr"]) & SUDOERS)
+@language
 async def authorized(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
