@@ -23,8 +23,7 @@ from YukkiMusic.utils.database import (
 from YukkiMusic.utils.decorators.language import language
 
 
-@app.on_message(command("AUTHORIZE_COMMAND") & SUDOERS)
-@language
+@app.on_message(filters.command(["addgr"]) & SUDOERS)
 async def authorize(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
@@ -41,8 +40,7 @@ async def authorize(client, message: Message, _):
         await message.reply_text(_["pbot_5"])
 
 
-@app.on_message(command("UNAUTHORIZE_COMMAND") & SUDOERS)
-@language
+@app.on_message(filters.command(["delgr"]) & SUDOERS)
 async def unauthorize(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
@@ -59,8 +57,7 @@ async def unauthorize(client, message: Message, _):
         return await message.reply_text(_["pbot_4"])
 
 
-@app.on_message(command("AUTHORIZED_COMMAND") & SUDOERS)
-@language
+@app.on_message(filters.command(["listgr"]) & SUDOERS)
 async def authorized(client, message: Message, _):
     if not config.PRIVATE_BOT_MODE:
         return await message.reply_text(_["pbot_12"])
