@@ -12,7 +12,7 @@ async def brah2(_, msg):
        await msg.reply("**Cuộc gọi nhóm đã tắt**")
 
 # invite members on vc
-@app.on_message(filters.video_chat_participants_invited)
+"""@app.on_message(filters.video_chat_participants_invited)
 async def brah3(app :app, message:Message):
            text = f"{message.from_user.mention} mời "
            x = 0
@@ -25,7 +25,7 @@ async def brah3(app :app, message:Message):
            try:
              await message.reply(f"{text} 😉")
            except:
-             pass
+             pass"""
 
 
 ####
