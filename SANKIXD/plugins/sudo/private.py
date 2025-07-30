@@ -9,7 +9,7 @@
 #
 
 from pyrogram.types import Message
-
+from pyrogram import Client, filters
 import config
 #from strings import command
 from SANKIXD import app
