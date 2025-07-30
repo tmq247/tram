@@ -11,7 +11,7 @@
 from pyrogram.types import Message
 
 import config
-from strings import command
+#from strings import command
 from SANKIXD import app
 from SANKIXD.misc import SUDOERS
 from SANKIXD.utils.database import (
