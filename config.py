@@ -9,6 +9,10 @@ from pyrogram import filters
 load_dotenv()
 # ------------------------------------
 # -----------------------------------------------------
+
+def is_bool(value: str) -> bool:
+    return str(value).lower() in ["true", "yes"]
+    
 API_ID = int(getenv("API_ID"))
 API_HASH = getenv("API_HASH")
 
