@@ -749,13 +749,18 @@ class Call(PyTgCalls):
 
     async def ping(self):
         pings = []
-        try:
-            for client in [self.one, self.two, self.three, self.four, self.five]:
-                if client and hasattr(client, 'ping'):
-                    pings.append(await client.ping)
-            return str(round(sum(pings) / len(pings), 3)) if pings else "0"
-        except:
-            return "0"
+        if config.STRING1:
+            pings.append(await self.one.ping)
+        if config.STRING2:
+            pings.append(await self.two.ping)
+        if config.STRING3:
+            pings.append(await self.three.ping)
+        if config.STRING4:
+            pings.append(await self.four.ping)
+        if config.STRING5:
+            pings.append(await self.five.ping)
+        return str(round(sum(pings) / len(pings), 3))
+
 
     async def start(self):
         LOGGER(__name__).info("Starting PyTgCalls Client...\n")
