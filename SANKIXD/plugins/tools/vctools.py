@@ -197,7 +197,7 @@ async def get_group_call(
     await app.send_message("**Cuộc gọi nhóm đang bị tắt** {err_msg}")
     return False
 
-@app.on_message(filters.command(["vcstart","startvc"], ["/", "!"]))
+@app.on_message(filters.command(["vcstart","mocall"], ["/", "!"]))
 async def start_group_call(c: Client, m: Message):
     chat_id = m.chat.id
     assistant = await get_assistant(chat_id)
@@ -263,7 +263,7 @@ async def start_group_call(c: Client, m: Message):
       except:
          await msg.edit_text("Cấp quyền quản lý cuộc gọi nhóm cho bot, userbot và thử lại⚡")
 
-@app.on_message(filters.command(["vcend","endvc"], ["/", "!"]))
+@app.on_message(filters.command(["vcend","tatcall"], ["/", "!"]))
 async def stop_group_call(c: Client, m: Message):
     chat_id = m.chat.id
     assistant = await get_assistant(chat_id)
