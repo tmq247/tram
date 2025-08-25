@@ -142,6 +142,7 @@ async def stream(
                 vidid, mystic, videoid=True, video=status
             )
         except:
+            await app.send_message(OWNER_ID, _["play_14"])
             raise AssistantErr(_["play_14"])
         if await is_active_chat(chat_id):
             await put_queue(
