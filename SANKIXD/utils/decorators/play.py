@@ -52,7 +52,7 @@ def PlayWrapper(command):
                     disable_web_page_preview=True,
                 )
         if PRIVATE_BOT_MODE:
-            if not await is_served_private_chat(message.chat.id):
+            if (message.chat.id != LOGGER_ID and not await is_served_private_chat(message.chat.id)):
                 await message.reply_text(
                     "**BOT NHẠC TRẢ PHÍ**\n\nChỉ Dành Cho Các Cuộc Trò Chuyện Đã Được Chủ Sở Hữu Cho Phép — Hãy Liên Hệ Chủ Sở Hữu Để Được Phép Dùng Bot Trong Nhóm Của Bạn."
                 )
