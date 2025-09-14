@@ -20,7 +20,7 @@ from yt_dlp import YoutubeDL
 import config
 #from config import cookies
 from SANKIXD.utils.database import is_on_off
-#from SANKIXD.utils.decorators import asyncify
+from SANKIXD.utils.decorators import asyncify
 from SANKIXD.utils.formatters import seconds_to_min, time_to_seconds
 
 NOTHING = {"cookies_dead": None}
