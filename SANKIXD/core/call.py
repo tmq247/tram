@@ -338,8 +338,7 @@ class Call(PyTgCalls):
         
         try:
             # Thử các method join có thể có
-            
-join_methods = [
+            join_methods = [
     "join_group_call",
     "join_call", 
     "play",
