@@ -17,7 +17,7 @@ import yt_dlp
 from PIL import Image
 
 from config import seconds_to_time
-from YukkiMusic.utils.decorators import asyncify
+from SANKIXD.utils.decorators import asyncify
 
 
 class Saavn:
