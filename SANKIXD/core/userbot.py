@@ -1,4 +1,28 @@
-from pyrogram import Client
+#
+# Copyright (C) 2024-2025 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
+#
+# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
+#
+# All rights reserved.
+#
+import asyncio
+import sys
+import traceback
+from datetime import datetime
+from functools import wraps
+
+from pyrogram import Client, StopPropagation
+from pyrogram.errors import (
+    ChatSendMediaForbidden,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    FloodWait,
+    MessageIdInvalid,
+    MessageNotModified,
+)
+from pyrogram.handlers import MessageHandler
 
 import config
 
@@ -6,174 +30,124 @@ from ..logging import LOGGER
 
 assistants = []
 assistantids = []
-"""(proxy = {
-    "scheme": "MTProto proxy",  # Hỗ trợ "socks4", "socks5" và "http"
-    "hostname": "51.159.157.218",
-    "port": 7743,
-    "secret": "ee1603010200010001fc030386e24c3add726161682e6972"
-} )"""
 
-#app = Client("my_account", proxy=proxy)
-#app.run()
 
-class Userbot(Client):
+class Userbot:
     def __init__(self):
-        self.one = Client(
-            name="SANKIAss1",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING1),
-            no_updates=True,
-            #proxy=proxy,
-        )
-        self.two = Client(
-            name="SANKIAss2",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING2),
-            no_updates=True,
-        )
-        self.three = Client(
-            name="SANKIAss3",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING3),
-            no_updates=True,
-        )
-        self.four = Client(
-            name="SANKIAss4",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING4),
-            no_updates=True,
-        )
-        self.five = Client(
-            name="SANKIAss5",
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            session_string=str(config.STRING5),
-            no_updates=True,
-        )
+        self.clients = [
+            Client(
+                f"YukkiString_{i}",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=session.strip(),
+            )
+            for i, session in enumerate(config.STRING_SESSIONS, start=1)
+        ]
+        self.handlers = []
+
+    async def _start(self, client, index):
+        LOGGER(__name__).info(f"Starting Assistant Client {index}")
+        try:
+            await client.start()
+            assistants.append(index)
+            try:
+                await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
+            except ChatWriteForbidden:
+                try:
+                    await client.join_chat(config.LOG_GROUP_ID)
+                    await client.send_message(config.LOG_GROUP_ID, "Assistant Started")
+                except Exception:
+                    LOGGER(__name__).error(
+                        f"Assistant Account {index} failed to send message in log group. "
+                        f"Ensure the assistant is added to the log group."
+                    )
+                    sys.exit(1)
+
+            get_me = await client.get_me()
+            client.username = get_me.username
+            client.id = get_me.id
+            client.mention = get_me.mention
+            assistantids.append(get_me.id)
+            client.name = f"{get_me.first_name} {get_me.last_name or ''}".strip()
+
+            # Add stored handlers to the client
+            for handler, group in self.handlers:
+                client.add_handler(handler, group)
+
+        except Exception as e:
+            LOGGER(__name__).error(
+                f"Assistant Account {index} failed with error: {str(e)}. Exiting..."
+            )
+            sys.exit(1)
 
     async def start(self):
-        LOGGER(__name__).info(f"Trợ lý khởi động...")
-        if config.STRING1:
-            await self.one.start()
-            try:
-                await self.one.join_chat("muoimuoimusicbot")
-                await self.one.join_chat("coihaycoc")
-            except:
-                pass
-            assistants.append(1)
-            try:
-                await self.one.send_message(config.LOGGER_ID, "Trợ lý khởi động")
-            except:
-                LOGGER(__name__).error(
-                    "Tài khoản Trợ lý 1 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên!"
-                )
-                exit()
-            self.one.id = self.one.me.id
-            self.one.name = self.one.me.mention
-            self.one.username = self.one.me.username
-            assistantids.append(self.one.id)
-            LOGGER(__name__).info(f"Trợ lý khởi động là {self.one.name}")
-
-        if config.STRING2:
-            await self.two.start()
-            try:
-                await self.one.join_chat("muoimuoimusicbot")
-                await self.one.join_chat("coihaycoc")
-            except:
-                pass
-            assistants.append(2)
-            try:
-                await self.two.send_message(config.LOGGER_ID, "Trợ lý khởi động")
-            except:
-                LOGGER(__name__).error(
-                    "Tài khoản Trợ lý 2 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên!"
-                )
-                exit()
-            self.two.id = self.two.me.id
-            self.two.name = self.two.me.mention
-            self.two.username = self.two.me.username
-            assistantids.append(self.two.id)
-            LOGGER(__name__).info(f"Trợ lý khởi động 2 là {self.two.name}")
-
-        if config.STRING3:
-            await self.three.start()
-            try:
-                await self.one.join_chat("muoimuoimusicbot")
-                await self.one.join_chat("coihaycoc")
-            except:
-                pass
-            assistants.append(3)
-            try:
-                await self.three.send_message(config.LOGGER_ID, "Trợ lý khởi động")
-            except:
-                LOGGER(__name__).error(
-                    "Tài khoản Trợ lý 3 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
-                )
-                exit()
-            self.three.id = self.three.me.id
-            self.three.name = self.three.me.mention
-            self.three.username = self.three.me.username
-            assistantids.append(self.three.id)
-            LOGGER(__name__).info(f"Trợ lý khởi động 3 là {self.three.name}")
-
-        if config.STRING4:
-            await self.four.start()
-            try:
-                await self.one.join_chat("muoimuoimusicbot")
-                await self.one.join_chat("coihaycoc")
-            except:
-                pass
-            assistants.append(4)
-            try:
-                await self.four.send_message(config.LOGGER_ID, "Trợ lý khởi động")
-            except:
-                LOGGER(__name__).error(
-                    "Tài khoản Trợ lý 4 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
-                )
-                exit()
-            self.four.id = self.four.me.id
-            self.four.name = self.four.me.mention
-            self.four.username = self.four.me.username
-            assistantids.append(self.four.id)
-            LOGGER(__name__).info(f"Trợ lý khởi động 4 là {self.four.name}")
-
-        if config.STRING5:
-            await self.five.start()
-            try:
-                await self.one.join_chat("muoimuoimusicbot")
-                await self.one.join_chat("coihaycoc")
-            except:
-                pass
-            assistants.append(5)
-            try:
-                await self.five.send_message(config.LOGGER_ID, "Trợ lý khởi động")
-            except:
-                LOGGER(__name__).error(
-                    "Tài khoản Trợ lý 5 không truy cập được vào Nhóm nhật ký. Đảm bảo rằng bạn đã thêm trợ lý của mình vào nhóm nhật ký của mình và được thăng chức làm quản trị viên! "
-                )
-                exit()
-            self.five.id = self.five.me.id
-            self.five.name = self.five.me.mention
-            self.five.username = self.five.me.username
-            assistantids.append(self.five.id)
-            LOGGER(__name__).info(f"Trợ lý khởi động 5 là {self.five.name}")
+        """Start all clients."""
+        tasks = [
+            self._start(client, i) for i, client in enumerate(self.clients, start=1)
+        ]
+        await asyncio.gather(*tasks)
 
     async def stop(self):
-        LOGGER(__name__).info(f"Dừng trợ lý...")
-        try:
-            if config.STRING1:
-                await self.one.stop()
-            if config.STRING2:
-                await self.two.stop()
-            if config.STRING3:
-                await self.three.stop()
-            if config.STRING4:
-                await self.four.stop()
-            if config.STRING5:
-                await self.five.stop()
-        except:
-            pass
+        """Gracefully stop all clients."""
+        tasks = [client.stop() for client in self.clients]
+        await asyncio.gather(*tasks)
+
+    def on_message(self, filters=None, group=0):
+        """Decorator for handling messages with error handling."""
+
+        def decorator(func):
+            @wraps(func)
+            async def wrapper(client, message):
+                try:
+                    await func(client, message)
+                except FloodWait as e:
+                    LOGGER(__name__).warning(
+                        f"FloodWait: Sleeping for {e.value} seconds."
+                    )
+                    await asyncio.sleep(e.value)
+                except (
+                    ChatWriteForbidden,
+                    ChatSendMediaForbidden,
+                    ChatSendPhotosForbidden,
+                    MessageNotModified,
+                    MessageIdInvalid,
+                ):
+                    pass
+                except StopPropagation:
+                    raise
+                except Exception as e:
+                    # Detailed error logging
+                    date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    user_id = message.from_user.id if message.from_user else "Unknown"
+                    chat_id = message.chat.id if message.chat else "Unknown"
+                    chat_username = (
+                        f"@{message.chat.username}"
+                        if message.chat.username
+                        else "Private Group"
+                    )
+                    command = (
+                        " ".join(message.command)
+                        if hasattr(message, "command")
+                        else message.text
+                    )
+                    error_trace = traceback.format_exc()
+                    error_message = (
+                        f"**Error:** {type(e).__name__}\n"
+                        f"**Date:** {date_time}\n"
+                        f"**Chat ID:** {chat_id}\n"
+                        f"**Chat Username:** {chat_username}\n"
+                        f"**User ID:** {user_id}\n"
+                        f"**Command/Text:** {command}\n"
+                        f"**Traceback:**\n{error_trace}"
+                    )
+                    await client.send_message(config.LOG_GROUP_ID, error_message)
+                    try:
+                        await client.send_message(config.OWNER_ID[0], error_message)
+                    except Exception:
+                        pass
+
+            handler = MessageHandler(wrapper, filters)
+            self.handlers.append((handler, group))
+            return func
+
+        return decorator
