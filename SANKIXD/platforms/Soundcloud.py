@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 from yt_dlp import YoutubeDL
 
-from HasiiMusic.utils.downloader import download_audio_concurrent
-from HasiiMusic.utils.formatters import seconds_to_min
+from SANKIXD.utils.downloader import download_audio_concurrent
+from SANKIXD.utils.formatters import seconds_to_min
 
 
 _SC_RE = re.compile(
