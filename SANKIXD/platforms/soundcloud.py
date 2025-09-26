@@ -12,7 +12,7 @@ from os import path
 
 from yt_dlp import YoutubeDL
 
-from SANKIXD.utils.decorators import asyncify
+from SANKIXD.utils.decorators.asyncify import asyncify
 from SANKIXD.utils.formatters import seconds_to_min
 
 
