@@ -29,7 +29,6 @@ import config
 from SANKIXD import LOGGER, YouTube, app, userbot
 from SANKIXD.core.userbot import assistants
 from SANKIXD.misc import db
-from SANKIXD.utils import fallback
 from SANKIXD.utils.database import (
     add_active_chat,
     add_active_video_chat,
