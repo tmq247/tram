@@ -12,7 +12,7 @@
 from pytgcalls import types as _types
 
 import config
-from YukkiMusic.core.mongo import mongodb
+from SANKIXD.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode
 commanddb = mongodb.commands
