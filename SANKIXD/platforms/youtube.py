@@ -18,7 +18,7 @@ from pyrogram.types import Message
 from yt_dlp import YoutubeDL
 
 import config
-from config import cookies
+from cookies import cookies
 from SANKIXD.utils.database import is_on_off
 from SANKIXD.utils.decorators.asyncify import asyncify
 from SANKIXD.utils.formatters import seconds_to_min, time_to_seconds
