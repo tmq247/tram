@@ -4,9 +4,10 @@ import psutil
 
 from SANKIXD.misc import _boot_
 from SANKIXD.utils.formatters import get_readable_time
+from .decorators.asyncify import asyncify
 
-
-async def bot_sys_stats():
+@asyncify
+def bot_sys_stats():
     bot_uptime = int(time.time() - _boot_)
     UP = f"{get_readable_time(bot_uptime)}"
     CPU = f"{psutil.cpu_percent(interval=0.5)}%"
