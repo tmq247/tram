@@ -36,7 +36,7 @@ class Userbot:
     def __init__(self):
         self.clients = [
             Client(
-                f"YukkiString_{i}",
+                f"SANKIAss{i}",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 session_string=session.strip(),
