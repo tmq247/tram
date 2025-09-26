@@ -55,7 +55,7 @@ from strings import get_string
 
 links = {}
 logger = logging.getLogger(__name__)
-
+autoend = {}
 
 async def _clear_(chat_id):
     popped = db.pop(chat_id, None)
