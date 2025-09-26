@@ -13,7 +13,7 @@ from pyrogram.errors import MessageNotModified, PeerIdInvalid, QueryIdInvalid
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from config import BANNED_USERS, CLEANMODE_DELETE_MINS, OWNER_ID
-from strings import command
+#from strings import command
 from SANKIXD import app
 from SANKIXD.utils.database import (
     add_nonadmin_chat,
