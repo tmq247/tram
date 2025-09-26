@@ -9,7 +9,7 @@ from SANKIXD.misc import SUDOERS, db
 from SANKIXD.utils.database import (
     get_active_chats,
     get_lang,
-    get_upvote_count,
+    #get_upvote_count,
     is_active_chat,
     is_music_playing,
     is_nonadmin_chat,
