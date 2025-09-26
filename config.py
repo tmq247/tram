@@ -32,6 +32,11 @@ ASSUSERNAME = getenv("ASSUSERNAME" , "muoimuoimusic")
 PRIVATE_BOT_MODE = is_bool(getenv("PRIVATE_BOT_MODE", "True"))
 
 #---------------------------------------------------------------
+# Time sleep duration For Youtube Downloader
+YOUTUBE_DOWNLOAD_EDIT_SLEEP = int(getenv("YOUTUBE_EDIT_SLEEP", "3"))
+
+# Time sleep duration For Telegram Downloader
+TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 #---------------------------------------------------------------
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 #---------------------------------------------------------------
