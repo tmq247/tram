@@ -10,7 +10,7 @@
 
 from .apple import Apple
 from .carbon import Carbon
-from .jiosavan import Saavn
+#from .jiosavan import Saavn
 from .resso import Resso
 from .soundcloud import SoundCloud
 from .spotify import Spotify
@@ -19,7 +19,7 @@ from .youtube import YouTube
 
 apple = Apple()
 carbon = Carbon()
-saavn = Saavn()
+#saavn = Saavn()
 resso = Resso()
 soundcloud = SoundCloud()
 spotify = Spotify()
