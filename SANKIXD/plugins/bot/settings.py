@@ -15,7 +15,7 @@ from SANKIXD.utils.database import (
     get_authuser_names,
     get_playmode,
     get_playtype,
-    get_upvote_count,
+    #get_upvote_count,
     is_nonadmin_chat,
     is_skipmode,
     remove_nonadmin_chat,
