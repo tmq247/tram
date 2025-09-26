@@ -12,8 +12,8 @@ from os import path
 
 from yt_dlp import YoutubeDL
 
-from YukkiMusic.utils.decorators import asyncify
-from YukkiMusic.utils.formatters import seconds_to_min
+from SANKIXD.utils.decorators import asyncify
+from SANKIXD.utils.formatters import seconds_to_min
 
 
 class SoundCloud:
