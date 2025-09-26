@@ -34,7 +34,9 @@ PRIVATE_BOT_MODE = is_bool(getenv("PRIVATE_BOT_MODE", "True"))
 #---------------------------------------------------------------
 # Time sleep duration For Youtube Downloader
 YOUTUBE_DOWNLOAD_EDIT_SLEEP = int(getenv("YOUTUBE_EDIT_SLEEP", "3"))
-
+CLEANMODE_DELETE_MINS = int(
+    getenv("CLEANMODE_MINS", "2")
+)  # Remember to give value in Minute
 # Time sleep duration For Telegram Downloader
 TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 #---------------------------------------------------------------
