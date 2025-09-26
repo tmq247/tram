@@ -15,7 +15,7 @@ from py_yt import VideosSearch
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import config
-from SANKIXD.utils.decorators import asyncify
+from SANKIXD.utils.decorators.asyncify import asyncify
 
 
 class Spotify:
