@@ -41,7 +41,7 @@ class Userbot:
                 api_hash=config.API_HASH,
                 session_string=session.strip(),
             )
-            for i, session in enumerate(config.STRING_SESSION, start=1)
+            for i, session in enumerate(config.STRING1, start=1)
         ]
         self.handlers = []
 
