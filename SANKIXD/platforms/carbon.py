@@ -14,7 +14,7 @@ import aiofiles
 import aiohttp
 from aiohttp import client_exceptions
 
-from YukkiMusic.utils.exceptions import UnableToFetchCarbon
+from SANKIXD.utils.exceptions import UnableToFetchCarbon
 
 themes = [
     "3024-night",
