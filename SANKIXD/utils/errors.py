@@ -24,7 +24,20 @@ def split_limits(text):
     result.append(small_msg)
 
     return result
+async def send_large_error(text: str, caption: str, filename: str):
+    try:
+        paste_url = await TuneBin(text)
+        if paste_url:
+            await app.send_message(LOGGER_ID, f"{caption}\n\n🔗 Paste: {paste_url}")
+            return
+    except Exception:
+        pass
 
+    path = f"{filename}.txt"
+    async with aiofiles.open(path, "w") as f:
+        await f.write(text)
+    await app.send_document(LOGGER_ID, path, caption="❌ Error Log (Fallback)")
+    os.remove(path)
 
 def capture_err(func):
     @wraps(func)
