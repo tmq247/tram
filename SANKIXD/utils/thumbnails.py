@@ -4,7 +4,7 @@ import aiofiles
 import aiohttp
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from unidecode import unidecode
-from yt_dlp import VideosSearch
+from py_yt import VideosSearch
 from SANKIXD import app
 from config import YOUTUBE_IMG_URL
 
