@@ -13,7 +13,7 @@ dbb()
 heroku()
 
 app = SANKI()
-api = SafoneAPI()
+#api = SafoneAPI()
 userbot = Userbot()
 
 from .platforms import *
