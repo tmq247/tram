@@ -23,5 +23,5 @@ from .platforms import *
 #SoundCloud = SoundAPI()
 #Spotify = SpotifyAPI()
 #Resso = RessoAPI()
-Telegram = TeleAPI()
+#Telegram = TeleAPI()
 YouTube = YouTubeAPI()
