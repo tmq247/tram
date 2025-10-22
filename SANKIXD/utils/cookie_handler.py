@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from config import COOKIE_URL
-from SANKIXD.utils.errors import capture_internal_err
+#from SANKIXD.utils.errors import capture_internal_err
 
 COOKIE_PATH = Path("SANKIXD/cookies/cookies.txt")
 
