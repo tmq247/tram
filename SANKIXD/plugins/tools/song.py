@@ -12,8 +12,8 @@ from SANKIXD import app, YouTube
 from pyrogram import filters
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from youtubesearchpython import VideosSearch
-from youtubesearchpython import SearchVideos
+from py_yt import VideosSearch
+from py_yt import SearchVideos
 import re
 from pykeyboard import InlineKeyboard
 from pyrogram.enums import ChatAction
