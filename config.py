@@ -15,7 +15,11 @@ def is_bool(value: str) -> bool:
     
 API_ID = int(getenv("API_ID"))
 API_HASH = getenv("API_HASH")
+####
 COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
+API_URL = getenv("API_URL")        # optional
+API_KEY = getenv("API_KEY")        # optional
+#####
 EVAL = list(map(int, getenv("EVAL", "6337933296 6337933296").split()))
 # ------------------------------------------------------
 BOT_TOKEN = getenv("BOT_TOKEN")
