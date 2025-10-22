@@ -12,7 +12,7 @@ ytdl = yt_dlp.YoutubeDL(
  )
 
 
-def download(url: str, my_hook) -> str:       
+def download_audio_concurrent(url: str, my_hook) -> str:       
     ydl_optssx = {
         'format' : 'bestaudio[ext=m4a]',
         "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -32,22 +32,4 @@ def download(url: str, my_hook) -> str:
         dloader
     xyz = path.join("downloads", f"{info['id']}.{info['ext']}")
     return xyz
-    # --- alias giữ API cũ ---
-    try:
-        # nếu download_audio là async
-        async def download_audio_concurrent(urls, out_dir, **kwargs):
-            if isinstance(urls, (str, bytes)):
-                urls = [urls]
-            from asyncio import gather
-            return await gather(*[download_audio(u, out_dir, **kwargs) for u in urls])
-    except NameError:
-        # nếu download_audio là sync
-        def download_audio_concurrent(urls, out_dir, **kwargs):
-            if isinstance(urls, (str, bytes)):
-                urls = [urls]
-            results = []
-            for u in urls:
-                results.append(download_audio(u, out_dir, **kwargs))
-            return results
-
-    __all__ = [*globals().get("__all__", []), "download_audio_concurrent"]
+    
