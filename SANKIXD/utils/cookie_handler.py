@@ -30,7 +30,7 @@ def resolve_raw_cookie_url(url: str) -> str:
     return url
 
 
-@capture_internal_err
+#@capture_internal_err
 async def fetch_and_store_cookies():
     if not COOKIE_URL:
         raise EnvironmentError("⚠️ ᴄᴏᴏᴋɪᴇ_ᴜʀʟ ɴᴏᴛ sᴇᴛ ɪɴ ᴇɴᴠ.")
