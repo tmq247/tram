@@ -13,7 +13,7 @@ from pyrogram import filters
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from py_yt import VideosSearch
-from py_yt import SearchVideos
+from youtubesearchpython import SearchVideos
 import re
 from pykeyboard import InlineKeyboard
 from pyrogram.enums import ChatAction
