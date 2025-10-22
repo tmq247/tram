@@ -4,7 +4,7 @@ from SANKIXD.core.git import git
 from SANKIXD.core.userbot import Userbot
 from SANKIXD.misc import dbb, heroku
 from pyrogram import Client
-from SafoneAPI import SafoneAPI
+#from SafoneAPI import SafoneAPI
 from .logging import LOGGER
 
 dirr()
