@@ -18,7 +18,7 @@ from config import (
 )
 from strings import get_string
 from SANKIXD import YouTube, app
-from SANKIXD.core.call import JARVIS
+from SANKIXD.core.call import Sanki
 from SANKIXD.misc import SUDOERS, db
 from SANKIXD.utils.database import (
     get_active_chats,
