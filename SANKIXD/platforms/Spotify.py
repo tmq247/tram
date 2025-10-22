@@ -11,12 +11,12 @@ from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
 from py_yt import VideosSearch
 
-from HasiiMusic.utils.cookie_handler import COOKIE_PATH
-from HasiiMusic.utils.database import is_on_off
-from HasiiMusic.utils.downloader import download_audio_concurrent, yt_dlp_download
-from HasiiMusic.utils.errors import capture_internal_err
-from HasiiMusic.utils.formatters import time_to_seconds
-from HasiiMusic.utils.tuning import (
+from SANKIXD.utils.cookie_handler import COOKIE_PATH
+from SANKIXD.utils.database import is_on_off
+from SANKIXD.utils.downloader import download_audio_concurrent, yt_dlp_download
+from SANKIXD.utils.errors import capture_internal_err
+from SANKIXD.utils.formatters import time_to_seconds
+from SANKIXD.utils.tuning import (
     YTDLP_TIMEOUT,
     YOUTUBE_META_MAX,
     YOUTUBE_META_TTL,
