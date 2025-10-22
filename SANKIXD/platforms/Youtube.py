@@ -7,7 +7,7 @@ from typing import Union
 import yt_dlp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
-from youtubesearchpython.__future__ import VideosSearch
+from yt_dlp import VideosSearch
 
 from SANKIXD.utils.database import is_on_off
 from SANKIXD.utils.formatters import time_to_seconds
