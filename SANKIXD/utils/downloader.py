@@ -43,9 +43,9 @@ import aiohttp
 from aiohttp import TCPConnector
 from yt_dlp import YoutubeDL
 
-from HasiiMusic.core.dir import DOWNLOAD_DIR as _DOWNLOAD_DIR, CACHE_DIR
-from HasiiMusic.utils.cookie_handler import COOKIE_PATH
-from HasiiMusic.utils.tuning import CHUNK_SIZE, SEM
+from SANKIXD.core.dir import DOWNLOAD_DIR as _DOWNLOAD_DIR, CACHE_DIR
+from SANKIXD.utils.cookie_handler import COOKIE_PATH
+from SANKIXD.utils.tuning import CHUNK_SIZE, SEM
 from config import API_KEY, API_URL
 
 USE_API: bool = bool(API_URL and API_KEY)
