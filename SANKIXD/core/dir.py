@@ -16,22 +16,6 @@ files = [
 ]
 
 
-def dirr():
-    downloads_folder = "downloads"
-    cache_folder = "cache"
-
-    for file in os.listdir():
-        if any(file.endswith(ext) for ext in files):
-            os.remove(file)
-
-    if downloads_folder not in listdir():
-        mkdir(downloads_folder)
-
-    if cache_folder not in listdir():
-        mkdir(cache_folder)
-
-    LOGGER(__name__).info("Danh mục được cập nhật.")
-
 
     #logging.info("Directories Updated.")
 
