@@ -23,7 +23,6 @@ sudoersdb = mongodb.sudoers
 usersdb = mongodb.tgusersdb
 cardsdb = mongodb.cards
 privatedb = mongodb.privatechats
-
 # Shifting to memory [mongo sucks often]
 active = []
 activevideo = []
@@ -40,6 +39,35 @@ playmode = {}
 playtype = {}
 skipmode = {}
 
+# Private Served Chats
+
+
+async def get_private_served_chats() -> list:
+    chats_list = []
+    async for chat in privatedb.find({"chat_id": {"$lt": 0}}):
+        chats_list.append(chat)
+    return chats_list
+
+
+async def is_served_private_chat(chat_id: int) -> bool:
+    chat = await privatedb.find_one({"chat_id": chat_id})
+    if not chat:
+        return False
+    return True
+
+
+async def add_private_chat(chat_id: int):
+    is_served = await is_served_private_chat(chat_id)
+    if is_served:
+        return
+    return await privatedb.insert_one({"chat_id": chat_id})
+
+
+async def remove_private_chat(chat_id: int):
+    is_served = await is_served_private_chat(chat_id)
+    if not is_served:
+        return
+    return await privatedb.delete_one({"chat_id": chat_id})
 
 async def get_assistant_number(chat_id: int) -> str:
     assistant = assistantdict.get(chat_id)
@@ -152,38 +180,6 @@ async def group_assistant(self, chat_id: int) -> int:
         return self.four
     elif int(assis) == 5:
         return self.five
-
-
-# Private Served Chats
-
-
-async def get_private_served_chats() -> list:
-    chats_list = []
-    async for chat in privatedb.find({"chat_id": {"$lt": 0}}):
-        chats_list.append(chat)
-    return chats_list
-
-
-async def is_served_private_chat(chat_id: int) -> bool:
-    chat = await privatedb.find_one({"chat_id": chat_id})
-    if not chat:
-        return False
-    return True
-
-
-async def add_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if is_served:
-        return
-    return await privatedb.insert_one({"chat_id": chat_id})
-
-
-async def remove_private_chat(chat_id: int):
-    is_served = await is_served_private_chat(chat_id)
-    if not is_served:
-        return
-    return await privatedb.delete_one({"chat_id": chat_id})
-
 
 
 async def is_skipmode(chat_id: int) -> bool:
