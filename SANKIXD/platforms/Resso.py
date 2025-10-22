@@ -3,7 +3,7 @@ from typing import Union
 
 import aiohttp
 from bs4 import BeautifulSoup
-from yt_dlp import VideosSearch
+from py_yt import VideosSearch
 
 
 class RessoAPI:
