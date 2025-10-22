@@ -17,10 +17,10 @@ from config import (
     votemode,
 )
 from strings import get_string
-from HasiiMusic import YouTube, app
-from HasiiMusic.core.call import JARVIS
-from HasiiMusic.misc import SUDOERS, db
-from HasiiMusic.utils.database import (
+from SANKIXD import YouTube, app
+from SANKIXD.core.call import JARVIS
+from SANKIXD.misc import SUDOERS, db
+from SANKIXD.utils.database import (
     get_active_chats,
     get_assistant,
     get_lang,
